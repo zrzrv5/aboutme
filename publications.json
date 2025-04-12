@@ -1,0 +1,57 @@
+[
+    {
+        "title": "Unraveling Superionic Conductivity in Na2B12H12: Molecular Dynamics Study of Phase Transition, Anion Reorientation, and Ionic Conductivity via Machine Learning Force Field",
+        "authors": "Rui Zhou, Kun Luo, Ling Fei, Qi An",
+        "journal": "ACS Electrochemistry",
+        "year": 2024,
+        "abstract": "Metal closo-hydroborates, particularly Na2B12H12, have emerged as promising solid-state electrolytes for sodium-ion batteries, owing to their high ionic conductivity at elevated temperatures. Despite their potential, the mechanisms underpinning their superionic conduction and phase transitions remain incompletely understood. In this study, we develop a machine learning force field (ML-FF) for Na2B12H12, enabling large-scale molecular dynamics simulations that capture the intricacies of its phase transition, anion reorientation dynamics, and ionic conductivity. Our simulations reveal a martensitic transformation from a monoclinic to a body-centered cubic (bcc) phase at ∼675 K, resulting in a dramatic enhancement in Na+ conductivity and a significant decrease in the activation energy for anion reorientation. Additionally, cooling simulations indicate an incomplete reverse phase transition due to rapid cooling, highlighting the complexities of phase stability in Na2B12H12. These findings emphasize the critical role of anion reorientation and the cooperative movement of cations and anions in facilitating superionic conduction. By leveraging the accuracy and efficiency of ML-FFs, this study provides unprecedented atomistic insights into the mechanisms driving high-temperature conductivity in Na2B12H12, offering pathways for the optimization of closo-hydroborates as next-generation solid-state electrolytes.",
+        "coverImage": {
+            "large": "/images/publications/ACS_Na2B12H12_large.png",
+            "medium": "/images/publications/ACS_Na2B12H12_medium.png",
+            "small": "/images/publications/ACS_Na2B12H12_small.png"
+        },
+        "link": "https://doi.org/10.1021/acselectrochem.4c00077"
+    },
+    {
+        "title": "Insights into Lithium Sulfide Glass Electrolyte Structures and Ionic Conductivity via Machine Learning Force Field Simulations",
+        "authors": "Rui Zhou, Kun Luo, S. W. Martin, Qi An",
+        "journal": "ACS Applied Materials & Interfaces",
+        "year": 2024,
+        "abstract": "Sulfide-based solid electrolytes (SEs) are important for advancing all-solid-state batteries (ASSBs), primarily due to their high ionic conductivities and robust mechanical stability. Glassy SEs (GSEs) comprising mixed Si and P glass formers are particularly promising for their synthesis process and their ability to prevent lithium dendrite growth. However, to date, the complexity of their glassy structures hinders a complete understanding of the relationships between their structures and properties. This study introduces a new machine learning force field (ML-FF) tailored for lithium sulfide-based GSEs, enabling the exploration of their structural characteristics, mechanical properties, and lithium ionic conductivities. Using molecular dynamic (MD) simulations with this ML-FF, we explore the glass structures in varying compositions, including binary Li2S-SiS2 and Li2S-P2S5 as well as ternary Li2S-SiS2-P2S5. Our simulations yielded consistent results in terms of density, elastic modulus, radial distribution functions, and neutron structure factors compared to DFT and experimental work. Our findings reveal distinct local environments for Si and P within these glasses, with most Si atoms in edge-sharing configurations in Li2S-SiS2 and a mix of corner- and edge-sharing tetrahedra in the ternary Li2S-SiS2-P2S5 composition. For lithium ionic conductivity at 300 K, the 50Li2S-50SiS2 glass displayed the lowest conductivity at 2.1 mS/cm, while the 75Li2S-25P2S5 composition exhibited the highest conductivity at 3.6 mS/cm. The ternary glass showed a conductivity of 2.6 mS/cm, sitting between the two. Moreover, an in-depth analysis of lithium ion diffusion over the MD trajectory in the ternary glass demonstrated a significant correlation between diffusion pathways and the rotational dynamics of nearby SiS4 or PS4 tetrahedra. The ML-FF developed in this study provides an important tool for exploring a broad spectrum of solid-state and mixed former sulfide-based electrolytes.",
+        "abstractImage": {
+            "large": "/images/publications/LiSiPS2024_large.png",
+            "medium": "/images/publications/LiSiPS2024_medium.png",
+            "small": "/images/publications/LiSiPS2024_small.png"
+        },
+        "link": "https://doi.org/10.1021/acsami.4c00618"
+    },
+    {
+        "title": "Unraveling Photoplasticity in ZnS: Enhanced Peierls Stress under Photoexcitation using Machine Learning Potentials",
+        "authors": "Kun Luo, Rui Zhou, Qi An",
+        "journal": "ACS Materials Letters",
+        "year": 2024,
+        "abstract": "Photoplasticity, the light-induced alteration of mechanical properties in semiconductors, is crucial for the development of advanced optoelectronic devices and the understanding of semiconductor mechanics. Despite progress in understanding this phenomenon, atomic-scale mechanisms, particularly under photoexcitation, remain complex and are partially understood. Here, we introduce a new computational framework combining constrained Density Functional Theory (CDFT) with machine learning potential (MLP) to explore Peierls stress and dislocation dynamics in zinc sulfide (ZnS) under both ground and excited states. Our results reveal that photoexcitation significantly increases Peierls stress by reducing strain concentration at the dislocation core, contributing to the transition from ductility to brittleness under light exposure. Importantly, this enhancement occurs without substantial changes in the dislocation core structure. These insights provide an understanding of the atomic-scale mechanisms behind photoplasticity in ZnS, demonstrating that integrating CDFT with MLP is a highly accurate and efficient approach to study complex material behaviors under photoexcitation.",
+        "link": "https://doi.org/10.1021/acsmaterialslett.4c01982"
+    },
+    {
+        "title": "Nitrogen doped carbon nanofiber derived from polypyrrole functionalized polyacrylonitrile for applications in lithium-ion batteries and oxygen reduction reaction",
+        "authors": "Jiayi Guo, Jiaqi Liu, Henghan Dai, Rui Zhou, Tianying Wang, Cuicui Zhang, Shan Ding, Hengguo Wang",
+        "journal": "Journal of Colloid and Interface Science",
+        "year": 2017,
+        "abstract": "Nitrogen doped carbon nanofiber films (NCNFs) is successfully synthesized via the carbonization of polypyrrole (PPY) functionalized electrospun polyacrylonitrile (PAN) nanofibers. Benefitting from the nitrogen-doped one-dimensional (1D) nanostructure, the as-obtained NCNFs show multifunctional applications as electrode materials for lithium ion batteries (LIBs) and catalysts for oxygen reduction reaction (ORR). For LIB application, the obtained NCNFs could be directly used as flexible, free-standing and binder-free electrode, which exhibits high specific capacity up to 698.9 mAh g−1 (higher than that of carbon nanofiber derived from PAN), long life over 160 cycles, and good rate capability (148.8 mAh g−1 at 2 A g−1). In addition, a preliminary ORR catalytic activity study has demonstrated that the NCNFs exhibit good catalytic activity. Therefore, these properties endorse NCNFs as auspicious candidates for both LIBs and ORR.",
+        "link": "https://doi.org/10.1016/j.jcis.2017.07.117",
+        "abstractImage":{
+            "large": "/images/publications/Old2017_large.png",
+            "medium": "/images/publications/Old2017_medium.png",
+            "small": "/images/publications/Old2017_small.png"
+        }
+    },
+    {
+        "title": "Self-sacrifice template formation of nitrogen-doped porous carbon microtubes towards high performance anode materials in lithium ion batteries",
+        "authors": "Hengguo Wang, Chenpei Yuan, Rui Zhou, Q. Duan, Yanhui Li",
+        "journal": "Chemical Engineering Journal",
+        "year": 2017,
+        "abstract": "The replacement of conventional graphite with high-performance turbostratic carbons has attracted tremendous interests for lithium ion batteries (LIBs). Herein, a facile and efficient self-sacrifice strategy is smartly developed to fabricate the nitrogen-doped porous carbon microtubes (NPCMs) by the carbonization of polypyrrole (PPY) functionalized electrospun polymethyl methacrylate (PMMA) microfiber template. The key point of this strategy is the choice of self-sacrifice PMMA template, which can be evaporated at relatively low temperatures. After the calcination, the NPCMs with different nitrogen binding configurations, such as pyridinic-N, pyrrolic-N and graphitic-N, are derived from PPY accordingly. Benefiting from the appealing structural features, the NPCMs exhibit desirable electrochemical performance, including a high reversible capacity (877.3 mAh g−1 at 0.05 A g−1), excellent rate capability (251.1 mAh g−1 at 5 A g−1) and good cycling stability (655.1 mAh g−1 with 83.7% retention after 400 cycles at 0.1 A g−1). This strategy might open new avenues for the design of a series of heteroatom-doped carbon materials in different application fields.",
+        "link": "https://doi.org/10.1016/j.cej.2017.02.059"
+    }
+] 
