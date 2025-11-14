@@ -295,16 +295,6 @@ header.night-mode {
     background-color: var(--primary-dark);
 }
 
-.section-subtitle {
-    font-size: 1.1rem;
-    text-align: center;
-    margin-top: -20px;
-    margin-bottom: 30px;
-    color: var(--text-secondary);
-    font-style: italic;
-    transition: color var(--color-transition);
-}
-
 .section-title.crossed-out {
     position: relative;
     display: inline-block;

@@ -1,13 +1,4 @@
 [
-
-    {
-        "title": "Data-driven atomistic modeling of crystalline and glassy solid-state electrolytes",
-        "authors": "Rui Zhou, Kun Luo, Qi An",
-        "journal": "Chemical Communications",
-        "year": 2025,
-        "abstract": "All-solid-state batteries promise safer, more stable, and higher-energy-density storage, but progress hinges on atomistic insight into solid electrolytes. Machine-learning force fields (ML-FFs) offer near-first-principles accuracy at molecular-dynamics scales, enabling simulations that are orders of magnitude larger and longer than ab initio approaches (e.g. density funcitonal theory). In this Review, we discuss recent ML-FF frameworks and the application of them on studying both crystalline and glassy solid electrolytes. Particually, we compare various ML-FF models and training strategies, examine transferability and uncertainty quantification, and outline best practices for data generation and validation. The applications of ML-FF on battery systems reveal advances in illustrating ionic-transport pathways, defect-mediated conduction, structure–property relationships, phase stability and transformations, and interfacial phenomena at grain boundaries and electrode|electrolyte contacts. Then we conclude with perspectives on key challenges—including long-range electrostatics, chemical reactivity, and multi-component complexity. Together, these developments position ML-FFs to accelerate the discovery and optimization of robust, high-performance solid electrolytes for practical all-solid-state batteries.",
-        "link": "https://pubs.rsc.org/en/content/articlehtml/2025/cc/d5cc04921k"
-    },
     {
         "title": "Unraveling Superionic Conductivity in Na2B12H12: Molecular Dynamics Study of Phase Transition, Anion Reorientation, and Ionic Conductivity via Machine Learning Force Field",
         "authors": "Rui Zhou, Kun Luo, Ling Fei, Qi An",
@@ -33,14 +24,6 @@
             "small": "/images/publications/LiSiPS2024_small.png"
         },
         "link": "https://doi.org/10.1021/acsami.4c00618"
-    },
-    {
-        "title":"dpdata: A Scalable Python Toolkit for Atomistic Machine Learning Data Sets",
-        "authors": "Jinzhe Zeng, Xingliang Peng, Yong-Bin Zhuang, Haidi Wang, Fengbo Yuan, Duo Zhang, Renxi Liu, Yingze Wang, Ping Tuo, Yuzhi Zhang, Yixiao Chen, Yifan Li, Cao Thang Nguyen, Jiameng Huang, Anyang Peng, Marián Rynik, Wei-Hong Xu, Zezhong Zhang, Xu-Yuan Zhou, Tao Chen, Jiahao Fan, Wanrun Jiang, Bowen Li, Denan Li, Haoxi Li, Wenshuo Liang, Ruihao Liao, Liping Liu, Chenxing Luo, Logan Ward, Kaiwei Wan, Junjie Wang, Pan Xiang, Chengqian Zhang, Jinchao Zhang, Rui Zhou, Jia-Xin Zhu, Linfeng Zhang, Han Wang",
-        "journal": "Journal of Chemical Information and Modeling",
-        "year": 2025,
-        "abstract": "Seamless management of atomistic data sets is a critical prerequisite for the successful development and deployment of machine learning potentials (MLPs). Here, we present dpdata, an open-source Python library designed to streamline every aspect of MLP data handling. Built upon a flexible, plugin-based architecture, dpdata supports reading, writing, and converting between a broad range of file formats─from popular quantum-chemistry packages and molecular-dynamics engines to specialized MLP frameworks. Users may define custom data types, formats, drivers, and minimizers, enabling effortless extension to emerging software. Key utilities include automated train-test splitting, coordinate perturbation for active learning, outlier-energy removal, Δ-learning data set generation, error-metric computation, and unit conversion. Through efficient NumPy-backed storage and system-level operations, dpdata achieves significant memory saving and inference speedups over configuration-by-configuration tools such as ASE. We also highlight practical impact, with dpdata used across published studies, for format conversion, data storage, coordinate perturbation, and utilization in other projects for data processing.",
-        "link": "https://pubs.acs.org/doi/abs/10.1021/acs.jcim.5c01767"
     },
     {
         "title": "Unraveling Photoplasticity in ZnS: Enhanced Peierls Stress under Photoexcitation using Machine Learning Potentials",
