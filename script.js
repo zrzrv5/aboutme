@@ -1,3 +1,14 @@
+// Telemetry helper function
+function trackEvent(category, action, label, value) {
+    if (typeof gtag !== 'undefined') {
+        gtag('event', action, {
+            'event_category': category,
+            'event_label': label,
+            'value': value
+        });
+    }
+}
+
 // Handle the titles and mode switching
 function initTitles() {
     const academicOption = document.querySelector('.academic-option');
@@ -51,6 +62,9 @@ function initTitles() {
         // Show academic background, hide developer background
         document.querySelector('.academic-background').style.opacity = '0.5';
         document.querySelector('.developer-background').style.opacity = '0';
+        
+        // Track telemetry
+        trackEvent('mode_switch', 'click', 'academic');
     }
     
     function switchToDeveloper() {
@@ -66,6 +80,9 @@ function initTitles() {
         // Hide academic background, show developer background
         document.querySelector('.academic-background').style.opacity = '0';
         document.querySelector('.developer-background').style.opacity = '0.25';
+        
+        // Track telemetry
+        trackEvent('mode_switch', 'click', 'developer');
     }
     
     // Set initial state based on body class
@@ -171,14 +188,14 @@ async function loadPublications(limit = 4) {
             const abstractHTML = pub.abstract ? `
                 <div class="abstract-wrapper">
                     <p class="publication-abstract">${pub.abstract}</p>
-                    <a href="${pub.link}" target="_blank" class="view-paper-link">View Paper</a>
+                    <a href="${pub.link}" target="_blank" class="view-paper-link" data-telemetry-label="${pub.title}">View Paper</a>
                 </div>
             ` : '';
             
             pubElement.innerHTML = `
                 ${imageHTML}
                 <div class="publication-content">
-                    <h3><a href="${pub.link}" target="_blank">${pub.title}</a></h3>
+                    <h3><a href="${pub.link}" target="_blank" class="publication-title-link" data-telemetry-label="${pub.title}">${pub.title}</a></h3>
                     <div class="authors">${formattedAuthors}</div>
                     <div class="journal">${pub.journal}, ${pub.year}</div>
                     ${abstractHTML}
@@ -196,6 +213,9 @@ async function loadPublications(limit = 4) {
             loadMoreButton.textContent = 'Show More Publications';
             googleScholarButton.style.display = 'none';
         }
+        
+        // Track telemetry for publication load/expand
+        trackEvent('publication', 'load', `showing_${itemsToShow}_of_${publicationsData.length}`, itemsToShow);
         
     } catch (error) {
         console.error('Error loading publications:', error);
@@ -224,6 +244,9 @@ function loadPatents(limit = 2) {
     } else {
         loadMoreButton.textContent = 'Show More Patents';
     }
+    
+    // Track telemetry for patent load/expand
+    trackEvent('publication', 'load', `patents_showing_${limit}_of_${patentItems.length}`, limit);
 }
 
 // Initialize everything when the document is ready
@@ -236,8 +259,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (loadMoreButton) {
         loadMoreButton.addEventListener('click', function() {
             if (this.textContent === 'Show Less') {
+                trackEvent('button', 'click', 'show_less_publications');
                 loadPublications(4); // Show first 4 publications
             } else {
+                trackEvent('button', 'click', 'show_more_publications');
                 loadPublications(100); // Show all publications
             }
         });
@@ -260,8 +285,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const currentLimit = document.querySelectorAll('.achievement-item:not(.hidden)').length;
             
             if (currentLimit >= patentItems.length) {
+                trackEvent('button', 'click', 'show_less_patents');
                 loadPatents(2); // Collapse back to 2 items
             } else {
+                trackEvent('button', 'click', 'show_more_patents');
                 loadPatents(patentItems.length); // Show all items
             }
         });
@@ -269,4 +296,75 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize patents display
     loadPatents(2);
+    
+    // Track external links using event delegation
+    document.addEventListener('click', function(e) {
+        const link = e.target.closest('a');
+        if (!link) return;
+        
+        const href = link.getAttribute('href');
+        if (!href || href === '#' || href.startsWith('#')) return;
+        
+        // Determine link type
+        let linkType = 'external';
+        let label = href;
+        
+        // Check for specific link types
+        if (href.includes('apps.apple.com')) {
+            linkType = 'app_store';
+            // Try to get app name from parent context
+            const appCard = link.closest('.app-card');
+            if (appCard) {
+                const appTitle = appCard.querySelector('h3');
+                label = appTitle ? appTitle.textContent : 'app_store_link';
+            } else {
+                label = 'app_store_link';
+            }
+        } else if (href.includes('scholar.google.com')) {
+            linkType = 'social';
+            label = 'google_scholar';
+        } else if (href.includes('linkedin.com')) {
+            linkType = 'social';
+            label = 'linkedin';
+        } else if (href.includes('github.com')) {
+            linkType = 'social';
+            label = 'github';
+        } else if (href.includes('testflight.apple.com')) {
+            linkType = 'testflight';
+            label = 'testflight_link';
+        } else if (href.includes('x.com') || href.includes('twitter.com')) {
+            linkType = 'social';
+            label = 'twitter';
+        } else if (link.classList.contains('view-paper-link')) {
+            linkType = 'publication';
+            label = link.getAttribute('data-telemetry-label') || 'publication_link';
+        } else if (link.classList.contains('publication-title-link')) {
+            linkType = 'publication';
+            label = link.getAttribute('data-telemetry-label') || 'publication_title';
+        } else if (link.classList.contains('project-link')) {
+            linkType = 'project';
+            const projectCard = link.closest('.project-card');
+            if (projectCard) {
+                const projectTitle = projectCard.querySelector('h3');
+                label = projectTitle ? projectTitle.textContent : 'project_link';
+            } else {
+                label = 'project_link';
+            }
+        } else if (link.classList.contains('app-link-product')) {
+            linkType = 'app';
+            const appCard = link.closest('.app-card');
+            if (appCard) {
+                const appTitle = appCard.querySelector('h3');
+                label = appTitle ? `${appTitle.textContent}_product_page` : 'app_product_page';
+            } else {
+                label = 'app_product_page';
+            }
+        } else if (link.classList.contains('google-scholar-button')) {
+            linkType = 'social';
+            label = 'google_scholar_button';
+        }
+        
+        // Track the link click
+        trackEvent('link', 'click', label);
+    });
 }); 
