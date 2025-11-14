@@ -98,11 +98,6 @@ function initTitles() {
 async function loadPublications(limit = 4) {
     console.log("Loading publications with limit:", limit);
     const publicationsContainer = document.getElementById('publications-container');
-    if (!publicationsContainer) {
-        console.warn('Publications container not found');
-        return;
-    }
-    
     const loadMoreButton = document.getElementById('load-more-publications');
     const googleScholarButton = document.querySelector('.google-scholar-button');
     
@@ -211,22 +206,8 @@ async function loadPublications(limit = 4) {
 // Patents loader
 function loadPatents(limit = 2) {
     const patentsContainer = document.getElementById('patents-container');
-    if (!patentsContainer) {
-        console.warn('Patents container not found');
-        return;
-    }
-    
     const patentItems = patentsContainer.querySelectorAll('.achievement-item');
-    if (patentItems.length === 0) {
-        console.warn('No patent items found');
-        return;
-    }
-    
     const loadMoreButton = document.getElementById('load-more-patents');
-    if (!loadMoreButton) {
-        console.warn('Load more patents button not found');
-        return;
-    }
     
     // Show/hide items based on limit
     patentItems.forEach((item, index) => {
@@ -245,68 +226,22 @@ function loadPatents(limit = 2) {
     }
 }
 
-// Load academic content from academic.html
-async function loadAcademicContent() {
-    const academicSection = document.querySelector('.academic-section');
-    if (!academicSection) {
-        console.warn('Academic section not found');
-        return false;
-    }
-    
-    try {
-        const response = await fetch('academic.html');
-        if (!response.ok) {
-            throw new Error(`HTTP error: ${response.status}`);
-        }
-        const html = await response.text();
-        if (!html || html.trim().length === 0) {
-            throw new Error('Empty response from academic.html');
-        }
-        academicSection.innerHTML = html;
-        return true;
-    } catch (error) {
-        console.error('Error loading academic content:', error);
-        academicSection.innerHTML = '<p class="error-message">Could not load academic content. Please try again later.</p>';
-        return false;
-    }
-}
-
-// Load developer content from developer.html
-async function loadDeveloperContent() {
-    const developerSection = document.querySelector('.developer-section');
-    if (!developerSection) {
-        console.warn('Developer section not found');
-        return false;
-    }
-    
-    try {
-        const response = await fetch('developer.html');
-        if (!response.ok) {
-            throw new Error(`HTTP error: ${response.status}`);
-        }
-        const html = await response.text();
-        if (!html || html.trim().length === 0) {
-            throw new Error('Empty response from developer.html');
-        }
-        developerSection.innerHTML = html;
-        return true;
-    } catch (error) {
-        console.error('Error loading developer content:', error);
-        developerSection.innerHTML = '<p class="error-message">Could not load developer content. Please try again later.</p>';
-        return false;
-    }
-}
-
 // Initialize everything when the document is ready
-document.addEventListener('DOMContentLoaded', async function() {
-    // Load content from separate files first
-    const [academicLoaded, developerLoaded] = await Promise.all([
-        loadAcademicContent(),
-        loadDeveloperContent()
-    ]);
-    
-    // Initialize titles (mode switching)
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize titles
     initTitles();
+    
+    // Set up publications button
+    const loadMoreButton = document.getElementById('load-more-publications');
+    if (loadMoreButton) {
+        loadMoreButton.addEventListener('click', function() {
+            if (this.textContent === 'Show Less') {
+                loadPublications(4); // Show first 4 publications
+            } else {
+                loadPublications(100); // Show all publications
+            }
+        });
+    }
     
     // Set current year in footer
     const yearElement = document.getElementById('year');
@@ -314,32 +249,13 @@ document.addEventListener('DOMContentLoaded', async function() {
         yearElement.textContent = new Date().getFullYear();
     }
     
-    // Set up publications button (using event delegation since content is loaded dynamically)
-    document.addEventListener('click', function(e) {
-        if (e.target && e.target.id === 'load-more-publications') {
-            const button = e.target;
-            if (button.textContent === 'Show Less') {
-                loadPublications(4); // Show first 4 publications
-            } else {
-                loadPublications(100); // Show all publications
-            }
-        }
-    });
+    // Initial load of publications - show 4 by default
+    loadPublications(4);
     
-    // Initial load of publications - show 4 by default (only if academic content loaded)
-    if (academicLoaded) {
-        // Use requestAnimationFrame to ensure DOM is ready
-        requestAnimationFrame(() => {
-            const container = document.getElementById('publications-container');
-            if (container) {
-                loadPublications(4);
-            }
-        });
-    }
-    
-    // Initialize patents display (using event delegation)
-    document.addEventListener('click', function(e) {
-        if (e.target && e.target.id === 'load-more-patents') {
+    // Initialize patents display
+    const loadMorePatentsButton = document.getElementById('load-more-patents');
+    if (loadMorePatentsButton) {
+        loadMorePatentsButton.addEventListener('click', function() {
             const patentItems = document.querySelectorAll('.achievement-item');
             const currentLimit = document.querySelectorAll('.achievement-item:not(.hidden)').length;
             
@@ -348,17 +264,9 @@ document.addEventListener('DOMContentLoaded', async function() {
             } else {
                 loadPatents(patentItems.length); // Show all items
             }
-        }
-    });
-    
-    // Initialize patents display (only if academic content loaded)
-    if (academicLoaded) {
-        // Use requestAnimationFrame to ensure DOM is ready
-        requestAnimationFrame(() => {
-            const container = document.getElementById('patents-container');
-            if (container) {
-                loadPatents(2);
-            }
         });
     }
+    
+    // Initialize patents display
+    loadPatents(2);
 }); 
