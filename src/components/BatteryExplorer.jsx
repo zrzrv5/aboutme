@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Zap, Battery, Layers, Activity, ArrowDown, Microscope, Box, Grip, Sliders, BarChart3, Linkedin } from 'lucide-react';
+import { Zap, Battery, Layers, Activity, ArrowDown, Microscope, Box, Grip, Sliders, BarChart3, Linkedin, Download } from 'lucide-react';
+
+const SECTION_IDS = ['intro', 'cathode', 'electrolyte', 'anode', 'atom', 'particle', 'wireframe', 'contact'];
 
 const BatteryExplorer = () => {
     const [scrollProgress, setScrollProgress] = useState(0);
@@ -67,46 +69,51 @@ const BatteryExplorer = () => {
     useEffect(() => {
         let ticking = false;
 
-        const handleScroll = () => {
-            if (!ticking) {
-                window.requestAnimationFrame(() => {
-                    const totalScroll = document.documentElement.scrollTop;
-                    const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-                    const scroll = totalScroll / windowHeight;
-                    setScrollProgress(Math.min(Math.max(scroll, 0), 1));
-                    ticking = false;
-                });
-                ticking = true;
-            }
-        };
+        const updateScrollStates = () => {
+            const doc = document.documentElement;
+            const totalScroll = doc.scrollTop;
+            const windowHeight = doc.scrollHeight - doc.clientHeight;
+            const scroll = windowHeight === 0 ? 0 : totalScroll / windowHeight;
+            setScrollProgress(Math.min(Math.max(scroll, 0), 1));
 
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+            const viewportCenter = window.innerHeight / 2;
+            let closestSection = SECTION_IDS[0];
+            let smallestDistance = Infinity;
 
-    // --- Intersection Observer for Active Section ---
-    useEffect(() => {
-        const observerOptions = {
-            root: null,
-            rootMargin: '-45% 0px -45% 0px', // Trigger when section is in the middle 10% of viewport
-            threshold: 0
-        };
+            SECTION_IDS.forEach((id) => {
+                const element = sectionRefs.current[id];
+                if (!element) return;
 
-        const observerCallback = (entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    setActiveSection(entry.target.id);
+                const rect = element.getBoundingClientRect();
+                const sectionCenter = rect.top + rect.height / 2;
+                const distance = Math.abs(sectionCenter - viewportCenter);
+
+                if (distance < smallestDistance) {
+                    smallestDistance = distance;
+                    closestSection = id;
                 }
+            });
+
+            setActiveSection((prev) => (prev === closestSection ? prev : closestSection));
+        };
+
+        const handleScroll = () => {
+            if (ticking) return;
+            ticking = true;
+
+            window.requestAnimationFrame(() => {
+                updateScrollStates();
+                ticking = false;
             });
         };
 
-        const observer = new IntersectionObserver(observerCallback, observerOptions);
-
-        Object.values(sectionRefs.current).forEach((el) => {
-            if (el) observer.observe(el);
-        });
-
-        return () => observer.disconnect();
+        handleScroll();
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        window.addEventListener('resize', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('resize', handleScroll);
+        };
     }, []);
 
     // --- Animation Calculations ---
@@ -121,12 +128,19 @@ const BatteryExplorer = () => {
     const anodeX = separation;
     const electrolyteScale = 1 + (separationCurve * 0.5);
 
-    // Visibility Toggles
+    // Visibility Toggles - Using display:none for Safari performance
     let batteryOpacity = 1;
-    if (activeSection === 'atom') batteryOpacity = 0.02;
-    else if (activeSection === 'particle') batteryOpacity = 0.1;
-    // Fade out battery slightly at the very end to focus on contact card
-    else if (activeSection === 'contact') batteryOpacity = 0.3;
+    let showBattery = true;
+    if (activeSection === 'atom') {
+        batteryOpacity = 0.02;
+        showBattery = true; // Keep visible but very faded
+    } else if (activeSection === 'particle') {
+        batteryOpacity = 0.1;
+        showBattery = true;
+    } else if (activeSection === 'contact') {
+        batteryOpacity = 0.3;
+        showBattery = true;
+    }
 
     const isWireframe = activeSection === 'wireframe' || activeSection === 'contact';
     const showAtoms = activeSection === 'atom';
@@ -156,7 +170,7 @@ const BatteryExplorer = () => {
             >
                 {/* Huge Background Text */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center">
-                    <h1 className="text-[8vw] leading-[0.9] font-black text-slate-800/30 tracking-tighter uppercase blur-sm">
+                    <h1 className="text-[8vw] leading-[0.9] font-black text-slate-800/30 tracking-tight uppercase blur-sm" style={{ textAlign: 'center' }}>
                         mechanism<br />
                         energy density<br />
                         rate performance<br />
@@ -165,17 +179,19 @@ const BatteryExplorer = () => {
                 </div>
 
                 {/* Foreground Text */}
-                <div className="relative z-10 flex flex-col items-center mt-[10vh] space-y-4">
+                <div className="relative z-10 flex flex-col items-center mt-[10vh] space-y-4 px-4">
                     <div className="flex items-center gap-4">
                         <div className="h-[2px] w-12 bg-indigo-500"></div>
                         <span className="text-indigo-400 font-mono tracking-[0.5em] text-xs uppercase">Battery R&D</span>
                         <div className="h-[2px] w-12 bg-indigo-500"></div>
                     </div>
-                    <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter uppercase drop-shadow-2xl text-center leading-none">
-                        Design<br />
-                        Manufacturing<br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-400 to-slate-600">Optimization</span>
-                    </h2>
+                    <div className="w-full max-w-4xl flex flex-col items-center">
+                        <h2 className="text-5xl md:text-7xl font-black text-white tracking-tight uppercase drop-shadow-2xl leading-none" style={{ textAlign: 'center', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.1em' }}>
+                            <span>Design</span>
+                            <span>Manufacturing</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-400 to-slate-600">Optimization</span>
+                        </h2>
+                    </div>
                 </div>
 
                 {/* Scroll Hint */}
@@ -206,10 +222,11 @@ const BatteryExplorer = () => {
 
                         {/* CATHODE (Left) */}
                         <div
-                            className={`absolute top-0 left-0 w-[45%] h-full transition-transform duration-100 z-20 ${isWireframe ? 'wireframe-mode origin-right animate-optimize-width-left' : ''}`}
+                            className={`absolute top-0 left-0 w-[45%] h-full z-20 ${isWireframe ? 'wireframe-mode origin-right animate-optimize-width-left' : ''}`}
                             style={{
                                 transformStyle: 'preserve-3d',
-                                transform: `translateX(${cathodeX}px)`
+                                transform: `translateX(${cathodeX}px)`,
+                                willChange: 'transform'
                             }}
                         >
                             {/* Tab - Animated in Wireframe */}
@@ -223,7 +240,7 @@ const BatteryExplorer = () => {
                             {/* Body - Synchronized Height Animation */}
                             <div className={`w-full h-full rounded-l-md bg-gradient-to-r from-indigo-800 to-indigo-600 border-y border-l border-indigo-400/50 flex items-center justify-center relative overflow-hidden shadow-xl ${isWireframe ? 'bg-none border-2 border-indigo-500/80 shadow-[0_0_15px_rgba(99,102,241,0.5)] animate-optimize-height' : ''}`}>
                                 {!isWireframe && <div className="absolute inset-0 bg-indigo-400/10 animate-pulse"></div>}
-                                <span className={`font-bold text-4xl z-10 select-none uppercase tracking-widest ${isWireframe ? 'text-indigo-500' : 'text-indigo-200/50'}`}>
+                                <span className={`font-bold text-4xl z-10 select-none uppercase tracking-wide ${isWireframe ? 'text-indigo-500' : 'text-indigo-200/50'}`} style={{ textAlign: 'center' }}>
                                     {contentData.cathode.visualLabel}
                                 </span>
                             </div>
@@ -231,10 +248,11 @@ const BatteryExplorer = () => {
 
                         {/* ELECTROLYTE (Middle) */}
                         <div
-                            className={`absolute top-0 left-1/2 w-[10%] h-full transition-transform duration-100 z-10 ${isWireframe ? 'wireframe-mode' : ''}`}
+                            className={`absolute top-0 left-1/2 w-[10%] h-full z-10 ${isWireframe ? 'wireframe-mode' : ''}`}
                             style={{
                                 transformStyle: 'preserve-3d',
-                                transform: `translateX(-50%) scaleX(${electrolyteScale})`
+                                transform: `translateX(-50%) scaleX(${electrolyteScale})`,
+                                willChange: 'transform'
                             }}
                         >
                             {/* Body - Synchronized Height Animation */}
@@ -245,10 +263,11 @@ const BatteryExplorer = () => {
 
                         {/* ANODE (Right) */}
                         <div
-                            className={`absolute top-0 right-0 w-[45%] h-full transition-transform duration-100 z-20 ${isWireframe ? 'wireframe-mode origin-left animate-optimize-width-right' : ''}`}
+                            className={`absolute top-0 right-0 w-[45%] h-full z-20 ${isWireframe ? 'wireframe-mode origin-left animate-optimize-width-right' : ''}`}
                             style={{
                                 transformStyle: 'preserve-3d',
-                                transform: `translateX(${anodeX}px)`
+                                transform: `translateX(${anodeX}px)`,
+                                willChange: 'transform'
                             }}
                         >
                             {/* Tab - Animated in Wireframe */}
@@ -261,7 +280,7 @@ const BatteryExplorer = () => {
 
                             {/* Body - Synchronized Height Animation */}
                             <div className={`w-full h-full rounded-r-md bg-gradient-to-l from-slate-700 to-slate-600 border-y border-r border-slate-500/50 flex items-center justify-center relative overflow-hidden shadow-xl ${isWireframe ? 'bg-none border-2 border-emerald-500/80 shadow-[0_0_15px_rgba(16,185,129,0.5)] animate-optimize-height' : ''}`}>
-                                <span className={`font-bold text-4xl z-10 select-none uppercase tracking-widest ${isWireframe ? 'text-emerald-500' : 'text-emerald-400/30'}`}>
+                                <span className={`font-bold text-4xl z-10 select-none uppercase tracking-wide ${isWireframe ? 'text-emerald-500' : 'text-emerald-400/30'}`} style={{ textAlign: 'center' }}>
                                     {contentData.anode.visualLabel}
                                 </span>
                             </div>
@@ -280,24 +299,27 @@ const BatteryExplorer = () => {
 
 
                     {/* --- ATOM SCALE GROUP --- */}
-                    <div
-                        className={`absolute inset-0 flex flex-wrap items-center justify-center gap-4 transition-all duration-1000 ${showAtoms ? 'opacity-100 scale-100' : 'opacity-0 scale-150 pointer-events-none'}`}
-                        style={{ transformStyle: 'preserve-3d' }}
-                    >
-                        {Array.from({ length: 12 }).map((_, i) => (
-                            <div key={i} className="w-16 h-16 rounded-full bg-indigo-500 shadow-[0_0_30px_rgba(99,102,241,0.8)] animate-pulse relative">
-                                <div className="absolute inset-0 border-2 border-white/30 rounded-full animate-ping opacity-20"></div>
-                                <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-indigo-100">Li+</div>
-                            </div>
-                        ))}
-                    </div>
+                    {showAtoms && (
+                        <div
+                            className="absolute inset-0 flex flex-wrap items-center justify-center gap-4 animate-fade-in-scale"
+                            style={{ transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}
+                        >
+                            {Array.from({ length: 12 }).map((_, i) => (
+                                <div key={i} className="w-16 h-16 rounded-full bg-indigo-500 shadow-[0_0_30px_rgba(99,102,241,0.8)] animate-pulse relative">
+                                    <div className="absolute inset-0 border-2 border-white/30 rounded-full animate-ping opacity-20"></div>
+                                    <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-indigo-100">Li+</div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
                     {/* --- PARTICLE SCALE GROUP --- */}
                     {/* Added translate-x-10 to move grains slightly right as requested */}
-                    <div
-                        className={`absolute inset-0 flex flex-col items-center justify-center gap-4 p-4 translate-x-10 transition-all duration-1000 ${showParticles ? 'opacity-100 scale-100' : 'opacity-0 scale-50 pointer-events-none'}`}
-                        style={{ transformStyle: 'preserve-3d' }}
-                    >
+                    {showParticles && (
+                        <div
+                            className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-4 translate-x-10 animate-fade-in-scale"
+                            style={{ transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}
+                        >
                         {/* Top Row (Smaller, Irregular) */}
                         <div className="flex gap-3 scale-75 opacity-80">
                             {Array.from({ length: 5 }).map((_, i) => (
@@ -333,7 +355,8 @@ const BatteryExplorer = () => {
                                 ></div>
                             ))}
                         </div>
-                    </div>
+                        </div>
+                    )}
 
                 </div>
             </div>
@@ -541,11 +564,11 @@ const BatteryExplorer = () => {
                 <section
                     id="wireframe"
                     ref={el => sectionRefs.current['wireframe'] = el}
-                    className="h-[60vh] flex flex-row items-center justify-between gap-6 px-6 md:px-16 lg:px-32 pt-16"
+                    className="h-[60vh] flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6 px-6 md:px-16 lg:px-32 pt-16"
                 >
                     {/* Card 1 - Left side */}
-                    <div className={`transition-all duration-700 delay-100 transform ${activeSection === 'wireframe' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}>
-                        <div className="bg-slate-900/90 backdrop-blur-md p-6 rounded-xl border-l-4 border-indigo-500 max-w-sm shadow-[0_0_30px_rgba(99,102,241,0.2)] pointer-events-auto text-left">
+                    <div className={`w-full lg:w-auto transition-all duration-700 delay-100 transform ${activeSection === 'wireframe' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}>
+                        <div className="w-full bg-slate-900/90 backdrop-blur-md p-6 rounded-xl border-l-4 border-indigo-500 max-w-xl lg:max-w-sm shadow-[0_0_30px_rgba(99,102,241,0.2)] pointer-events-auto text-left mx-auto">
                             <div className="flex items-center gap-3 mb-4 text-indigo-500">
                                 <Grip className="w-5 h-5" />
                                 <h2 className="text-xl font-bold text-white">{contentData.wireframe.cardTitle}</h2>
@@ -567,8 +590,8 @@ const BatteryExplorer = () => {
                     </div>
 
                     {/* Card 2 - Right side */}
-                    <div className={`transition-all duration-700 delay-300 transform ${activeSection === 'wireframe' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}>
-                        <div className="bg-slate-900/90 backdrop-blur-md p-6 rounded-xl border-r-4 border-emerald-500 max-w-sm shadow-[0_0_30px_rgba(16,185,129,0.2)] pointer-events-auto text-right">
+                    <div className={`w-full lg:w-auto transition-all duration-700 delay-300 transform ${activeSection === 'wireframe' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}>
+                        <div className="w-full bg-slate-900/90 backdrop-blur-md p-6 rounded-xl border-r-4 border-emerald-500 max-w-xl lg:max-w-sm shadow-[0_0_30px_rgba(16,185,129,0.2)] pointer-events-auto text-right mx-auto">
                             <div className="flex items-center justify-end gap-3 mb-4 text-emerald-500">
                                 <h2 className="text-xl font-bold text-white">{contentData.wireframe2.cardTitle}</h2>
                                 <Sliders className="w-5 h-5" />
@@ -599,7 +622,7 @@ const BatteryExplorer = () => {
                     className="h-[60vh] flex flex-col items-center justify-center pointer-events-auto relative z-30"
                 >
                     <div className={`transition-all duration-1000 transform ${activeSection === 'contact' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}>
-                        <div className="bg-slate-900/80 backdrop-blur-xl p-12 rounded-2xl border border-slate-700 shadow-2xl text-center max-w-lg mx-auto pointer-events-auto">
+                        <div className="bg-slate-900/80 backdrop-blur-xl p-8 sm:p-12 rounded-2xl border border-slate-700 shadow-2xl text-center max-w-2xl mx-auto pointer-events-auto w-full">
                             <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg">
                                 <Battery className="w-8 h-8 text-white animate-pulse" />
                             </div>
@@ -608,16 +631,29 @@ const BatteryExplorer = () => {
                                 Seeking Internship / Full-time Roles<br />
                                 <span className="text-indigo-400 font-semibold">Expected Graduation: 2026 - 2027</span>
                             </p>
-                            <a
-                                href="https://www.linkedin.com/in/zrzrv5"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                <button className="group bg-[#0077b5] hover:bg-[#006396] text-white px-8 py-3 rounded-full font-semibold transition-all flex items-center justify-center gap-2 mx-auto shadow-lg hover:scale-105">
-                                    <Linkedin className="w-5 h-5" />
-                                    Message me on LinkedIn
-                                </button>
-                            </a>
+                            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center w-full">
+                                <a
+                                    href="https://www.linkedin.com/in/zrzrv5"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex-1 sm:flex-initial"
+                                >
+                                    <button className="w-full group bg-[#0077b5] hover:bg-[#006396] text-white px-6 py-3 rounded-full font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:scale-105 whitespace-nowrap text-sm sm:text-base">
+                                        <Linkedin className="w-5 h-5 flex-shrink-0" />
+                                        Message me on LinkedIn
+                                    </button>
+                                </a>
+                                <a
+                                    href="/ZHOU_Rui_Resume_2025.pdf"
+                                    download="ZHOU_Rui_Resume_2025.pdf"
+                                    className="flex-1 sm:flex-initial"
+                                >
+                                    <button className="w-full group bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-full font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:scale-105 whitespace-nowrap text-sm sm:text-base">
+                                        <Download className="w-5 h-5 flex-shrink-0" />
+                                        Download Resume
+                                    </button>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -636,6 +672,22 @@ const BatteryExplorer = () => {
         }
         .wireframe-mode {
           backface-visibility: visible;
+        }
+        
+        /* Safari-optimized fade-in animation */
+        @keyframes fade-in-scale {
+          0% { 
+            opacity: 0;
+            transform: scale(0.8);
+          }
+          100% { 
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        .animate-fade-in-scale {
+          animation: fade-in-scale 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+          transform-origin: center center;
         }
         
         /* --- Optimization Animations (Connected Constraints) --- */

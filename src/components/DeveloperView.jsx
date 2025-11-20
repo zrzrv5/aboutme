@@ -216,7 +216,7 @@ const DeveloperView = () => {
                             <span className="tech">Core Bluetooth</span>
                             <span className="tech">Swift</span>
                         </div>
-                        <p>📸 Remote shutter control for Fujifilm cameras (and possibly more brands!).</p>
+                        <p>📸 Remote shutter control for Fujifilm cameras (and possibly more brands!) on Apple Watch.</p>
                         <div className="project-links">
                             <a href="#" className="project-link">Demo Video</a>
                         </div>

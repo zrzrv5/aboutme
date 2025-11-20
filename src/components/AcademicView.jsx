@@ -75,6 +75,7 @@ const AcademicView = () => {
                         <span>MD</span>
                         <span>DFT</span>
                         <span>ML-FF</span>
+                        <span>MC</span>
                         <span>DEM</span>
                     </div>
                     <p>Multiscale computational modeling of materials using density functional theory (DFT), machine learning force fields (ML-FF), and discrete element methods (DEM), spanning from the atomic scale to the mesoscale.</p>
@@ -87,6 +88,15 @@ const AcademicView = () => {
                         <span>LFMP</span>
                     </div>
                     <p>Currently working on solid-state electrolytes. Previously focused on improving the stability and energy density of cathode materials like NCM and LFP/LFMP. </p>
+                </div>
+                <div className="research-item">
+                    <h3>💡 Semiconductor Materials</h3>
+                    <div className="meta">
+                        <span>ZnS</span>
+                        <span>CdTe</span>
+                        <span>Si</span>
+                    </div>
+                    <p>Investigating of ZnS and CdTe semiconductors using machine learning force fields. Studying the mechanical properties, electronic structures, and photoplasticity of these materials in ground and excited states. </p>
                 </div>
             </section>
 
@@ -188,8 +198,12 @@ const AcademicView = () => {
                             <div className="timeline-title">M.S. in Materials Science and Engineering</div>
                             <div className="timeline-institution">Washington University in St. Louis</div>
                             <div className="timeline-tags">
-                                <span className="tag">MD Simulation</span>
-                                <span className="tag">Thin-film Evaporation</span>
+                                <span className="tag">MD</span>
+                                <span className="tag">CFD</span>
+                                <span className="tag">Thin-film Silicon</span>
+                                <span className="tag">Microfluidics</span>
+                                <span className="tag">Microfabrication</span>
+                                <span className="tag">Lithography</span>
                             </div>
                         </div>
                     </div>
@@ -204,6 +218,8 @@ const AcademicView = () => {
                                 <span className="tag">Carbon Nanotube Synthesis</span>
                                 <span className="tag">LIB Anode Materials</span>
                                 <span className="tag">Electrochemical Analysis</span>
+                                <span className="tag">Electrospinning</span>
+                                <span className="tag">High-Tempreature-High-Pressure</span>
                             </div>
                         </div>
                     </div>
@@ -254,7 +270,7 @@ const AcademicView = () => {
             </section>
 
             <div className="downloads-section">
-                <a href="#" className="button">Download Academic CV</a>
+                <a href="/ZHOU_Rui_CV_2025.pdf" download="ZHOU_Rui_CV_2025.pdf" className="button">Download Academic CV</a>
             </div>
         </div>
     );

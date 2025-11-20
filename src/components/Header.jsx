@@ -4,12 +4,29 @@ const Header = ({ mode, setMode }) => {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100);
+      if (ticking) return;
+      
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+        setIsScrolled(scrollY > 100);
+        ticking = false;
+      });
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    // Check initial scroll position
+    handleScroll();
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, []);
 
   const handleModeChange = (newMode) => {
@@ -107,8 +124,7 @@ const Header = ({ mode, setMode }) => {
 
       {/* Floating Selector */}
       <div
-        className={`fixed left-1/2 -translate-x-1/2 backdrop-blur-md shadow-xl rounded-full flex z-50 transition-all duration-300 ${mode === 'academic' ? 'bg-white/95 border-slate-200' : 'bg-slate-900/95 border-slate-700'} border ${isScrolled ? 'top-5 opacity-100' : '-top-24 opacity-0 pointer-events-none'}`}
-        style={{ padding: '8px' }}
+        className={`floating-tab-wrapper fixed left-1/2 -translate-x-1/2 backdrop-blur-md shadow-xl rounded-full flex flex-row flex-nowrap items-center justify-center gap-1 sm:gap-2 px-2 py-2 sm:px-4 z-50 transition-all duration-300 ${mode === 'academic' ? 'bg-white/95 border-slate-200' : 'bg-slate-900/95 border-slate-700'} border ${isScrolled ? 'top-5 opacity-100' : '-top-24 opacity-0 pointer-events-none'}`}
       >
         <div
           className={getSelectorClass('academic')}
