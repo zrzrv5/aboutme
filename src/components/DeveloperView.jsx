@@ -1,11 +1,160 @@
 import React from 'react';
 
+/* ── Seeded PRNG (deterministic per-item) ─────────────────────── */
+function mulberry32(seed) {
+    let s = seed | 0;
+    return () => {
+        s = (s + 0x6d2b79f5) | 0;
+        let t = Math.imul(s ^ (s >>> 15), 1 | s);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+}
+
+/* ── Generate a single hand-drawn scratch path ────────────────── */
+function generateScratchPath(rng, w, yCenter, opts = {}) {
+    const {
+        segments = 6,        // number of line segments
+        yJitter = 4,         // max vertical wobble per point
+        xShorten = 0.06,     // fraction to inset start/end
+    } = opts;
+
+    const x0 = w * (xShorten * (0.5 + rng()));
+    const x1 = w * (1 - xShorten * (0.5 + rng()));
+    const step = (x1 - x0) / segments;
+
+    const pts = [];
+    for (let i = 0; i <= segments; i++) {
+        const x = x0 + step * i;
+        const y = yCenter + (rng() - 0.5) * 2 * yJitter;
+        pts.push([x, y]);
+    }
+
+    // Build a smooth-ish path through all points using quadratic beziers
+    let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+    for (let i = 1; i < pts.length - 1; i++) {
+        const cpX = pts[i][0];
+        const cpY = pts[i][1];
+        const endX = (pts[i][0] + pts[i + 1][0]) / 2;
+        const endY = (pts[i][1] + pts[i + 1][1]) / 2;
+        d += ` Q ${cpX.toFixed(1)} ${cpY.toFixed(1)} ${endX.toFixed(1)} ${endY.toFixed(1)}`;
+    }
+    // last segment straight to end
+    const last = pts[pts.length - 1];
+    d += ` L ${last[0].toFixed(1)} ${last[1].toFixed(1)}`;
+    return d;
+}
+
+/* ── ScratchMark SVG overlay ─────────────────────────────────── */
+const ScratchMark = ({ seed, delay = '0s', strokes = 2, className = '' }) => {
+    const rng = mulberry32(seed);
+    const h = 20;   // viewBox height
+    const w = 120;  // viewBox width — stretched to 100% via CSS
+
+    const paths = [];
+    for (let i = 0; i < strokes; i++) {
+        const yCenter = h * (0.35 + 0.3 * i / Math.max(strokes - 1, 1)) + (rng() - 0.5) * 4;
+        const strokeWidth = 1.6 + rng() * 1.1;
+        const d = generateScratchPath(rng, w, yCenter, {
+            segments: 5 + Math.floor(rng() * 4),
+            yJitter: 2.5 + rng() * 3,
+            xShorten: 0.02 + rng() * 0.06,
+        });
+        const animDelay = `calc(${delay} + ${(i * 0.12).toFixed(2)}s)`;
+        paths.push(
+            <path
+                key={i}
+                className="scratch-stroke"
+                d={d}
+                strokeWidth={strokeWidth}
+                style={{ animationDelay: animDelay }}
+            />
+        );
+    }
+
+    return (
+        <svg
+            className={`scratch-svg ${className}`}
+            viewBox={`0 0 ${w} ${h}`}
+            preserveAspectRatio="none"
+            aria-hidden="true"
+        >
+            {paths}
+        </svg>
+    );
+};
+
+/* ── Title Scribble SVG (big messy cross-out) ────────────────── */
+const TitleScribble = () => {
+    const rng = mulberry32(42);
+    const w = 540, h = 100;
+    const strokeCount = 3;
+    const paths = [];
+
+    for (let i = 0; i < strokeCount; i++) {
+        const center = h * 0.5;
+        const offset = (i - (strokeCount - 1) / 2) * 14;
+        const yCenter = center + offset + (rng() - 0.5) * 4;
+        const strokeWidth = 2.2 + rng() * 2.0;
+        const d = generateScratchPath(rng, w, yCenter, {
+            segments: 7 + Math.floor(rng() * 5),
+            yJitter: 3 + rng() * 3.5,
+            xShorten: 0.01 + rng() * 0.04,
+        });
+        paths.push(
+            <path
+                key={i}
+                className="scribble-path"
+                d={d}
+                strokeWidth={strokeWidth}
+                style={{ animationDelay: `${(i * 0.14).toFixed(2)}s` }}
+            />
+        );
+    }
+
+    return (
+        <span className="scribble-overlay" aria-hidden="true">
+            <svg className="scribble-svg" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
+                {paths}
+            </svg>
+        </span>
+    );
+};
+
 const DeveloperView = () => {
     return (
         <div className="developer-section content-section">
             <section className="apps-section">
                 <h2 className="section-title">Released Apps</h2>
                 <div className="apps-container">
+
+                    {/* NAIIVE */}
+                    <div className="app-card">
+                        <div className="app-image">
+                            <img src="/images/naiive/naiive_me_banner.png"
+                                srcSet="/images/naiive/naiive_me_banner-2.png 300w,
+                          /images/naiive/naiive_me_banner-1.png 600w,
+                          /images/naiive/naiive_me_banner.png 1200w"
+                                sizes="(max-width: 600px) 300px,
+                          (max-width: 1200px) 600px,
+                          1200px"
+                                alt="NAIIVE Banner" />
+                            <span className="app-badge badge-downloads">Beta</span>
+                            <span className="app-badge badge-year" style={{ top: '45px' }}>2026</span>
+                        </div>
+                        <div className="app-details">
+                            <h3>NAIIVE</h3>
+                            <p>An experimental scientific visualization tool combining spatial rendering with a node-based editor.</p>
+                            <div className="dev-comment">
+                                <span className="dev-comment-tag">Dev Note</span>
+                                <p>Still a work in progress! 🚧</p>
+                            </div>
+                            <div className="app-links">
+                                <a href="https://testflight.apple.com/join/VrYnN9nE" className="app-link app-link-product">Join TestFlight</a>
+                                <a href="https://github.com/zrzrv5/NAIIVE" className="app-link app-link-product">GitHub</a>
+                            </div>
+                        </div>
+                    </div>
 
                     {/* TotK Companion */}
                     <div className="app-card">
@@ -109,53 +258,69 @@ const DeveloperView = () => {
             </section>
 
             <section className="skills-section">
-                <h2 className="section-title crossed-out">Technical Skills</h2>
-                <span className="handwritten-note"> mostly Vibe-coding Now 😬</span>
+                <div className="skills-title-wrap">
+                    <h2 className="section-title crossed-out">
+                        <span className="scratch-target">Technical Skills</span>
+                        <TitleScribble />
+                    </h2>
+                    <span className="handwritten-note">mostly Vibe-coding Now 😬</span>
+                </div>
+
                 <div className="skills-container">
-                    <div className="skill-category">
-                        <h3>iOS Development</h3>
+                    <div className="skill-category skill-category-replaced" style={{ '--card-delay': '0.15s' }}>
+                        <h3 className="skill-title-rewrite">
+                            <span className="skill-title-old">
+                                iOS Development
+                                <ScratchMark seed={101} delay="calc(var(--card-delay) + 0.36s)" strokes={2} />
+                            </span>
+                            <span className="skill-title-new">Vibe-coded now</span>
+                        </h3>
                         <div className="skill-list">
-                            <span className="skill-item">Swift</span>
-                            <span className="skill-item">Metal</span>
-                            <span className="skill-item">Core Data</span>
-                            <span className="skill-item">CloudKit</span>
-                            <span className="skill-item">CoreNFC</span>
-                            <span className="skill-item">VisionOS</span>
-                            <span className="skill-item">MapKit</span>
+                            {['Swift', 'Metal', 'Core Data', 'CloudKit', 'CoreNFC', 'VisionOS', 'MapKit'].map((skill, i) => (
+                                <span className="skill-item" key={skill} style={{ '--tag-seq': `${(i * 0.07).toFixed(2)}s` }}>
+                                    {skill}
+                                    <ScratchMark className="tag-scratch" seed={200 + i} delay={`calc(var(--card-delay) + 0.64s + ${(i * 0.07).toFixed(2)}s)`} strokes={2} />
+                                </span>
+                            ))}
                         </div>
+                        <span className="skill-replacement-note">Codex + Claude Opus</span>
                     </div>
-                    <div className="skill-category">
-                        <h3>Languages</h3>
+                    <div className="skill-category skill-category-replaced" style={{ '--card-delay': '0.4s' }}>
+                        <h3 className="skill-title-rewrite">
+                            <span className="skill-title-old">
+                                Languages
+                                <ScratchMark seed={301} delay="calc(var(--card-delay) + 0.36s)" strokes={2} />
+                            </span>
+                            <span className="skill-title-new">Vibe-coded now</span>
+                        </h3>
                         <div className="skill-list">
-                            <span className="skill-item">Python</span>
-                            <span className="skill-item">Swift</span>
-                            <span className="skill-item">C</span>
-                            <span className="skill-item">MATLAB</span>
+                            {['Python', 'Swift', 'C', 'MATLAB'].map((skill, i) => (
+                                <span className="skill-item" key={skill} style={{ '--tag-seq': `${(i * 0.07).toFixed(2)}s` }}>
+                                    {skill}
+                                    <ScratchMark className="tag-scratch" seed={400 + i} delay={`calc(var(--card-delay) + 0.64s + ${(i * 0.07).toFixed(2)}s)`} strokes={2} />
+                                </span>
+                            ))}
                         </div>
+                        <span className="skill-replacement-note">markdown is all you needed</span>
                     </div>
 
-                    <div className="skill-category">
-                        <h3>Tools</h3>
+                    <div className="skill-category skill-category-replaced" style={{ '--card-delay': '0.65s' }}>
+                        <h3 className="skill-title-rewrite">
+                            <span className="skill-title-old">
+                                Tools
+                                <ScratchMark seed={501} delay="calc(var(--card-delay) + 0.36s)" strokes={2} />
+                            </span>
+                            <span className="skill-title-new">Vibe-coded now</span>
+                        </h3>
                         <div className="skill-list">
-                            <span className="skill-item">Xcode</span>
-                            <span className="skill-item">Figma</span>
-                            <span className="skill-item">Sketch</span>
-                            <span className="skill-item">Git</span>
-                            <span className="skill-item">TestFlight</span>
-                            <span className="skill-item">Fastlane</span>
-                            <span className="skill-item">CI/CD</span>
-                            <span className="skill-item">Linux</span>
+                            {['Xcode', 'Figma', 'Sketch', 'Git', 'TestFlight', 'Fastlane', 'CI/CD', 'Linux'].map((skill, i) => (
+                                <span className="skill-item" key={skill} style={{ '--tag-seq': `${(i * 0.07).toFixed(2)}s` }}>
+                                    {skill}
+                                    <ScratchMark className="tag-scratch" seed={600 + i} delay={`calc(var(--card-delay) + 0.64s + ${(i * 0.07).toFixed(2)}s)`} strokes={2} />
+                                </span>
+                            ))}
                         </div>
-                    </div>
-                    <div className="skill-category">
-                        <h3>Vibe-coding Tools</h3>
-                        <div className="skill-list">
-                            <span className="skill-item">Cursor</span>
-                            <span className="skill-item">Antigravity</span>
-                            <span className="skill-item">Kiro</span>
-                            <span className="skill-item">Copilot</span>
-                            <span className="skill-item">Claude Code</span>
-                        </div>
+                        <span className="skill-replacement-note">🦞</span>
                     </div>
 
                 </div>
@@ -181,20 +346,6 @@ const DeveloperView = () => {
                         </div>
                     </div>
 
-                    <div className="project-card">
-                        <h3>Unreleased Project #0</h3>
-                        <div className="tech-stack">
-                            <span className="tech"><strong>Metal</strong></span>
-                            <span className="tech">visionOS</span>
-                            <span className="tech">Swift</span>
-                        </div>
-                        <p>🥽 Low-code atomistic visualization & analysis. Learning GPU Programming!</p>
-                        <div className="project-links">
-                            <a href="https://x.com/i/status/1840661711428231455" className="project-link">Demo#1 (Renderer & Parser)</a>
-                            <a href="https://x.com/i/status/1920641257212154303" className="project-link">Demo#2 (Animated)</a>
-                            <a href="https://x.com/i/status/1834096587875791282" className="project-link">Demo#3 (Spatial Rendering on Vision Pro)</a>
-                        </div>
-                    </div>
 
                     <div className="project-card">
                         <h3>Unreleased Project #1</h3>

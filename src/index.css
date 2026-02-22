@@ -24,7 +24,12 @@
 }
 
 /* Prevent Font Awesome icons from being affected by global reset */
-.fa, .fas, .far, .fal, .fad, .fab {
+.fa,
+.fas,
+.far,
+.fal,
+.fad,
+.fab {
     font-family: 'Font Awesome 6 Free', 'Font Awesome 6 Brands' !important;
 }
 
@@ -81,12 +86,15 @@
     .battery-explorer-wrapper .md\:pr-10 {
         padding-right: 2.5rem !important;
     }
+
     .battery-explorer-wrapper .md\:pr-16 {
         padding-right: 4rem !important;
     }
+
     .battery-explorer-wrapper .md\:pl-16 {
         padding-left: 4rem !important;
     }
+
     .battery-explorer-wrapper .md\:px-16 {
         padding-left: 4rem !important;
         padding-right: 4rem !important;
@@ -97,9 +105,11 @@
     .battery-explorer-wrapper .lg\:pr-16 {
         padding-right: 4rem !important;
     }
+
     .battery-explorer-wrapper .lg\:pl-32 {
         padding-left: 8rem !important;
     }
+
     .battery-explorer-wrapper .lg\:px-32 {
         padding-left: 8rem !important;
         padding-right: 8rem !important;
@@ -160,7 +170,7 @@
     flex-wrap: wrap !important;
 }
 
-.battery-explorer-wrapper .space-y-4 > * + * {
+.battery-explorer-wrapper .space-y-4>*+* {
     margin-top: 1rem !important;
 }
 
@@ -523,70 +533,76 @@ body.engineer-mode {
 
 .section-title.crossed-out {
     position: relative;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    isolation: isolate;
 }
 
-.section-title.crossed-out::before {
-    content: '';
+.section-title.crossed-out .scratch-target {
+    position: relative;
+    z-index: 1;
+}
+
+.section-title.crossed-out .scribble-overlay {
     position: absolute;
-    top: 40%;
-    left: 0;
-    width: 0;
-    height: 3px;
-    background-color: #ff6b6b;
-    transform: translateY(-50%);
-    animation: crossOut 1.5s forwards ease-out;
+    inset: -6px -26px -6px -24px;
+    pointer-events: none;
+    z-index: 2;
 }
 
-@keyframes crossOut {
-    0% {
-        width: 0;
-    }
+.section-title.crossed-out .scribble-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
 
-    100% {
-        width: 100%;
-    }
+.section-title.crossed-out .scribble-path {
+    fill: none;
+    stroke: rgba(255, 95, 109, 0.92);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1200;
+    stroke-dashoffset: 1200;
+    filter: drop-shadow(0 0 1.5px rgba(255, 107, 107, 0.35));
+    animation: scribbleDraw 0.48s cubic-bezier(0.18, 0.84, 0.26, 1) forwards;
+    /* stroke-width set inline per path */
 }
 
 .handwritten-note {
-    font-family: 'Dancing Script', cursive;
-    font-size: 1.5em;
-    color: rgba(255, 255, 255, 0.9);
+    font-family: 'Bradley Hand', 'Segoe Print', 'Comic Sans MS', cursive;
+    font-size: clamp(1.1rem, 2vw, 1.7rem);
+    color: #ffe3ad;
     position: absolute;
-    left: 70%;
-    top: -10px;
+    left: calc(100% - 18px);
+    top: -8px;
     opacity: 0;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    animation: fadeIn 1s 1.5s forwards;
-    transform: rotate(-5deg);
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.45);
+    animation: handwrittenReveal 0.7s 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    transform: rotate(-6deg) translateY(-8px) scale(0.94);
+    white-space: nowrap;
+    pointer-events: none;
 }
 
-@keyframes fadeIn {
+@keyframes scribbleDraw {
+    0% {
+        stroke-dashoffset: 900;
+    }
+
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes handwrittenReveal {
     0% {
         opacity: 0;
-        transform: rotate(-5deg) translateY(-10px);
+        transform: rotate(-6deg) translateY(-8px) scale(0.94);
     }
 
     100% {
         opacity: 1;
-        transform: rotate(-5deg) translateY(0);
-    }
-}
-
-.section-title.crossed-out+.handwritten-note {
-    opacity: 1;
-    animation: fadeIn 2s ease-in-out forwards;
-}
-
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-        transform: translate(-50%, -50%) rotate(-5deg) scale(0.8);
-    }
-
-    100% {
-        opacity: 1;
-        transform: translate(-50%, -50%) rotate(-5deg) scale(1);
+        transform: rotate(-6deg) translateY(0) scale(1);
     }
 }
 
@@ -792,15 +808,25 @@ body.engineer-mode {
     position: relative;
 }
 
+.skills-title-wrap {
+    display: inline-flex;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 60px;
+}
+
 .skills-section .section-title {
     display: inline-block;
-    margin-bottom: 60px;
+    margin-bottom: 0;
 }
 
 .skills-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 20px;
+    max-width: 1040px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .skill-category {
@@ -809,6 +835,8 @@ body.engineer-mode {
     padding: 25px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
 }
 
 .skill-category:hover {
@@ -834,6 +862,103 @@ body.engineer-mode {
     border-radius: 20px;
     font-size: 0.9rem;
     font-weight: 500;
+}
+
+.skill-category-replaced {
+    --card-delay: 0s;
+}
+
+.skill-title-rewrite {
+    position: relative;
+    min-height: 1.8em;
+    margin-bottom: 18px;
+}
+
+.skill-title-old {
+    position: relative;
+    display: inline-block;
+    animation: legacySkillFade 0.45s calc(var(--card-delay) + 0.95s) ease-out forwards;
+}
+
+.skill-title-new {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%) rotate(-5deg);
+    opacity: 0;
+    color: #ffd68d;
+    font-family: 'Bradley Hand', 'Segoe Print', 'Comic Sans MS', cursive;
+    font-size: 1.2rem;
+    font-weight: 700;
+    white-space: nowrap;
+    animation: replacementTagReveal 0.6s calc(var(--card-delay) + 1.15s) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ── SVG scratch overlay (titles & tags) ──────────────────── */
+.scratch-svg {
+    position: absolute;
+    inset: -2px -6px;
+    width: calc(100% + 12px);
+    height: calc(100% + 4px);
+    pointer-events: none;
+    z-index: 3;
+    overflow: visible;
+}
+
+.scratch-stroke {
+    fill: none;
+    stroke: rgba(255, 95, 109, 0.92);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 400;
+    stroke-dashoffset: 400;
+    animation: scribbleDraw 0.38s cubic-bezier(0.22, 0.88, 0.28, 1) forwards;
+    /* animationDelay set inline per path */
+}
+
+.scratch-svg.tag-scratch .scratch-stroke {
+    stroke: rgba(255, 95, 109, 0.82);
+}
+
+.skill-item {
+    position: relative;
+    overflow: visible;
+}
+
+.skill-replacement-note {
+    display: inline-block;
+    margin-top: 16px;
+    opacity: 0;
+    font-family: 'Bradley Hand', 'Segoe Print', 'Comic Sans MS', cursive;
+    color: #ffe3ad;
+    font-size: 1.1rem;
+    transform: rotate(-4deg) translateY(-8px) scale(0.94);
+    animation: replacementTagReveal 0.6s calc(var(--card-delay) + 1.18s) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* scratchStroke keyframe removed — replaced by scribbleDraw on SVG paths */
+
+@keyframes legacySkillFade {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.65;
+        filter: grayscale(0.3);
+    }
+}
+
+@keyframes replacementTagReveal {
+    0% {
+        opacity: 0;
+        transform: rotate(-4deg) translateY(-8px) scale(0.94);
+    }
+
+    100% {
+        opacity: 1;
+        transform: rotate(-4deg) translateY(0) scale(1);
+    }
 }
 
 .apps-section {
@@ -1294,6 +1419,29 @@ body.night-mode .social-link:hover {
         margin-left: auto;
         margin-right: auto;
         max-width: 400px;
+    }
+
+    .skills-title-wrap {
+        margin-bottom: 36px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .handwritten-note {
+        position: static;
+        transform: rotate(-4deg) translateY(-4px) scale(0.96);
+        white-space: normal;
+        text-align: center;
+    }
+
+    .section-title.crossed-out .scribble-overlay {
+        inset: -8px -14px -8px -14px;
+    }
+
+    .skill-title-new {
+        font-size: 1.05rem;
     }
 }
 
@@ -2377,8 +2525,13 @@ body.engineer-mode .developer-background {
 }
 
 @keyframes flow {
-    0% { background-position: 0 0; }
-    100% { background-position: 0 40px; }
+    0% {
+        background-position: 0 0;
+    }
+
+    100% {
+        background-position: 0 40px;
+    }
 }
 
 .animate-flow {
@@ -2392,8 +2545,15 @@ body.engineer-mode .developer-background {
 /* Optimization Animations (Connected Constraints) */
 /* 1. Height Animation: Applied to all components synchronously */
 @keyframes optimize-height {
-    0%, 100% { transform: scaleY(1); }
-    50% { transform: scaleY(1.15); }
+
+    0%,
+    100% {
+        transform: scaleY(1);
+    }
+
+    50% {
+        transform: scaleY(1.15);
+    }
 }
 
 .animate-optimize-height {
@@ -2403,8 +2563,15 @@ body.engineer-mode .developer-background {
 /* 2. Width Animations: Anchored to keep connection */
 /* Cathode: Anchored Right. Scales > 1 to grow left. */
 @keyframes optimize-width-left {
-    0%, 100% { transform: scaleX(1) translateX(0); }
-    50% { transform: scaleX(1.1) translateX(0); }
+
+    0%,
+    100% {
+        transform: scaleX(1) translateX(0);
+    }
+
+    50% {
+        transform: scaleX(1.1) translateX(0);
+    }
 }
 
 .animate-optimize-width-left {
@@ -2413,8 +2580,15 @@ body.engineer-mode .developer-background {
 
 /* Anode: Anchored Left. Scales > 1 to grow right. */
 @keyframes optimize-width-right {
-    0%, 100% { transform: scaleX(1) translateX(0); }
-    50% { transform: scaleX(1.15) translateX(0); }
+
+    0%,
+    100% {
+        transform: scaleX(1) translateX(0);
+    }
+
+    50% {
+        transform: scaleX(1.15) translateX(0);
+    }
 }
 
 .animate-optimize-width-right {
@@ -2424,25 +2598,36 @@ body.engineer-mode .developer-background {
 
 /* Tabs: Move position and resize slightly, sync Y with height expansion */
 @keyframes optimize-tab {
-    0%, 100% { 
-        transform: translateZ(-1px) translateX(0) translateY(0); 
-        width: 3rem; 
+
+    0%,
+    100% {
+        transform: translateZ(-1px) translateX(0) translateY(0);
+        width: 3rem;
     }
-    50% { 
-        transform: translateZ(-1px) translateX(10px) translateY(-0.75rem); 
-        width: 2.5rem; 
+
+    50% {
+        transform: translateZ(-1px) translateX(10px) translateY(-0.75rem);
+        width: 2.5rem;
     }
 }
 
 .animate-optimize-tab {
-    animation: optimize-tab 4s ease-in-out infinite; /* Synced with height animation */
+    animation: optimize-tab 4s ease-in-out infinite;
+    /* Synced with height animation */
 }
 
 /* Graph Animations (Particle Scale) */
 /* Distribution Curve: Simulates changing Mean (X) and Standard Deviation (Scale X) */
 @keyframes dist-shift {
-    0%, 100% { transform: translateX(0px) scaleX(1); }
-    50% { transform: translateX(10px) scaleX(0.8); }
+
+    0%,
+    100% {
+        transform: translateX(0px) scaleX(1);
+    }
+
+    50% {
+        transform: translateX(10px) scaleX(0.8);
+    }
 }
 
 .animate-dist-curve {
@@ -2451,8 +2636,15 @@ body.engineer-mode .developer-background {
 
 /* Density Bar: Grows when Porosity Shrinks */
 @keyframes density-cycle {
-    0%, 100% { height: 80%; }
-    50% { height: 40%; }
+
+    0%,
+    100% {
+        height: 80%;
+    }
+
+    50% {
+        height: 40%;
+    }
 }
 
 .animate-density-bar {
@@ -2461,8 +2653,15 @@ body.engineer-mode .developer-background {
 
 /* Porosity Bar: Shrinks when Density Grows (Inverse) */
 @keyframes porosity-cycle {
-    0%, 100% { height: 20%; }
-    50% { height: 60%; }
+
+    0%,
+    100% {
+        height: 20%;
+    }
+
+    50% {
+        height: 60%;
+    }
 }
 
 .animate-porosity-bar {
@@ -2519,7 +2718,7 @@ body.engineer-mode .developer-background {
         font-size: 14px !important;
         min-height: 40px !important;
     }
-    
+
     .floating-tab-wrapper {
         max-width: calc(100vw - 24px);
     }
@@ -2541,19 +2740,23 @@ body.engineer-mode .developer-background {
 
 /* Engineer mode footer styling - similar to dark mode */
 body.engineer-mode .site-footer {
-    background-color: #0f172a !important; /* slate-900 */
+    background-color: #0f172a !important;
+    /* slate-900 */
     color: #f1f5f9 !important;
 }
 
 body.engineer-mode .social-link {
-    color: #cbd5e1 !important; /* slate-300 */
+    color: #cbd5e1 !important;
+    /* slate-300 */
     background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 body.engineer-mode .social-link:hover {
-    color: #10b981 !important; /* emerald-500 */
+    color: #10b981 !important;
+    /* emerald-500 */
 }
 
 body.engineer-mode .contact-list li a:hover {
-    color: #10b981 !important; /* emerald-500 */
+    color: #10b981 !important;
+    /* emerald-500 */
 }
