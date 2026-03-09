@@ -147,9 +147,12 @@ const DeveloperView = () => {
                             <p>An experimental scientific visualization tool combining spatial rendering with a node-based editor.</p>
                             <div className="dev-comment">
                                 <span className="dev-comment-tag">Dev Note</span>
-                                <p>Still a work in progress! 🚧</p>
+                                <p>Still a work in progress! Recommded TestFlight for the best experience.🚧</p>
                             </div>
                             <div className="app-links">
+                                <a href="https://apps.apple.com/us/app/naiive/id6758065886" className="app-link-appstore">
+                                    <img src="https://developer.apple.com/app-store/marketing/guidelines/images/badge-download-on-the-app-store.svg" alt="Download on the App Store" />
+                                </a>
                                 <a href="https://testflight.apple.com/join/VrYnN9nE" className="app-link app-link-product">Join TestFlight</a>
                                 <a href="https://github.com/zrzrv5/NAIIVE" className="app-link app-link-product">GitHub</a>
                             </div>
@@ -273,7 +276,7 @@ const DeveloperView = () => {
                                 iOS Development
                                 <ScratchMark seed={101} delay="calc(var(--card-delay) + 0.36s)" strokes={2} />
                             </span>
-                            <span className="skill-title-new">Vibe-coded now</span>
+                            <span className="skill-title-new">Vibe-code now</span>
                         </h3>
                         <div className="skill-list">
                             {['Swift', 'Metal', 'Core Data', 'CloudKit', 'CoreNFC', 'VisionOS', 'MapKit'].map((skill, i) => (
@@ -291,7 +294,7 @@ const DeveloperView = () => {
                                 Languages
                                 <ScratchMark seed={301} delay="calc(var(--card-delay) + 0.36s)" strokes={2} />
                             </span>
-                            <span className="skill-title-new">Vibe-coded now</span>
+                            <span className="skill-title-new">Vibe-code now</span>
                         </h3>
                         <div className="skill-list">
                             {['Python', 'Swift', 'C', 'MATLAB'].map((skill, i) => (
@@ -310,7 +313,7 @@ const DeveloperView = () => {
                                 Tools
                                 <ScratchMark seed={501} delay="calc(var(--card-delay) + 0.36s)" strokes={2} />
                             </span>
-                            <span className="skill-title-new">Vibe-coded now</span>
+                            <span className="skill-title-new">Vibe-code now</span>
                         </h3>
                         <div className="skill-list">
                             {['Xcode', 'Figma', 'Sketch', 'Git', 'TestFlight', 'Fastlane', 'CI/CD', 'Linux'].map((skill, i) => (
