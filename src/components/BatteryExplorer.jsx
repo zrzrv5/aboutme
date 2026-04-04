@@ -320,41 +320,41 @@ const BatteryExplorer = () => {
                             className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-4 translate-x-10 animate-fade-in-scale"
                             style={{ transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}
                         >
-                        {/* Top Row (Smaller, Irregular) */}
-                        <div className="flex gap-3 scale-75 opacity-80">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                                <div
-                                    key={`top-${i}`}
-                                    className="w-12 h-12 bg-slate-700 border border-slate-500 shadow-lg flex items-center justify-center"
-                                    style={particleShapes.top[i]}
-                                ></div>
-                            ))}
-                        </div>
+                            {/* Top Row (Smaller, Irregular) */}
+                            <div className="flex gap-3 scale-75 opacity-80">
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                    <div
+                                        key={`top-${i}`}
+                                        className="w-12 h-12 bg-slate-700 border border-slate-500 shadow-lg flex items-center justify-center"
+                                        style={particleShapes.top[i]}
+                                    ></div>
+                                ))}
+                            </div>
 
-                        {/* Middle Row (Normal, Irregular) */}
-                        <div className="flex gap-3">
-                            {Array.from({ length: 4 }).map((_, i) => (
-                                <div
-                                    key={`mid-${i}`}
-                                    className="w-14 h-14 bg-slate-600 border border-slate-400 shadow-xl flex items-center justify-center"
-                                    style={particleShapes.middle[i]}
-                                >
-                                    {/* Changed text to D50 */}
-                                    <span className="text-[8px] text-slate-400 font-bold">D50</span>
-                                </div>
-                            ))}
-                        </div>
+                            {/* Middle Row (Normal, Irregular) */}
+                            <div className="flex gap-3">
+                                {Array.from({ length: 4 }).map((_, i) => (
+                                    <div
+                                        key={`mid-${i}`}
+                                        className="w-14 h-14 bg-slate-600 border border-slate-400 shadow-xl flex items-center justify-center"
+                                        style={particleShapes.middle[i]}
+                                    >
+                                        {/* Changed text to D50 */}
+                                        <span className="text-[8px] text-slate-400 font-bold">D50</span>
+                                    </div>
+                                ))}
+                            </div>
 
-                        {/* Bottom Row (Larger, Irregular) */}
-                        <div className="flex gap-3 scale-110">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                                <div
-                                    key={`bot-${i}`}
-                                    className="w-12 h-12 bg-slate-700 border border-slate-500 shadow-lg flex items-center justify-center"
-                                    style={particleShapes.bottom[i]}
-                                ></div>
-                            ))}
-                        </div>
+                            {/* Bottom Row (Larger, Irregular) */}
+                            <div className="flex gap-3 scale-110">
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                    <div
+                                        key={`bot-${i}`}
+                                        className="w-12 h-12 bg-slate-700 border border-slate-500 shadow-lg flex items-center justify-center"
+                                        style={particleShapes.bottom[i]}
+                                    ></div>
+                                ))}
+                            </div>
                         </div>
                     )}
 
@@ -628,11 +628,11 @@ const BatteryExplorer = () => {
                             </div>
                             <h2 className="text-3xl font-bold text-white mb-2">Looking for Opportunities</h2>
                             <p className="text-slate-400 mb-6 text-lg">
-                                Seeking Internship / Full-time Roles<br />
+                                Full-time Roles<br />
                                 <span className="text-indigo-400 font-semibold">Expected Graduation: 2026 - 2027</span>
                             </p>
                             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center w-full">
-                                <a
+                                {/* <a
                                     href="https://www.linkedin.com/in/zrzrv5"
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -641,8 +641,9 @@ const BatteryExplorer = () => {
                                     <button className="w-full group bg-[#0077b5] hover:bg-[#006396] text-white px-6 py-3 rounded-full font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:scale-105 whitespace-nowrap text-sm sm:text-base">
                                         <Linkedin className="w-5 h-5 flex-shrink-0" />
                                         Message me on LinkedIn
+                                // fuck linkedin
                                     </button>
-                                </a>
+                                </a> */}
                                 <a
                                     href="/ZHOU_Rui_Resume_2025.pdf"
                                     download="ZHOU_Rui_Resume_2025.pdf"

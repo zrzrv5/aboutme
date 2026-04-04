@@ -154,6 +154,20 @@ const AcademicView = () => {
             <section className="education">
                 <h2 className="section-title">Education & Work Experience</h2>
                 <div className="timeline">
+
+                    <div className="timeline-item right">
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
+                            <div className="timeline-date">2026 Summer</div>
+                            <div className="timeline-title">Upcoming Ph.D. Intern</div>
+                            <div className="timeline-institution">Seagate</div>
+                            <div className="timeline-institution">Normandale, Minnesota</div>
+                            <div className="timeline-tags">
+                                {/* <span className="tag"></span> */}
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="timeline-item left">
                         <div className="timeline-dot"></div>
                         <div className="timeline-content">
@@ -248,7 +262,7 @@ const AcademicView = () => {
                             <div className="achievement-item">
                                 <h3>Simulation optimization design method, system, equipment and medium for battery material mixing proportion</h3>
                                 <div className="meta">
-                                    <span><i>📝</i>CN115579085A (Pending, Oct 2022)</span>
+                                    <span><i>📝</i>CN115579085A (Granted, Oct 2022)</span>
                                 </div>
                                 <p>A practical simulation method for optimizing battery material blending proportions, resulting in enhanced compaction density and improved energy density for next-generation battery systems.(Summarized by AI🤖)</p>
                             </div>
@@ -270,7 +284,7 @@ const AcademicView = () => {
             </section>
 
             <div className="downloads-section">
-                <a href="/ZHOU_Rui_CV_2025.pdf" download="ZHOU_Rui_CV_2025.pdf" className="button">Download Academic CV</a>
+                <a href="/ZHOU_Rui_CV-2025-Dec.pdf" download="ZHOU_Rui_CV-2025-Dec.pdf" className="button">Download Academic CV</a>
             </div>
         </div>
     );

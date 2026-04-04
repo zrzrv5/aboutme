@@ -5,8 +5,8 @@ const Footer = ({ mode }) => {
     const year = new Date().getFullYear();
 
     const contactInfo = isDeveloper ? {
-        email: 'dev [at] 1sec.plus',
-        address: '📬 PO Box 1015, Ames, Iowa, 50014'
+        email: 'feedback [at] 1sec.plus',
+        address: ' '
     } : {
         email: '[my first name last name no spaces] [at] [my school domain]',
         address: '📍 Iowa State University'
@@ -27,9 +27,10 @@ const Footer = ({ mode }) => {
                     <div className="footer-social">
                         <h3>Connect</h3>
                         <div className="social-links">
-                            <a href="https://www.linkedin.com/in/zrzrv5" className="social-link" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                            {/* fuck linkedin */}
+                            {/* <a href="https://www.linkedin.com/in/zrzrv5" className="social-link" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                                 <i className="fab fa-linkedin"></i>
-                            </a>
+                            </a> */}
                             <a href="https://scholar.google.com/citations?user=p27FiGAAAAAJ" className="social-link" target="_blank" rel="noopener noreferrer" aria-label="Google Scholar">
                                 <i className="fas fa-graduation-cap"></i>
                             </a>

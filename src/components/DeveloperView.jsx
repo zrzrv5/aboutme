@@ -351,16 +351,16 @@ const DeveloperView = () => {
 
 
                     <div className="project-card">
-                        <h3>Unreleased Project #1</h3>
+                        <h3>LaneLoaf</h3>
                         <div className="tech-stack">
                             <span className="tech"><strong>Vibe Coding</strong> </span>
                             <span className="tech">MapKit</span>
                             <span className="tech">Swift</span>
-                            <span className="tech">Python</span>
+                            {/* <span className="tech">Python</span> */}
                         </div>
-                        <p>🛣️ Car Trajectory Player: merges dashcam videos and extracts GPS trajectories.</p>
+                        <p>🛣️ Turn dashcam footages into trip logs</p>
                         <div className="project-links">
-                            <a href="https://x.com/ZRZRV5/status/1791689586193653907/photo/1" className="project-link">Screenshot</a>
+                            <a href="https://laneloaf.1sec.plus" className="project-link">Product Page</a>
                         </div>
                     </div>
 
@@ -378,7 +378,7 @@ const DeveloperView = () => {
                     <div className="project-card">
                         <h3>Quick TrajView</h3>
                         <div className="tech-stack">
-                            <span className="tech"><strong>Vibe Coding</strong> </span>
+                            <span className="tech"><strong>Slop Coding</strong> </span>
                             <span className="tech">Three.js</span>
                             <span className="tech">Python</span>
                         </div>
@@ -386,6 +386,19 @@ const DeveloperView = () => {
                         <div className="project-links">
                             <a href="https://github.com/zrzrv5/QuickTrajView-vscode" className="project-link">GitHub</a>
                         </div>
+                    </div>
+
+                    <div className="project-card">
+                        <h3>S.L.O.P</h3>
+                        <div className="tech-stack">
+                            <span className="tech"><strong>Slop Coding</strong> </span>
+                            <span className="tech">AI Agent</span>
+                            {/* <span className="tech">Markdown</span> */}
+                        </div>
+                        <p> hpc + skills.md </p>
+                        {/* <div className="project-links">
+                            <a href="https://github.com/zrzrv5/SLOP" className="project-link">GitHub</a>
+                        </div> */}
                     </div>
 
                 </div>
