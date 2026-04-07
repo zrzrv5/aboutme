@@ -515,12 +515,12 @@ body.engineer-mode {
 }
 
 .section-subtitle {
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     text-align: center !important;
     display: block;
     width: 100%;
     max-width: 100%;
-    margin-top: 10px;
+    margin-top: 5px;
     margin-bottom: 30px;
     margin-left: auto;
     margin-right: auto;
@@ -642,7 +642,7 @@ body.engineer-mode {
     grid-template-columns: repeat(auto-fill, minmax(350px, max-content));
     gap: 25px;
     margin-bottom: 60px;
-    max-width: 1000px;
+    max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
     justify-content: center;

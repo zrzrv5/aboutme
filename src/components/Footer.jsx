@@ -28,11 +28,14 @@ const Footer = ({ mode }) => {
                         <h3>Connect</h3>
                         <div className="social-links">
                             {/* fuck linkedin */}
-                            {/* <a href="https://www.linkedin.com/in/zrzrv5" className="social-link" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                            <a href="https://www.linkedin.com/in/zrzrv5" className="social-link" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                                 <i className="fab fa-linkedin"></i>
-                            </a> */}
+                            </a>
                             <a href="https://scholar.google.com/citations?user=p27FiGAAAAAJ" className="social-link" target="_blank" rel="noopener noreferrer" aria-label="Google Scholar">
                                 <i className="fas fa-graduation-cap"></i>
+                            </a>
+                            <a href="https://orcid.org/0000-0002-5789-4629" className="social-link" target="_blank" rel="noopener noreferrer" aria-label="ORCID">
+                                <i className="fab fa-orcid"></i>
                             </a>
                             <a href="https://github.com/zrzrv5" className="social-link" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                                 <i className="fab fa-github"></i>

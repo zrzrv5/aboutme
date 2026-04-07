@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 
 const AcademicView = () => {
     const [publications, setPublications] = useState([]);
-    const [visiblePublications, setVisiblePublications] = useState(4);
+    const [pubMetadata, setPubMetadata] = useState(null);
+    const [isCompact, setIsCompact] = useState(true);
     const [visiblePatents, setVisiblePatents] = useState(2);
     const [loading, setLoading] = useState(true);
 
@@ -10,7 +11,12 @@ const AcademicView = () => {
         fetch('/publications.json')
             .then(response => response.json())
             .then(data => {
-                setPublications(data);
+                if (data.metadata) {
+                    setPublications(data.publications);
+                    setPubMetadata(data.metadata);
+                } else {
+                    setPublications(data);
+                }
                 setLoading(false);
             })
             .catch(error => {
@@ -20,11 +26,7 @@ const AcademicView = () => {
     }, []);
 
     const handleLoadMorePublications = () => {
-        if (visiblePublications >= publications.length) {
-            setVisiblePublications(4);
-        } else {
-            setVisiblePublications(publications.length);
-        }
+        setIsCompact(!isCompact);
     };
 
     const handleLoadMorePatents = () => {
@@ -102,11 +104,16 @@ const AcademicView = () => {
 
             <section className="publications">
                 <h2 className="section-title">Publications</h2>
+                {pubMetadata && (
+                    <div className="section-subtitle">
+                        {publications.length} Publications • {pubMetadata.patents} Patents • {pubMetadata.peerReviews} Peer Reviews • updated {pubMetadata.lastUpdated}
+                    </div>
+                )}
                 <div id="publications-container">
                     {loading ? (
                         <p>Loading publications...</p>
                     ) : (
-                        publications.slice(0, visiblePublications).map((pub, index) => (
+                        publications.filter(pub => !isCompact || pub.show).map((pub, index) => (
                             <div key={index} className="publication-item">
                                 {(pub.coverImage || pub.abstractImage) && (
                                     <div className={pub.coverImage ? "publication-cover-image" : "publication-abstract-image"}>
@@ -140,9 +147,9 @@ const AcademicView = () => {
                 <div className="publications-control">
                     <div className="publications-buttons">
                         <button onClick={handleLoadMorePublications} className="button">
-                            {visiblePublications >= publications.length ? 'Show Less' : 'Show More Publications'}
+                            {!isCompact ? 'Show Less' : 'Show More Publications'}
                         </button>
-                        {visiblePublications >= publications.length && (
+                        {!isCompact && (
                             <a href="https://scholar.google.com/citations?user=p27FiGAAAAAJ" target="_blank" rel="noopener noreferrer" className="button google-scholar-button">
                                 <span>Visit Google Scholar</span>
                             </a>
