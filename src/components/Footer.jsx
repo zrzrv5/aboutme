@@ -5,7 +5,7 @@ const Footer = ({ mode }) => {
     const year = new Date().getFullYear();
 
     const contactInfo = isDeveloper ? {
-        email: 'feedback [at] 1sec.plus',
+        email: 'zrzrv5 [at] 1sec.plus',
         address: ' '
     } : {
         email: '[my first name last name no spaces] [at] [my school domain]',
