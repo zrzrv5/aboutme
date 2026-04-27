@@ -291,7 +291,7 @@ const AcademicView = () => {
             </section>
 
             <div className="downloads-section">
-                <a href="/ZHOU_Rui_CV-2025-Dec.pdf" download="ZHOU_Rui_CV-2025-Dec.pdf" className="button">Download Academic CV</a>
+                <a href="/ZHOU_Rui_CV-2026-Apr.pdf" download="ZHOU_Rui_CV-2026-Apr.pdf" className="button">Download Academic CV</a>
             </div>
         </div>
     );

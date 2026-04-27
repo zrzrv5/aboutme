@@ -33,6 +33,88 @@
     font-family: 'Font Awesome 6 Free', 'Font Awesome 6 Brands' !important;
 }
 
+.static-fallback {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px 64px;
+    color: #1f2937;
+    line-height: 1.65;
+    text-align: left;
+}
+
+.static-fallback header,
+.static-fallback section {
+    margin-bottom: 40px;
+}
+
+.static-fallback h1 {
+    margin-bottom: 16px;
+    color: #0f172a;
+    font-size: clamp(2.5rem, 8vw, 4.75rem);
+    line-height: 0.95;
+}
+
+.static-fallback h2 {
+    margin-bottom: 16px;
+    color: #0f172a;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+}
+
+.static-fallback h3 {
+    margin-bottom: 8px;
+    color: #111827;
+    font-size: 1.125rem;
+}
+
+.static-fallback p,
+.static-fallback li {
+    margin-bottom: 12px;
+}
+
+.static-fallback a {
+    color: #2563eb;
+    font-weight: 700;
+}
+
+.static-fallback-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 40px;
+}
+
+.static-fallback-nav a,
+.static-fallback-button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 10px 16px;
+    border: 1px solid rgba(37, 99, 235, 0.25);
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.08);
+    text-decoration: none;
+}
+
+.static-fallback-item {
+    display: grid;
+    grid-template-columns: minmax(120px, 180px) 1fr;
+    gap: 20px;
+    padding: 24px 0;
+    border-top: 1px solid rgba(15, 23, 42, 0.14);
+}
+
+.static-fallback-item img {
+    width: 100%;
+    max-height: 180px;
+    object-fit: contain;
+}
+
+@media (max-width: 640px) {
+    .static-fallback-item {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Override global reset for BatteryExplorer to allow Tailwind utilities */
 /* Force Tailwind padding utilities to work */
 .battery-explorer-wrapper .p-8 {
@@ -2542,6 +2624,24 @@ body.engineer-mode .developer-background {
     backface-visibility: visible;
 }
 
+/* Safari-optimized fade-in animation */
+@keyframes fade-in-scale {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.animate-fade-in-scale {
+    animation: fade-in-scale 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    transform-origin: center center;
+}
+
 /* Optimization Animations (Connected Constraints) */
 /* 1. Height Animation: Applied to all components synchronously */
 @keyframes optimize-height {
@@ -2601,19 +2701,18 @@ body.engineer-mode .developer-background {
 
     0%,
     100% {
-        transform: translateZ(-1px) translateX(0) translateY(0);
-        width: 3rem;
+        transform: translateZ(-1px) translateX(0) translateY(0) scaleX(1);
     }
 
     50% {
-        transform: translateZ(-1px) translateX(10px) translateY(-0.75rem);
-        width: 2.5rem;
+        transform: translateZ(-1px) translateX(10px) translateY(-0.75rem) scaleX(0.83);
     }
 }
 
 .animate-optimize-tab {
     animation: optimize-tab 4s ease-in-out infinite;
     /* Synced with height animation */
+    transform-origin: center bottom;
 }
 
 /* Graph Animations (Particle Scale) */
@@ -2639,11 +2738,11 @@ body.engineer-mode .developer-background {
 
     0%,
     100% {
-        height: 80%;
+        transform: scaleY(1);
     }
 
     50% {
-        height: 40%;
+        transform: scaleY(0.5);
     }
 }
 
@@ -2656,16 +2755,40 @@ body.engineer-mode .developer-background {
 
     0%,
     100% {
-        height: 20%;
+        transform: scaleY(0.33);
     }
 
     50% {
-        height: 60%;
+        transform: scaleY(1);
     }
 }
 
 .animate-porosity-bar {
     animation: porosity-cycle 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .battery-explorer-wrapper *,
+    .view-content,
+    .floating-tab-wrapper,
+    .floating-tab-button {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .battery-explorer-wrapper .animate-flow,
+    .battery-explorer-wrapper .animate-fade-in-scale,
+    .battery-explorer-wrapper .animate-optimize-height,
+    .battery-explorer-wrapper .animate-optimize-width-left,
+    .battery-explorer-wrapper .animate-optimize-width-right,
+    .battery-explorer-wrapper .animate-optimize-tab,
+    .battery-explorer-wrapper .animate-dist-curve,
+    .battery-explorer-wrapper .animate-density-bar,
+    .battery-explorer-wrapper .animate-porosity-bar {
+        animation: none !important;
+    }
 }
 
 /* BatteryExplorer Scrollbar */

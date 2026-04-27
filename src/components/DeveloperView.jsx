@@ -190,7 +190,6 @@ const DeveloperView = () => {
                                 <a href="https://apps.apple.com/us/app/tears-of-the-kingdom-companion/id6448892536" className="app-link-appstore">
                                     <img src="https://developer.apple.com/app-store/marketing/guidelines/images/badge-download-on-the-app-store.svg" alt="Download on the App Store" />
                                 </a>
-                                <a href="#" className="app-link app-link-product">Product Page</a>
                             </div>
                         </div>
                     </div>
@@ -224,7 +223,6 @@ const DeveloperView = () => {
                                 <a href="https://apps.apple.com/us/app/amiibot/id1514835611" className="app-link-appstore">
                                     <img src="https://developer.apple.com/app-store/marketing/guidelines/images/badge-download-on-the-app-store.svg" alt="Download on the App Store" />
                                 </a>
-                                <a href="#" className="app-link app-link-product">Product Page</a>
                             </div>
                         </div>
                     </div>
@@ -371,9 +369,6 @@ const DeveloperView = () => {
                             <span className="tech">Swift</span>
                         </div>
                         <p>📸 Remote shutter control for Fujifilm cameras (and possibly more brands!) on Apple Watch.</p>
-                        <div className="project-links">
-                            <a href="#" className="project-link">Demo Video</a>
-                        </div>
                     </div>
                     <div className="project-card">
                         <h3>Quick TrajView</h3>
@@ -403,10 +398,6 @@ const DeveloperView = () => {
 
                 </div>
             </section>
-
-            <div className="downloads-section">
-                {/* <a href="#" className="button">Visit 1sec.plus</a> */}
-            </div>
         </div>
     );
 };

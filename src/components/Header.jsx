@@ -31,12 +31,6 @@ const Header = ({ mode, setMode }) => {
 
   const handleModeChange = (newMode) => {
     setMode(newMode);
-    if (window.gtag) {
-      window.gtag('event', 'tab_press', {
-        event_category: 'navigation',
-        event_label: newMode
-      });
-    }
   };
 
   // Helper to get active classes for title options
@@ -93,6 +87,9 @@ const Header = ({ mode, setMode }) => {
         <div
           className={getTitleOptionClass('academic')}
           onClick={() => handleModeChange('academic')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleModeChange('academic')}
         >
           <div className={getTitleClass('academic')}>Ph.D. Candidate</div>
         </div>
@@ -103,6 +100,9 @@ const Header = ({ mode, setMode }) => {
         <div
           className={getTitleOptionClass('engineer')}
           onClick={() => handleModeChange('engineer')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleModeChange('engineer')}
         >
           <div className={getTitleClass('engineer')}>Battery Engineer</div>
         </div>
@@ -113,13 +113,16 @@ const Header = ({ mode, setMode }) => {
         <div
           className={getTitleOptionClass('developer')}
           onClick={() => handleModeChange('developer')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleModeChange('developer')}
         >
           <div className={getTitleClass('developer')}>iOS Developer</div>
         </div>
       </div>
 
       <div className={`text-base md:text-lg font-normal mt-4 opacity-80 transition-opacity duration-200 h-6 ${mode === 'academic' ? 'text-slate-600' : 'text-slate-300'}`}>
-        {mode === 'academic' ? "Atoms go brrrrr" : mode === 'engineer' ? " " : "Yep, native apps only"}
+        {mode === 'academic' ? "Atoms go brrrrr" : mode === 'engineer' ? "Battery R&D, simulation, optimization" : "Yep, native apps only"}
       </div>
 
       {/* Floating Selector */}
@@ -143,7 +146,7 @@ const Header = ({ mode, setMode }) => {
           tabIndex={0}
           onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleModeChange('engineer')}
         >
-          🔋 Engineer
+          🔋 Industry
         </div>
 
         <div

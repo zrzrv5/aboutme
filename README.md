@@ -92,7 +92,7 @@ aboutme/
 │   ├── index.css                # Global styles
 │   └── main.jsx                 # Entry point
 ├── public/
-│   ├── ZHOU_Rui_CV_2025.pdf    # Academic CV
+│   ├── ZHOU_Rui_CV-2026-Apr.pdf # Academic CV
 │   ├── ZHOU_Rui_Resume_2025.pdf # Industry resume
 │   ├── publications.json        # Publication data
 │   └── images/                  # Project images
@@ -162,7 +162,7 @@ Edit `public/publications.json`:
 ### Updating CV/Resume
 
 Replace files in `public/`:
-- `ZHOU_Rui_CV_2025.pdf`
+- `ZHOU_Rui_CV-2026-Apr.pdf`
 - `ZHOU_Rui_Resume_2025.pdf`
 
 ## 🐛 Known Issues & Solutions

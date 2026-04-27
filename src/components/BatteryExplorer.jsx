@@ -130,16 +130,12 @@ const BatteryExplorer = () => {
 
     // Visibility Toggles - Using display:none for Safari performance
     let batteryOpacity = 1;
-    let showBattery = true;
     if (activeSection === 'atom') {
         batteryOpacity = 0.02;
-        showBattery = true; // Keep visible but very faded
     } else if (activeSection === 'particle') {
         batteryOpacity = 0.1;
-        showBattery = true;
     } else if (activeSection === 'contact') {
         batteryOpacity = 0.3;
-        showBattery = true;
     }
 
     const isWireframe = activeSection === 'wireframe' || activeSection === 'contact';
@@ -222,27 +218,29 @@ const BatteryExplorer = () => {
 
                         {/* CATHODE (Left) */}
                         <div
-                            className={`absolute top-0 left-0 w-[45%] h-full z-20 ${isWireframe ? 'wireframe-mode origin-right animate-optimize-width-left' : ''}`}
+                            className={`absolute top-0 left-0 w-[45%] h-full z-20 ${isWireframe ? 'wireframe-mode' : ''}`}
                             style={{
                                 transformStyle: 'preserve-3d',
                                 transform: `translateX(${cathodeX}px)`,
                                 willChange: 'transform'
                             }}
                         >
-                            {/* Tab - Animated in Wireframe */}
-                            <div
-                                className={`absolute -top-8 left-8 w-12 h-10 bg-gradient-to-b from-slate-300 to-slate-400 border-x border-t border-white/50 rounded-t-md shadow-lg ${isWireframe ? 'bg-none border-indigo-500 border-2 text-indigo-500 animate-optimize-tab' : ''}`}
-                                style={{ transform: 'translateZ(-1px)' }}
-                            >
-                                <div className="w-full h-full flex items-center justify-center font-bold text-xs pb-2 text-slate-600">+</div>
-                            </div>
+                            <div className={`relative w-full h-full origin-right ${isWireframe ? 'animate-optimize-width-left' : ''}`}>
+                                {/* Tab - Animated in Wireframe */}
+                                <div
+                                    className={`absolute -top-8 left-8 w-12 h-10 bg-gradient-to-b from-slate-300 to-slate-400 border-x border-t border-white/50 rounded-t-md shadow-lg ${isWireframe ? 'bg-none border-indigo-500 border-2 text-indigo-500 animate-optimize-tab' : ''}`}
+                                    style={{ transform: 'translateZ(-1px)' }}
+                                >
+                                    <div className="w-full h-full flex items-center justify-center font-bold text-xs pb-2 text-slate-600">+</div>
+                                </div>
 
-                            {/* Body - Synchronized Height Animation */}
-                            <div className={`w-full h-full rounded-l-md bg-gradient-to-r from-indigo-800 to-indigo-600 border-y border-l border-indigo-400/50 flex items-center justify-center relative overflow-hidden shadow-xl ${isWireframe ? 'bg-none border-2 border-indigo-500/80 shadow-[0_0_15px_rgba(99,102,241,0.5)] animate-optimize-height' : ''}`}>
-                                {!isWireframe && <div className="absolute inset-0 bg-indigo-400/10 animate-pulse"></div>}
-                                <span className={`font-bold text-4xl z-10 select-none uppercase tracking-wide ${isWireframe ? 'text-indigo-500' : 'text-indigo-200/50'}`} style={{ textAlign: 'center' }}>
-                                    {contentData.cathode.visualLabel}
-                                </span>
+                                {/* Body - Synchronized Height Animation */}
+                                <div className={`w-full h-full rounded-l-md bg-gradient-to-r from-indigo-800 to-indigo-600 border-y border-l border-indigo-400/50 flex items-center justify-center relative overflow-hidden shadow-xl ${isWireframe ? 'bg-none border-2 border-indigo-500/80 shadow-[0_0_15px_rgba(99,102,241,0.5)] animate-optimize-height' : ''}`}>
+                                    {!isWireframe && <div className="absolute inset-0 bg-indigo-400/10 animate-pulse"></div>}
+                                    <span className={`font-bold text-4xl z-10 select-none uppercase tracking-wide ${isWireframe ? 'text-indigo-500' : 'text-indigo-200/50'}`} style={{ textAlign: 'center' }}>
+                                        {contentData.cathode.visualLabel}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
@@ -263,26 +261,28 @@ const BatteryExplorer = () => {
 
                         {/* ANODE (Right) */}
                         <div
-                            className={`absolute top-0 right-0 w-[45%] h-full z-20 ${isWireframe ? 'wireframe-mode origin-left animate-optimize-width-right' : ''}`}
+                            className={`absolute top-0 right-0 w-[45%] h-full z-20 ${isWireframe ? 'wireframe-mode' : ''}`}
                             style={{
                                 transformStyle: 'preserve-3d',
                                 transform: `translateX(${anodeX}px)`,
                                 willChange: 'transform'
                             }}
                         >
-                            {/* Tab - Animated in Wireframe */}
-                            <div
-                                className={`absolute -top-8 right-8 w-12 h-10 bg-gradient-to-b from-orange-300 to-orange-400 border-x border-t border-white/50 rounded-t-md shadow-lg ${isWireframe ? 'bg-none border-emerald-500 border-2 text-emerald-500 animate-optimize-tab' : ''}`}
-                                style={{ transform: 'translateZ(-1px)' }}
-                            >
-                                <div className="w-full h-full flex items-center justify-center font-bold text-xs pb-2 text-orange-900">-</div>
-                            </div>
+                            <div className={`relative w-full h-full origin-left ${isWireframe ? 'animate-optimize-width-right' : ''}`}>
+                                {/* Tab - Animated in Wireframe */}
+                                <div
+                                    className={`absolute -top-8 right-8 w-12 h-10 bg-gradient-to-b from-orange-300 to-orange-400 border-x border-t border-white/50 rounded-t-md shadow-lg ${isWireframe ? 'bg-none border-emerald-500 border-2 text-emerald-500 animate-optimize-tab' : ''}`}
+                                    style={{ transform: 'translateZ(-1px)' }}
+                                >
+                                    <div className="w-full h-full flex items-center justify-center font-bold text-xs pb-2 text-orange-900">-</div>
+                                </div>
 
-                            {/* Body - Synchronized Height Animation */}
-                            <div className={`w-full h-full rounded-r-md bg-gradient-to-l from-slate-700 to-slate-600 border-y border-r border-slate-500/50 flex items-center justify-center relative overflow-hidden shadow-xl ${isWireframe ? 'bg-none border-2 border-emerald-500/80 shadow-[0_0_15px_rgba(16,185,129,0.5)] animate-optimize-height' : ''}`}>
-                                <span className={`font-bold text-4xl z-10 select-none uppercase tracking-wide ${isWireframe ? 'text-emerald-500' : 'text-emerald-400/30'}`} style={{ textAlign: 'center' }}>
-                                    {contentData.anode.visualLabel}
-                                </span>
+                                {/* Body - Synchronized Height Animation */}
+                                <div className={`w-full h-full rounded-r-md bg-gradient-to-l from-slate-700 to-slate-600 border-y border-r border-slate-500/50 flex items-center justify-center relative overflow-hidden shadow-xl ${isWireframe ? 'bg-none border-2 border-emerald-500/80 shadow-[0_0_15px_rgba(16,185,129,0.5)] animate-optimize-height' : ''}`}>
+                                    <span className={`font-bold text-4xl z-10 select-none uppercase tracking-wide ${isWireframe ? 'text-emerald-500' : 'text-emerald-400/30'}`} style={{ textAlign: 'center' }}>
+                                        {contentData.anode.visualLabel}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
@@ -531,12 +531,12 @@ const BatteryExplorer = () => {
                                     <div className="flex items-end justify-around h-16 gap-1 pb-1">
                                         {/* Density Bar - Animated */}
                                         <div className="flex flex-col items-center gap-1 w-1/2 h-full justify-end">
-                                            <div className="w-full bg-indigo-500 rounded-t-sm relative group hover:bg-indigo-400 transition-colors animate-density-bar"></div>
+                                            <div className="w-full bg-indigo-500 rounded-t-sm relative group hover:bg-indigo-400 transition-colors origin-bottom animate-density-bar" style={{ height: '80%' }}></div>
                                             <span className="text-[8px] text-slate-500">Density</span>
                                         </div>
                                         {/* Porosity Bar - Animated (Inverse) */}
                                         <div className="flex flex-col items-center gap-1 w-1/2 h-full justify-end">
-                                            <div className="w-full bg-indigo-300/30 border border-indigo-300 rounded-t-sm group hover:bg-indigo-300/50 transition-colors animate-porosity-bar"></div>
+                                            <div className="w-full bg-indigo-300/30 border border-indigo-300 rounded-t-sm group hover:bg-indigo-300/50 transition-colors origin-bottom animate-porosity-bar" style={{ height: '60%' }}></div>
                                             <span className="text-[8px] text-slate-500">Porosity</span>
                                         </div>
                                     </div>
@@ -660,119 +660,6 @@ const BatteryExplorer = () => {
                 </section>
 
             </div>
-            <style>{`
-        .perspective-container {
-          perspective: 1200px;
-        }
-        @keyframes flow {
-          0% { background-position: 0 0; }
-          100% { background-position: 0 40px; }
-        }
-        .animate-flow {
-          animation: flow 1.5s linear infinite;
-        }
-        .wireframe-mode {
-          backface-visibility: visible;
-        }
-        
-        /* Safari-optimized fade-in animation */
-        @keyframes fade-in-scale {
-          0% { 
-            opacity: 0;
-            transform: scale(0.8);
-          }
-          100% { 
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-        .animate-fade-in-scale {
-          animation: fade-in-scale 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-          transform-origin: center center;
-        }
-        
-        /* --- Optimization Animations (Connected Constraints) --- */
-        
-        @keyframes optimize-height {
-          0%, 100% { transform: scaleY(1); }
-          50% { transform: scaleY(1.15); }
-        }
-        .animate-optimize-height {
-          animation: optimize-height 4s ease-in-out infinite;
-        }
-
-        @keyframes optimize-width-left {
-          0%, 100% { transform: scaleX(1) translateX(0); }
-          50% { transform: scaleX(1.1) translateX(0); }
-        }
-        .animate-optimize-width-left {
-          animation: optimize-width-left 5s ease-in-out infinite;
-        }
-
-        @keyframes optimize-width-right {
-          0%, 100% { transform: scaleX(1) translateX(0); }
-          50% { transform: scaleX(1.15) translateX(0); }
-        }
-        .animate-optimize-width-right {
-          animation: optimize-width-right 5s ease-in-out infinite;
-          animation-delay: 0.5s;
-        }
-
-        /* Tabs: Move position and resize slightly, sync Y with height expansion */
-        @keyframes optimize-tab {
-          0%, 100% { 
-            transform: translateZ(-1px) translateX(0) translateY(0); 
-            width: 3rem; 
-          }
-          50% { 
-            transform: translateZ(-1px) translateX(10px) translateY(-0.75rem); 
-            width: 2.5rem; 
-          }
-        }
-        .animate-optimize-tab {
-          animation: optimize-tab 4s ease-in-out infinite; /* Synced with height */
-        }
-
-        /* --- Graph Animations --- */
-
-        @keyframes dist-shift {
-          0%, 100% { transform: translateX(0px) scaleX(1); }
-          50% { transform: translateX(10px) scaleX(0.8); }
-        }
-        .animate-dist-curve {
-          animation: dist-shift 4s ease-in-out infinite;
-        }
-
-        @keyframes density-cycle {
-          0%, 100% { height: 80%; }
-          50% { height: 40%; }
-        }
-        .animate-density-bar {
-          animation: density-cycle 4s ease-in-out infinite;
-        }
-
-        @keyframes porosity-cycle {
-          0%, 100% { height: 20%; }
-          50% { height: 60%; }
-        }
-        .animate-porosity-bar {
-          animation: porosity-cycle 4s ease-in-out infinite;
-        }
-
-        ::-webkit-scrollbar {
-          width: 10px;
-        }
-        ::-webkit-scrollbar-track {
-          background: #020617;
-        }
-        ::-webkit-scrollbar-thumb {
-          background: #3730a3;
-          border-radius: 5px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-          background: #4f46e5;
-        }
-      `}</style>
         </div>
     );
 };
