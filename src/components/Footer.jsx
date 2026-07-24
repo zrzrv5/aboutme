@@ -2,15 +2,16 @@ import React from 'react';
 
 const Footer = ({ mode }) => {
     const isDeveloper = mode === 'developer';
+    // Industry visitors get the direct address too — the academic riddle is a poor
+    // payoff for the "Get in Touch" CTA in the battery view.
+    const usesDirectEmail = isDeveloper || mode === 'engineer';
     const year = new Date().getFullYear();
 
-    const contactInfo = isDeveloper ? {
-        email: 'zrzrv5 [at] 1sec.plus',
-        address: ' '
-    } : {
-        email: '[my first name last name no spaces] [at] [my school domain]',
-        address: '📍 Iowa State University'
-
+    const contactInfo = {
+        email: usesDirectEmail
+            ? 'zrzrv5 [at] 1sec.plus'
+            : '[my first name last name no spaces] [at] [my school domain]',
+        address: isDeveloper ? ' ' : '📍 Iowa State University'
     };
 
     return (
@@ -44,7 +45,7 @@ const Footer = ({ mode }) => {
                     </div>
                 </div>
                 <div className="copyright">
-                    &copy; <span id="year">{year}</span> 1sec.plus All Rights Reserved.
+                    &copy; <span id="year">{year}</span> 1sec.plus. All Rights Reserved.
                 </div>
             </div>
         </footer>

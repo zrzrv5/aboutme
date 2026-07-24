@@ -98,7 +98,7 @@ const AcademicView = () => {
                         <span>CdTe</span>
                         <span>Si</span>
                     </div>
-                    <p>Investigating of ZnS and CdTe semiconductors using machine learning force fields. Studying the mechanical properties, electronic structures, and photoplasticity of these materials in ground and excited states. </p>
+                    <p>Investigating ZnS and CdTe semiconductors using machine learning force fields. Studying the mechanical properties, electronic structures, and photoplasticity of these materials in ground and excited states. </p>
                 </div>
             </section>
 
@@ -165,12 +165,12 @@ const AcademicView = () => {
                     <div className="timeline-item right">
                         <div className="timeline-dot"></div>
                         <div className="timeline-content">
-                            <div className="timeline-date">2026 Summer</div>
-                            <div className="timeline-title">Upcoming Ph.D. Intern</div>
+                            <div className="timeline-date">Summer 2026</div>
+                            <div className="timeline-title">Intern</div>
                             <div className="timeline-institution">Seagate</div>
-                            <div className="timeline-institution">Normandale, Minnesota</div>
                             <div className="timeline-tags">
-                                {/* <span className="tag"></span> */}
+                                <span className="tag">ML</span>
+                                <span className="tag">MD</span>
                             </div>
                         </div>
                     </div>
@@ -240,7 +240,7 @@ const AcademicView = () => {
                                 <span className="tag">LIB Anode Materials</span>
                                 <span className="tag">Electrochemical Analysis</span>
                                 <span className="tag">Electrospinning</span>
-                                <span className="tag">High-Tempreature-High-Pressure</span>
+                                <span className="tag">High-Temperature-High-Pressure</span>
                             </div>
                         </div>
                     </div>
@@ -253,16 +253,16 @@ const AcademicView = () => {
                     <div className={`achievement-item ${visiblePatents < 1 ? 'hidden' : ''}`}>
                         <h3>Ternary material and preparation method thereof, lithium ion battery and power utilization equipment</h3>
                         <div className="meta">
-                            <span><i>📝</i>CN114744187B (Granted, June 2022)</span>
+                            <span><i>📝</i>CN114744187B (Granted, Jun 2022)</span>
                         </div>
-                        <p>A novel ternary cathode material with optimized stability coefficient that enhances structural integrity during charging cycles, improving battery performance and energy density for advanced power applications.(Summarized by AI🤖)</p>
+                        <p>A novel ternary cathode material with an optimized stability coefficient that enhances structural integrity during charging cycles, improving battery performance and energy density for advanced power applications. (Summarized by AI🤖)</p>
                     </div>
                     <div className={`achievement-item ${visiblePatents < 2 ? 'hidden' : ''}`}>
                         <h3>Method, system, equipment and storage medium for optimizing particle size of material particles</h3>
                         <div className="meta">
                             <span><i>📝</i>CN114169233A (Granted, Nov 2021)</span>
                         </div>
-                        <p>An effective computational approach for determining optimal particle size distributions in battery materials, reducing development time and costs while improving battery density and performance.(Summarized by AI🤖)</p>
+                        <p>An effective computational approach for determining optimal particle size distributions in battery materials, reducing development time and costs while improving battery density and performance. (Summarized by AI🤖)</p>
                     </div>
                     {visiblePatents >= 3 && (
                         <>
@@ -271,14 +271,14 @@ const AcademicView = () => {
                                 <div className="meta">
                                     <span><i>📝</i>CN115579085A (Granted, Oct 2022)</span>
                                 </div>
-                                <p>A practical simulation method for optimizing battery material blending proportions, resulting in enhanced compaction density and improved energy density for next-generation battery systems.(Summarized by AI🤖)</p>
+                                <p>A practical simulation method for optimizing battery material blending proportions, resulting in enhanced compaction density and improved energy density for next-generation battery systems. (Summarized by AI🤖)</p>
                             </div>
                             <div className="achievement-item">
                                 <h3>Parameter identification method, system, device and medium for secondary battery physical model</h3>
                                 <div className="meta">
                                     <span><i>📝</i>CN115392123A (Granted, Aug 2022)</span>
                                 </div>
-                                <p>A reliable framework for identifying critical parameters in battery physical models, enabling accurate characterization of performance across operating conditions to improve efficiency, lifespan, and safety in energy storage applications.(Summarized by AI🤖)</p>
+                                <p>A reliable framework for identifying critical parameters in battery physical models, enabling accurate characterization of performance across operating conditions to improve efficiency, lifespan, and safety in energy storage applications. (Summarized by AI🤖)</p>
                             </div>
                         </>
                     )}
@@ -290,9 +290,6 @@ const AcademicView = () => {
                 </div>
             </section>
 
-            <div className="downloads-section">
-                <a href="/ZHOU_Rui_CV-2026-Apr.pdf" download="ZHOU_Rui_CV-2026-Apr.pdf" className="button">Download Academic CV</a>
-            </div>
         </div>
     );
 };

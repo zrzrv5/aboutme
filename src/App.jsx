@@ -4,6 +4,7 @@ import Footer from './components/Footer';
 import AcademicView from './components/AcademicView';
 import DeveloperView from './components/DeveloperView';
 import BatteryExplorer from './components/BatteryExplorer';
+import ScaleDivePrototype from './components/ScaleDivePrototype';
 
 const MODE_CONFIG = {
   academic: {
@@ -14,12 +15,12 @@ const MODE_CONFIG = {
   engineer: {
     path: '/industry/',
     section: 'industry',
-    title: 'Industry | Rui Zhou Battery R&D And Simulation',
+    title: 'Industry | Rui Zhou Battery R&D and Simulation',
   },
   developer: {
     path: '/developer/',
     section: 'developer',
-    title: 'Developer | Rui Zhou iOS Apps And Scientific Tools',
+    title: 'Developer | Rui Zhou iOS Apps and Scientific Tools',
   },
 };
 
@@ -129,6 +130,11 @@ function App() {
     document.addEventListener('click', handleLinkClick);
     return () => document.removeEventListener('click', handleLinkClick);
   }, []);
+
+  // DEV prototype switch — view the dive-and-climb zoom at any URL with ?proto=dive
+  if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('proto') === 'dive') {
+    return <ScaleDivePrototype />;
+  }
 
   return (
     <>

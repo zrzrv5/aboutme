@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Zap, Battery, Layers, Activity, ArrowDown, Microscope, Box, Grip, Sliders, BarChart3, Linkedin, Download } from 'lucide-react';
+import { Zap, Battery, Layers, Activity, ArrowDown, Microscope, Box, Grip, Sliders, BarChart3, Mail } from 'lucide-react';
 
 const SECTION_IDS = ['intro', 'cathode', 'electrolyte', 'anode', 'atom', 'particle', 'wireframe', 'contact'];
 
@@ -28,27 +28,27 @@ const BatteryExplorer = () => {
         cathode: {
             visualLabel: "Cathode",
             cardTitle: "Cathode Materials",
-            cardBody: "I worked on cathode materials including lithium nickel cobalt manganese (NCM), lithium iron phosphate (LFP), and lithium iron manganese phosphate (LFMP) for lithium-ion batteries.\n I investigated the effects of different doping elements and particle mixing to identify potential candidates for higher energy density, improved high-voltage stability, and better low-temperature performance.",
+            cardBody: "I worked on cathode materials including lithium nickel cobalt manganese oxide (NCM), lithium iron phosphate (LFP), and lithium iron manganese phosphate (LFMP) for lithium-ion batteries.\n I investigated the effects of different doping elements and particle mixing to identify potential candidates for higher energy density, improved high-voltage stability, and better low-temperature performance.",
             cardTags: ["NCM", "LFP", "LFMP"]
         },
         electrolyte: {
-            cardTitle: "Solid State Electrolyte",
-            cardBody: "At Iowa State University, I mainly study solid electrolyte materials for lithium and sodium batteries. My research includes glassy and crystalline materials, including sulfide-based, hydride-based, and oxyhalide-based materials. I investigate their mechanical properties, ionic transportation mechanisms, phase transitions, etc.",
+            cardTitle: "Solid-State Electrolytes",
+            cardBody: "At Iowa State University, I mainly study solid electrolyte materials for lithium and sodium batteries. My research covers glassy and crystalline materials, including sulfide-based, hydride-based, and oxyhalide-based materials. I investigate their mechanical properties, ion transport mechanisms, phase transitions, etc.",
             cardTags: ["Li-Si-P-S", "Na-C-B-H"]
         },
         anode: {
             visualLabel: "Anode",
             cardTitle: "Anode Materials & SEI ",
-            cardBody: "Beyond solid electrolyte materials themselves, my current research also focuses on the interphases they form against metal anodes.\n\nDuring my undergraduate years, I also carried out hands-on experiments on the synthesis of carbon-based anode materials through electrospinning and High-Tempreature-High-Pressure methods. I performed characterizations such as XRD and evaluated performance by assembling half-cells.", cardTags: ["Li Metal", "Graphite"]
+            cardBody: "Beyond solid electrolyte materials themselves, my current research also focuses on the interphases they form against metal anodes.\n\nDuring my undergraduate years, I also carried out hands-on experiments on the synthesis of carbon-based anode materials through electrospinning and High-Temperature-High-Pressure methods. I performed characterizations such as XRD and evaluated performance by assembling half-cells.", cardTags: ["Li Metal", "Graphite"]
         },
         atom: {
             cardTitle: "Atomic Level (Å)",
-            cardBody: "I mostly studied batteries at atomic scale through DFT and MD simulations, gaining atomic insights into ion transport and interfacial phenomena.",
+            cardBody: "I mostly studied batteries at the atomic scale through DFT and MD simulations, gaining atomic insights into ion transport and interfacial phenomena.",
             cardDetail: "First-principles modeling"
         },
         particle: {
             cardTitle: "Particle Scale (µm)",
-            cardBody: "The second-most time I spent is on modeling at the particle level using Discrete Element Methods (DEM). \nDuring my time at Sunwoda, I built the workflow to model the electrode structure with particles of different size distributions and calendaring pressures. \nThis workflow was then integrated into a custom-developed optimization workflow to find the optimal size and pressure allowing for best energy density and rate performance.",
+            cardBody: "The second-largest share of my time went to modeling at the particle level using Discrete Element Methods (DEM). \nDuring my time at Sunwoda, I built the workflow to model the electrode structure with particles of different size distributions and calendering pressures. \nThis workflow was then integrated into a custom optimization loop to find the size and pressure that give the best energy density and rate performance.",
             cardDetail: "DEM & Process Optimization"
         },
         wireframe: {
@@ -617,7 +617,6 @@ const BatteryExplorer = () => {
 
                 {/* Contact/Opportunities Section */}
                 <section
-                    id="contact"
                     ref={el => sectionRefs.current['contact'] = el}
                     className="h-[60vh] flex flex-col items-center justify-center pointer-events-auto relative z-30"
                 >
@@ -626,32 +625,15 @@ const BatteryExplorer = () => {
                             <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg">
                                 <Battery className="w-8 h-8 text-white animate-pulse" />
                             </div>
-                            <h2 className="text-3xl font-bold text-white mb-2">Looking for Opportunities</h2>
+                            <h2 className="text-3xl font-bold text-white mb-2">Open to Full-Time Roles</h2>
                             <p className="text-slate-400 mb-6 text-lg">
-                                Full-time Roles<br />
-                                <span className="text-indigo-400 font-semibold">Expected Graduation: 2026 - 2027</span>
+                                <span className="text-indigo-400 font-semibold">Expected Graduation: 2027</span>
                             </p>
                             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center w-full">
-                                {/* <a
-                                    href="https://www.linkedin.com/in/zrzrv5"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex-1 sm:flex-initial"
-                                >
-                                    <button className="w-full group bg-[#0077b5] hover:bg-[#006396] text-white px-6 py-3 rounded-full font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:scale-105 whitespace-nowrap text-sm sm:text-base">
-                                        <Linkedin className="w-5 h-5 flex-shrink-0" />
-                                        Message me on LinkedIn
-                                // fuck linkedin
-                                    </button>
-                                </a> */}
-                                <a
-                                    href="/ZHOU_Rui_Resume_2025.pdf"
-                                    download="ZHOU_Rui_Resume_2025.pdf"
-                                    className="flex-1 sm:flex-initial"
-                                >
+                                <a href="#contact" className="flex-1 sm:flex-initial">
                                     <button className="w-full group bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-full font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:scale-105 whitespace-nowrap text-sm sm:text-base">
-                                        <Download className="w-5 h-5 flex-shrink-0" />
-                                        Download Resume
+                                        <Mail className="w-5 h-5 flex-shrink-0" />
+                                        Get in Touch
                                     </button>
                                 </a>
                             </div>

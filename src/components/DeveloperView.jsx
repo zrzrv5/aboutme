@@ -147,12 +147,10 @@ const DeveloperView = () => {
                             <p>An experimental scientific visualization tool combining spatial rendering with a node-based editor.</p>
                             <div className="dev-comment">
                                 <span className="dev-comment-tag">Dev Note</span>
-                                <p>Still a work in progress! Recommded TestFlight for the best experience.🚧</p>
+                                <p>Still a work in progress! Recommend TestFlight for the best experience. 🚧</p>
                             </div>
                             <div className="app-links">
-                                <a href="https://apps.apple.com/us/app/naiive/id6758065886" className="app-link-appstore">
-                                    <img src="https://developer.apple.com/app-store/marketing/guidelines/images/badge-download-on-the-app-store.svg" alt="Download on the App Store" />
-                                </a>
+                                <a href="https://naiive.1sec.plus" className="app-link app-link-product">Product Page</a>
                                 <a href="https://testflight.apple.com/join/VrYnN9nE" className="app-link app-link-product">Join TestFlight</a>
                                 <a href="https://github.com/zrzrv5/NAIIVE" className="app-link app-link-product">GitHub</a>
                             </div>
@@ -182,7 +180,7 @@ const DeveloperView = () => {
                                 <span className="dev-comment-tag">Dev Note</span>
                                 <p>Vibe-coding before it's cool.</p>
                                 <p>
-                                    An experiment in rapid dev using generative AI tools (chatGPT, Midjourney) for coding, i18n, and asset creation.
+                                    An experiment in rapid dev using generative AI tools (ChatGPT, Midjourney) for coding, i18n, and asset creation.
                                 </p>
                                 <p>Built in just two days!</p>
                             </div>
@@ -204,7 +202,7 @@ const DeveloperView = () => {
                                 sizes="(max-width: 600px) 300px,
                           (max-width: 1200px) 600px,
                           1200px"
-                                alt="Amiibot Old Banner" />
+                                alt="AmiiBot Banner" />
                             <span className="app-badge badge-downloads">10K+ </span>
                             <span className="app-badge badge-paid" style={{ top: '45px' }}>Paid App</span>
                             <span className="app-badge badge-year" style={{ top: '80px' }}>2020</span>
@@ -237,8 +235,8 @@ const DeveloperView = () => {
                                 sizes="(max-width: 600px) 300px,
                           (max-width: 1200px) 600px,
                           1200px"
-                                alt="Amiibot Old Banner" />
-                            <span className="app-badge badge-downloads">1K~5K</span>
+                                alt="L!NG Banner" />
+                            <span className="app-badge badge-downloads">1K–5K</span>
                             <span className="app-badge badge-deprecated" style={{ top: '45px' }}>In-App Purchase</span>
                             <span className="app-badge badge-year" style={{ top: '80px' }}>2017</span>
                         </div>
@@ -264,7 +262,7 @@ const DeveloperView = () => {
                         <span className="scratch-target">Technical Skills</span>
                         <TitleScribble />
                     </h2>
-                    <span className="handwritten-note">mostly Vibe-coding Now 😬</span>
+                    <span className="handwritten-note">mostly vibe-coding now 😬</span>
                 </div>
 
                 <div className="skills-container">
@@ -277,14 +275,14 @@ const DeveloperView = () => {
                             <span className="skill-title-new">Vibe-code now</span>
                         </h3>
                         <div className="skill-list">
-                            {['Swift', 'Metal', 'Core Data', 'CloudKit', 'CoreNFC', 'VisionOS', 'MapKit'].map((skill, i) => (
+                            {['Swift', 'Metal', 'Core Data', 'CloudKit', 'CoreNFC', 'visionOS', 'MapKit'].map((skill, i) => (
                                 <span className="skill-item" key={skill} style={{ '--tag-seq': `${(i * 0.07).toFixed(2)}s` }}>
                                     {skill}
                                     <ScratchMark className="tag-scratch" seed={200 + i} delay={`calc(var(--card-delay) + 0.64s + ${(i * 0.07).toFixed(2)}s)`} strokes={2} />
                                 </span>
                             ))}
                         </div>
-                        <span className="skill-replacement-note">Codex + Claude Opus</span>
+                        <span className="skill-replacement-note">Codex + <s className="line-through">Fable</s></span>
                     </div>
                     <div className="skill-category skill-category-replaced" style={{ '--card-delay': '0.4s' }}>
                         <h3 className="skill-title-rewrite">
@@ -356,7 +354,7 @@ const DeveloperView = () => {
                             <span className="tech">Swift</span>
                             {/* <span className="tech">Python</span> */}
                         </div>
-                        <p>🛣️ Turn dashcam footages into trip logs</p>
+                        <p>🛣️ Turn dashcam footage into trip logs</p>
                         <div className="project-links">
                             <a href="https://laneloaf.1sec.plus" className="project-link">Product Page</a>
                         </div>
@@ -377,7 +375,7 @@ const DeveloperView = () => {
                             <span className="tech">Three.js</span>
                             <span className="tech">Python</span>
                         </div>
-                        <p>🧑‍🔬 viewing atom simulation trajectories directly in VS Code Server! A vibe-coding project that glue Three.js and dpdata python package.</p>
+                        <p>🧑‍🔬 Viewing atom simulation trajectories directly in VS Code Server! A vibe-coding project that glues Three.js and the dpdata Python package.</p>
                         <div className="project-links">
                             <a href="https://github.com/zrzrv5/QuickTrajView-vscode" className="project-link">GitHub</a>
                         </div>

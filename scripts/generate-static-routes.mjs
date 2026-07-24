@@ -133,7 +133,7 @@ const homeFallback = `
       <p>Battery materials researcher, simulation engineer, and iOS developer working across atomistic modeling, solid-state electrolytes, and practical app products.</p>
     </header>
     <section>
-      <h2>Battery Research And Industry Work</h2>
+      <h2>Battery Research and Industry Work</h2>
       <p>I study solid-state battery materials with molecular dynamics, density functional theory, machine-learning force fields, and process-level simulation. My industry experience includes cathode materials, particle-scale modeling, electrode optimization, and parameter identification for battery models.</p>
     </section>
     <section>
@@ -152,7 +152,6 @@ const academicFallback = `
     <header>
       <h1>Rui Zhou Academic Profile</h1>
       <p>Ph.D. candidate in Materials Science and Engineering at Iowa State University, focused on computational battery materials, solid electrolytes, and machine-learning force-field simulations.</p>
-      <p><a class="static-fallback-button" href="/ZHOU_Rui_CV-2026-Apr.pdf">Download Academic CV</a></p>
     </header>
     <section>
       <h2>Research Areas</h2>
@@ -168,7 +167,7 @@ const academicFallback = `
       ${publications.map(renderPublication).join('')}
     </section>
     <section>
-      <h2>Education And Experience</h2>
+      <h2>Education and Experience</h2>
       <ul>
         <li>Ph.D. in Materials Science and Engineering, Iowa State University, Jan 2023 - present.</li>
         <li>Simulation Engineer, Sunwoda Electric Vehicle Battery Co., Ltd., Dec 2020 - Dec 2022.</li>
@@ -184,7 +183,6 @@ const industryFallback = `
     <header>
       <h1>Rui Zhou Industry Battery R&amp;D</h1>
       <p>Battery simulation and materials R&amp;D experience across cathodes, solid electrolytes, anodes, particle-scale electrode structure, parameter identification, and data-driven modeling.</p>
-      <p><a class="static-fallback-button" href="/ZHOU_Rui_Resume_2025.pdf">Download Resume</a></p>
     </header>
     <section>
       <h2>Industry Focus</h2>
@@ -234,7 +232,7 @@ const routes = [
   {
     path: '/',
     output: 'index.html',
-    title: 'Rui Zhou | Battery Materials Research, Simulation, And iOS Apps',
+    title: 'Rui Zhou | Battery Materials Research, Simulation, and iOS Apps',
     description:
       'Rui Zhou is a battery materials researcher, simulation engineer, and iOS developer focused on solid-state electrolytes, machine-learning force fields, and practical app products.',
     image: `${SITE_URL}/images/publications/ACS_Na2B10H10_medium.png`,
@@ -265,7 +263,7 @@ const routes = [
   {
     path: '/industry/',
     output: 'industry/index.html',
-    title: 'Industry | Rui Zhou Battery R&D And Simulation',
+    title: 'Industry | Rui Zhou Battery R&D and Simulation',
     description:
       'Industry-facing battery R&D portfolio for Rui Zhou: cathode materials, solid electrolytes, DEM, DFT, MD, parameter identification, and data-driven modeling.',
     image: `${SITE_URL}/images/publications/ACS_Na2B12H12_medium.png`,
@@ -280,7 +278,7 @@ const routes = [
   {
     path: '/developer/',
     output: 'developer/index.html',
-    title: 'Developer | Rui Zhou iOS Apps And Scientific Tools',
+    title: 'Developer | Rui Zhou iOS Apps and Scientific Tools',
     description:
       'Developer portfolio for Rui Zhou: released iOS apps, TestFlight projects, scientific visualization tools, and native Apple platform work.',
     image: `${SITE_URL}/images/naiive/naiive_me_banner-1.png`,
