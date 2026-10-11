@@ -121,10 +121,10 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
     <main id="main-content" className="mg-sheet" aria-label="Rui Zhou’s research and projects" tabIndex={-1}>
       <header className="mg-head" id="profile" tabIndex={-1}>
         <Row note={<Note tilt={-3} delay={300}>atoms go brrrrr</Note>}>
-          <h1>Rui Zhou <span className="mg-name-zh" lang="zh">周睿</span></h1>
+          <h1>Rui Zhou</h1>
           <p className="mg-role">I study materials and build software to work with them.</p>
           <p className="mg-intro">My work spans battery materials, semiconductors, ceramics and metals. I use atomic simulations and machine learning to understand how they behave — and make tools for exploring the results.</p>
-          <p className="mg-current">PhD candidate · Iowa State University · Advised by Qi An</p>
+          <p className="mg-current">PhD candidate · Iowa State University</p>
           <p className="mg-availability">{person.availability}</p>
           <p className="mg-proof"><strong>{papers.length||counts.papers}</strong> peer-reviewed papers · <strong>{selectedPapers.length||counts.firstAuthor}</strong> first-author · <strong>{patents.length}</strong> granted patents</p>
           <p className="mg-contact"><a href={links.email}>Email</a><a href={links.linkedin}>LinkedIn</a><a href={links.scholar}>Google Scholar</a><a href={links.github}>GitHub</a></p>
@@ -133,13 +133,13 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
 
       <section data-reading-focus="isu" id="summary" tabIndex={-1}>
         <Row label={<h2 className="mg-h">Research</h2>}>
-          <h3 className="mg-entry-title">How atoms move, and why it matters</h3>
+          <h3 className="mg-entry-title">Ion transport and interfacial reactions</h3>
           <p>In solid electrolytes, I study how disorder, phase changes and interfaces shape <Hl>ion transport</Hl>. My systems include thiophosphate glasses, closo-hydroborates and metal oxyhalides.</p>
           <p className="mg-result">At lithium–sulfide interfaces, our simulations linked faster interphase growth to phosphorus-rich chemistry and showed how a crystallization event could slow further thickening.</p>
           <p className="mg-project-links"><a data-analytics="publication" href="https://doi.org/10.1039/D6TA01253A" target="_blank" rel="noreferrer">Lithium–electrolyte interfaces ↗</a><a data-analytics="publication" href="https://doi.org/10.1021/acsaem.6c00367" target="_blank" rel="noreferrer">Closo-hydroborates ↗</a></p>
         </Row>
         <Row>
-          <h3 className="mg-entry-title">When crystals deform</h3>
+          <h3 className="mg-entry-title">Defects and mechanical response</h3>
           <p>Other collaborations follow dislocations in high-entropy carbides and Mg–Bi alloys, and the effect of light on ZnS and CdTe. Electronic-structure calculations and ML potentials help connect atomic changes to <Hl>mechanical response</Hl>.</p>
           <p className="mg-result">In our ZnS study, photoexcitation increased the stress needed for dislocations to move, helping explain why illumination makes the crystal harder to deform.</p>
           <p className="mg-project-links"><a data-analytics="publication" href="https://doi.org/10.1021/acsaenm.4c00280" target="_blank" rel="noreferrer">Carbide ceramics ↗</a><a data-analytics="publication" href="https://doi.org/10.1103/l83s-dwqz" target="_blank" rel="noreferrer">Mg–Bi alloys ↗</a><a data-analytics="publication" href="https://doi.org/10.1021/acsmaterialslett.4c01982" target="_blank" rel="noreferrer">ZnS photoplasticity ↗</a><a data-analytics="publication" href="https://doi.org/10.1016/j.ijmecsci.2025.110765" target="_blank" rel="noreferrer">CdTe photoplasticity ↗</a></p>

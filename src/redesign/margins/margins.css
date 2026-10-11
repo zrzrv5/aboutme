@@ -382,7 +382,6 @@ body.mg-body-bg { background: #e8e6e0; }
 .mg-skills>.mg-body>.mg-skill-routes{margin-top:0}
 @media(prefers-reduced-motion:reduce){.mg-note-tick{transition:none}}
 
-.mg-name-zh{font:400 .40em/1.2 system-ui,sans-serif!important;color:var(--dim);letter-spacing:.06em;white-space:nowrap;vertical-align:middle;margin-left:8px}
 .mg-availability{font-size:16px;margin-top:8px;color:var(--ink)}
 .mg-proof{font-size:15.5px;margin-top:10px;color:var(--dim);font-variant-numeric:tabular-nums}
 .mg-result{margin-top:9px}
@@ -390,7 +389,7 @@ body.mg-body-bg { background: #e8e6e0; }
 .mg-project-status{font-size:12px;color:var(--dim);margin-bottom:5px}
 .mg-patent-dates{display:block;color:var(--dim);font-size:13px;margin-top:3px}
 .mg-skill-routes li>small{display:block;color:var(--dim);margin-top:3px}
-@media(max-width:600px){.mg-tools{gap:12px}.mg-tools .mg-notes-toggle{font-size:22px}.mg-name-zh{margin-left:3px}.mg-availability{font-size:15px}}
+@media(max-width:600px){.mg-tools{gap:12px}.mg-tools .mg-notes-toggle{font-size:22px}.mg-availability{font-size:15px}}
 
 html[data-margin-notes='off'] .mg-note{visibility:hidden}
 html[data-margin-notes='off'] .mg-hl{background:transparent}
