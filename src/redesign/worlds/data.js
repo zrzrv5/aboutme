@@ -145,7 +145,7 @@ export const ENTITIES = [
     kind: 'education',
     name: '理工门 · Gate of Light',
     roleLabel: 'Undergrad @ CUST',
-    title: '长春理工大学 · CUST',
+    title: '长春理工大学 · Changchun University of Science and Technology',
     period: '2014 – 2018',
     sectionLabel: 'Study',
     publicationYears: [2014, 2018],

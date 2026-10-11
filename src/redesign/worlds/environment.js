@@ -44,7 +44,8 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   const c = COLORS[art] ?? COLORS.diorama;
   const illustrated = art === 'illustrated';
   const pixel = art === 'pixel';
-  const quality=worldRenderSettings({coarse:window.matchMedia('(pointer: coarse)').matches,pixel,dpr:window.devicePixelRatio||1});
+  const coarse=window.matchMedia('(pointer: coarse)').matches;
+  const quality=worldRenderSettings({coarse,pixel,dpr:window.devicePixelRatio||1});
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(c.sea);
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !pixel, alpha: false, powerPreference: 'low-power' });
@@ -413,7 +414,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   function resize(w,h) {
     width=Math.max(1,w); height=Math.max(1,h);
     const aspect=width/height;
-    renderer.setPixelRatio(quality.pixelRatio);
+    renderer.setPixelRatio(worldRenderSettings({coarse,pixel,dpr:window.devicePixelRatio||1,width,height}).pixelRatio);
     const renderWidth=pixel?Math.max(280,Math.round(width/2.2)):width;
     renderer.setSize(renderWidth,pixel?Math.round(renderWidth/aspect):height,false);
     orbit.resize(width,height,inspecting);

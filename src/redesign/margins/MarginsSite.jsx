@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { ArrowUpRight } from 'lucide-react';
 import { links, patents, person, counts, experienceById, appById } from '../content';
 import usePublications from '../usePublications';
 import { Hl, Under, Note } from './ink';
@@ -25,7 +26,7 @@ function Row({ children, label, note, className = '', id, project = false }) {
 
 function ProjectLinks({project}) {
   if(!project.links?.length)return null;
-  return <p className="mg-project-links">{project.links.map(link=><a key={link.href} href={link.href} target="_blank" rel="noreferrer">{link.label}<span aria-hidden="true"> ↗</span></a>)}</p>;
+  return <p className="mg-project-links">{project.links.map(link=><a key={link.href} href={link.href} target="_blank" rel="noreferrer">{link.label}<span aria-hidden="true"> <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></span></a>)}</p>;
 }
 
 const APP_NOTES={
@@ -110,7 +111,7 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
   return <div className={`rz-margins ${notes?'notes-on':'notes-off'}`}>
     <nav className="mg-tools" aria-label="Page view">
       <a className="mg-explore" href={siteUrl('world',reading)} title="Explore the same research and projects on an interactive island" onClick={event=>{if(onSwitch&&!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey){event.preventDefault();onSwitch(readAnchor.current??reading);}}}>
-        <span>Explore in 3D</span><span className="mg-tab-arrow" aria-hidden="true">↗</span>
+        <span>Explore in 3D</span><ArrowUpRight className="mg-tab-arrow" size={20} aria-hidden="true"/>
       </a>
       <button className="mg-notes-toggle" type="button" role="switch" aria-checked={notes} onClick={toggleNotes} aria-label="Margin notes and highlights" title={notes?'Hide handwritten notes and highlights':'Show handwritten notes and highlights'}>
         <svg className="mg-note-check" viewBox="0 0 24 24" width="23" height="23" aria-hidden="true"><path className="mg-note-box" d="m4 5 15-1 1 16-16-1Z"/><path className="mg-note-tick" d="m6 11 5 5L21 3"/></svg>
@@ -136,20 +137,20 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
           <h3 className="mg-entry-title">Ion transport and interfacial reactions</h3>
           <p>In solid electrolytes, I study how disorder, phase changes and interfaces shape <Hl>ion transport</Hl>. My systems include thiophosphate glasses, closo-hydroborates and metal oxyhalides.</p>
           <p className="mg-result">At lithium–sulfide interfaces, our simulations linked faster interphase growth to phosphorus-rich chemistry and showed how a crystallization event could slow further thickening.</p>
-          <p className="mg-project-links"><a data-analytics="publication" href="https://doi.org/10.1039/D6TA01253A" target="_blank" rel="noreferrer">Lithium–electrolyte interfaces ↗</a><a data-analytics="publication" href="https://doi.org/10.1021/acsaem.6c00367" target="_blank" rel="noreferrer">Closo-hydroborates ↗</a></p>
+          <p className="mg-project-links"><a data-analytics="publication" href="https://doi.org/10.1039/D6TA01253A" target="_blank" rel="noreferrer">Lithium–electrolyte interfaces <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1021/acsaem.6c00367" target="_blank" rel="noreferrer">Closo-hydroborates <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a></p>
         </Row>
         <Row>
           <h3 className="mg-entry-title">Defects and mechanical response</h3>
           <p>Other collaborations follow dislocations in high-entropy carbides and Mg–Bi alloys, and the effect of light on ZnS and CdTe. Electronic-structure calculations and ML potentials help connect atomic changes to <Hl>mechanical response</Hl>.</p>
           <p className="mg-result">In our ZnS study, photoexcitation increased the stress needed for dislocations to move, helping explain why illumination makes the crystal harder to deform.</p>
-          <p className="mg-project-links"><a data-analytics="publication" href="https://doi.org/10.1021/acsaenm.4c00280" target="_blank" rel="noreferrer">Carbide ceramics ↗</a><a data-analytics="publication" href="https://doi.org/10.1103/l83s-dwqz" target="_blank" rel="noreferrer">Mg–Bi alloys ↗</a><a data-analytics="publication" href="https://doi.org/10.1021/acsmaterialslett.4c01982" target="_blank" rel="noreferrer">ZnS photoplasticity ↗</a><a data-analytics="publication" href="https://doi.org/10.1016/j.ijmecsci.2025.110765" target="_blank" rel="noreferrer">CdTe photoplasticity ↗</a></p>
+          <p className="mg-project-links"><a data-analytics="publication" href="https://doi.org/10.1021/acsaenm.4c00280" target="_blank" rel="noreferrer">Carbide ceramics <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1103/l83s-dwqz" target="_blank" rel="noreferrer">Mg–Bi alloys <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1021/acsmaterialslett.4c01982" target="_blank" rel="noreferrer">ZnS photoplasticity <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1016/j.ijmecsci.2025.110765" target="_blank" rel="noreferrer">CdTe photoplasticity <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a></p>
         </Row>
         <Row id="papers" className="mg-pub">
           <details className="mg-reading" open={focusId==='library'||undefined}>
             <summary>Selected papers &amp; authors</summary>
             {status==='loading'?<p role="status">Loading publications…</p>:status==='error'?<p>Find the publication list on <a href={links.scholar}>Google Scholar</a>.</p>:null}
             <ol>{selectedPapers.map(p=><li key={p.link}><a data-analytics="publication" href={p.link} target="_blank" rel="noreferrer"><Chem>{p.title}</Chem></a><PaperAuthors authors={p.authors}/><small>{p.venue} · {p.year}</small></li>)}</ol>
-            <a href={links.scholar}>All publications on Google Scholar ↗</a>
+            <a href={links.scholar}>All publications on Google Scholar <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a>
           </details>
         </Row>
       </section>
@@ -183,13 +184,13 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
         {JOURNEY.map((entry,index)=><Row key={entry.id} id={entry.id} label={index===0?<h2 className="mg-h">Along the way</h2>:null} className="mg-job">
           <h3 className="mg-entry-title">{entry.title}</h3><p className="mg-title">{entry.role}</p><p className="mg-when">{entry.period}</p><p>{entry.text}</p>
           {entry.work?<dl className="mg-work-notes">{entry.work.map(work=><div key={work.title}><dt>{work.title}</dt><dd>{work.text}</dd></div>)}</dl>:null}
-          {entry.id==='sunwoda'?<details id="patents" tabIndex={-1} className="mg-reading" open={focusId==='patents'||undefined}><summary>{patents.length} granted patents from battery R&amp;D</summary><ul>{patents.map(p=><li key={p.id}><a href={p.href} target="_blank" rel="noreferrer">{p.title} · {p.id} ↗</a><small className="mg-patent-dates">Filed {p.filed} · Granted {p.granted}</small></li>)}</ul></details>:null}
+          {entry.id==='sunwoda'?<details id="patents" tabIndex={-1} className="mg-reading" open={focusId==='patents'||undefined}><summary>{patents.length} granted patents from battery R&amp;D</summary><ul>{patents.map(p=><li key={p.id}><a href={p.href} target="_blank" rel="noreferrer">{p.title} · {p.id} <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><small className="mg-patent-dates">Filed {p.filed} · Granted {p.granted}</small></li>)}</ul></details>:null}
         </Row>)}
       </section>
 
       <section id="education" tabIndex={-1}>
-        <Row label={<h2 className="mg-h">Earlier</h2>} id="wustl"><h3 className="mg-entry-title">Washington University in St. Louis</h3><p className="mg-title">Master of Science · Materials Science and Engineering</p><p className="mg-when">2018 – 2020 · St. Louis, Missouri</p><p>Studying water evaporating from graphene-coated silicon introduced me to molecular dynamics and working on a cluster.</p><p className="mg-coursework">Course projects added MEMS microfabrication — a team project building a passive-mixer microfluidic device — and CFD simulation with ANSYS Fluent.</p><p className="mg-project-links"><a data-analytics="publication" href="https://openscholarship.wustl.edu/eng_etds/694/" target="_blank" rel="noreferrer">Read the thesis ↗</a></p></Row>
-        <Row id="cust"><h3 className="mg-entry-title">Changchun University of Science and Technology</h3><p className="mg-title">Bachelor of Science · Materials Science and Engineering</p><p className="mg-when">2014 – 2018 · Changchun, China</p><p>My starting point was experimental: carbon anode materials, electrospinning, synthesis and half-cell testing. Python and MATLAB began here, too.</p><p className="mg-project-links"><a data-analytics="publication" href="https://doi.org/10.1016/j.jcis.2017.07.117" target="_blank" rel="noreferrer">Carbon nanofibers ↗</a></p></Row>
+        <Row label={<h2 className="mg-h">Earlier</h2>} id="wustl"><h3 className="mg-entry-title">Washington University in St. Louis</h3><p className="mg-title">Master of Science · Materials Science and Engineering</p><p className="mg-when">2018 – 2020 · St. Louis, Missouri</p><p>Studying water evaporating from graphene-coated silicon introduced me to molecular dynamics and working on a cluster.</p><p className="mg-coursework">Course projects added MEMS microfabrication — a team project building a passive-mixer microfluidic device — and CFD simulation with ANSYS Fluent.</p><p className="mg-project-links"><a data-analytics="publication" href="https://openscholarship.wustl.edu/eng_etds/694/" target="_blank" rel="noreferrer">Read the thesis <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a></p></Row>
+        <Row id="cust"><h3 className="mg-entry-title">Changchun University of Science and Technology</h3><p className="mg-title">Bachelor of Science · Materials Science and Engineering</p><p className="mg-when">2014 – 2018 · Changchun, China</p><p>My starting point was experimental: carbon anode materials, electrospinning, synthesis and half-cell testing. Python and MATLAB began here, too.</p><p className="mg-project-links"><a data-analytics="publication" href="https://doi.org/10.1016/j.jcis.2017.07.117" target="_blank" rel="noreferrer">Carbon nanofibers <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a></p></Row>
       </section>
 
       <section data-reading-focus="item:python" id="skills" tabIndex={-1}>

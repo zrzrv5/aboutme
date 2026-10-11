@@ -49,7 +49,7 @@ function EntityDetails({ entity, papers }) {
     {entity.media?<ProjectMedia title={entity.title} media={entity.media}/>:null}
     {entity.stats ? <div className="atlas-stats">{entity.stats.map(stat => <span key={stat.label}><b>{stat.value}%</b>{stat.label}</span>)}</div> : null}
     {entity.papers ? <ol className="atlas-papers">{papers.map(paper => <li key={paper.link}>
-      <a data-analytics="publication" href={paper.link} target="_blank" rel="noreferrer"><Chem>{paper.title}</Chem> ↗</a>
+      <a data-analytics="publication" href={paper.link} target="_blank" rel="noreferrer"><Chem>{paper.title}</Chem> <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a>
       <PaperAuthors authors={paper.authors}/>
       <small>{paper.year} · {paper.venue}{paper.firstAuthor ? ' · first author' : ''}</small>
     </li>)}</ol> : null}
@@ -92,7 +92,7 @@ function ExperienceDetails({ entity, papers, publicationStatus, publicationMeta,
       {publicationStatus === 'loading' ? <p className="game-prose" role="status">Loading papers…</p> : publicationStatus === 'error' ? <p className="game-prose">The paper list could not be loaded. You can find it on Google Scholar.</p> : <>
         <p className="game-experience-caption">{relevantPapers.length} peer-reviewed{firstAuthorCount ? ` · ${firstAuthorCount} first-author` : ''}</p>
         <ol className="atlas-papers">{relevantPapers.map(paper => <li key={paper.link}>
-          <a data-analytics="publication" href={paper.link} target="_blank" rel="noreferrer"><Chem>{paper.title}</Chem> ↗</a>
+          <a data-analytics="publication" href={paper.link} target="_blank" rel="noreferrer"><Chem>{paper.title}</Chem> <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a>
           <PaperAuthors authors={paper.authors}/>
           <small>{paper.year} · {paper.venue}{paper.firstAuthor ? ' · first author' : ''}</small>
         </li>)}</ol>
@@ -277,7 +277,7 @@ export default function GameWorld({ focusId, onSwitch }) {
 
       <Privacy/>
       <p className="game-menu-hint">Drag to rotate. Scroll or pinch to zoom.<br/>Arrow keys rotate; + / − zoom; Home resets.<br/><br/>The tool chest holds my skills.<br/>The noticeboard keeps my field journal.<br/>The mirror opens my portfolio.</p>
-      <p className="game-build-credit">Built with GPT-6 Astra :)<br/><a href="https://github.com/zrzrv5/aboutme/tree/claude/website-redesign-exploration-4a44e6" target="_blank" rel="noreferrer">Source on GitHub ↗</a></p>
+      <p className="game-build-credit">Built with GPT-6 Astra :)<br/><a href="https://github.com/zrzrv5/aboutme/tree/claude/website-redesign-exploration-4a44e6" target="_blank" rel="noreferrer">Source on GitHub <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a></p>
     </GameWindow> : null}
   </main>;
 }

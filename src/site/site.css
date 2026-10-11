@@ -5,6 +5,7 @@ button,input,select,textarea{font:inherit}
 button,a{-webkit-tap-highlight-color:transparent}
 button{cursor:pointer}
 img,svg{vertical-align:middle}
+.inline-link-arrow{display:inline-block;width:.9em;height:.9em;flex:none;margin-left:.15em;vertical-align:-.08em;stroke-width:1.5;pointer-events:none}
 button:disabled{cursor:default}
 :focus-visible{outline:2px solid currentColor;outline-offset:4px}
 body.ws-fun{overflow:hidden;background:#d8e6df}
