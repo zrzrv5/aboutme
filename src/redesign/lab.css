@@ -1,0 +1,51 @@
+body.redesign-lab { overflow-x: hidden; }
+
+.lab-switcher {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 9999;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 8px;
+  background: #1d1d1b;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+}
+
+.lab-switcher a {
+  font: 500 12px/1 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  color: #a6a6a0;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 6px;
+}
+
+.lab-switcher a:hover { color: #fff; }
+.lab-switcher a.on { background: #fcfcfb; color: #1d1d1b; }
+
+.lab-loading { min-height: 100vh; }
+
+.lab-chooser {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 112px 24px 120px;
+  color: #1d1d1b;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+body.redesign-lab:has(.lab-chooser) { background: #fcfcfb; }
+
+.lab-chooser * { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+.lab-chooser h1 { font-size: 15px; font-weight: 600; margin-bottom: 32px; }
+.lab-chooser ol { list-style: none; }
+.lab-chooser li { padding: 14px 0; border-top: 1px solid #e9e9e5; }
+.lab-chooser li a { color: #1d1d1b; font-weight: 500; }
+.lab-chooser li p { color: #75756f; }
+.lab-chooser a { color: inherit; text-underline-offset: 3px; }
+.lab-foot { margin-top: 32px; color: #75756f; }
+
+/* Undo element styles from the current site's index.css */
+body.redesign-lab footer { background: none; color: inherit; padding: 0; transition: none; }
+body.redesign-lab header { height: auto; }

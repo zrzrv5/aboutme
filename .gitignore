@@ -23,3 +23,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local visual QA and implementation snapshots
+.claude/design-previews/
+.claude/design-backups/

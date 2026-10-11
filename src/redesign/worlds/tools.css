@@ -1,0 +1,66 @@
+/* A field notebook: one selected skill, its actual growth, and the work behind it. */
+.game-window-inventory{width:min(1060px,calc(100vw - 56px));max-height:min(91dvh,870px);background:#173537;border:1px solid #a7ae91;border-radius:6px;box-shadow:0 24px 80px #102d3866}
+.game-window-inventory::backdrop{background:#0d252ba8;backdrop-filter:blur(3px)}
+.game-window-inventory .game-window-heading{padding:12px 20px 12px 26px;border-bottom:1px solid #91a39835}
+.game-window-inventory .game-window-heading h1{font-size:24px;color:#f1e5bd}
+.game-window-inventory .game-window-body{padding:0;scrollbar-color:#758c82 #173537}
+.skill-atlas{display:grid;grid-template-columns:235px minmax(0,1fr);color:#dbe3d4}
+.skill-catalog{padding:22px 17px 23px;border-right:1px solid #91a39835;background:#142f32}
+.skill-catalog-caption{display:flex;justify-content:space-between;font-size:9px;letter-spacing:1.8px;margin:0 6px 21px;color:#bdb68e}
+.skill-catalog-caption span{letter-spacing:0;color:#8fa9a2}
+.skill-catalog section+section{margin-top:21px}
+.skill-catalog h2{margin:0 7px 8px;font:500 10px/1.4 sans-serif;color:#a5bcb0;letter-spacing:.6px}
+.skill-catalog button{width:100%;display:flex;align-items:center;gap:8px;min-height:37px;padding:3px 6px;border:0;border-left:2px solid transparent;background:none;text-align:left;color:#a9bdb2;font-size:11px;border-radius:0}
+.skill-catalog button .atlas-equipment{width:27px;height:27px;flex:none;opacity:.8}
+.skill-catalog button small{margin-left:auto;color:#718e83;font:11px monospace}
+.skill-catalog button[aria-pressed=true]{color:#f8e9b3;background:#284749;border-left-color:#dfcb93}
+.skill-catalog button[aria-pressed=true] small{color:#e5d099}
+.skill-catalog button:hover{color:#fff0c0;background:#274547}
+.skill-catalog button:focus-visible,.skill-atlas button:focus-visible{outline:2px solid #ddcc99;outline-offset:2px}
+.skill-workspace{min-width:0;padding:24px 30px 0}
+.skill-hero{display:flex;align-items:center;gap:25px;min-height:156px;padding:0 0 20px}
+.skill-emblem{position:relative;display:grid;place-items:center;width:125px;height:140px;flex:none}
+.skill-emblem .atlas-equipment{width:116px;height:116px;filter:drop-shadow(4px 7px 0 #09242966);animation:skill-arrive .2s ease-out}
+.skill-emblem>span{font:11px monospace;letter-spacing:1px;color:#dfca90}
+.skill-eyebrow{font-size:9px;text-transform:uppercase;letter-spacing:1.6px;color:#b8bd95;margin:0 0 9px}
+.skill-hero h2{font:500 30px/1.05 Georgia,serif;letter-spacing:-.5px;color:#f2e6bc;margin:0 0 9px}
+.skill-definition{font-size:12px;line-height:1.5;margin:0;color:#c1d3c6}
+.skill-stack{font:11px/1.6 monospace;color:#8eafa7;margin:9px 0 0}
+.skill-growth-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:20px;border-top:1px solid #91a39835}
+.skill-growth-heading h3{font-size:11px;font-weight:500;color:#d2c79c;margin:0}
+.skill-growth-heading>span{color:#809f95;font-size:10px}
+.skill-route-scroll{overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:#708f83 transparent;margin:0 -9px}
+.skill-route{position:relative;margin:auto}
+.skill-route svg{position:absolute;width:100%;height:100%;inset:0;overflow:visible;pointer-events:none}
+.skill-guide{stroke:#8ba79b20;stroke-width:1}
+.skill-route svg text{fill:#78988c;font:9px monospace}
+.skill-route-earned{stroke:#dec990;stroke-width:2;fill:none}
+.skill-route-applied{stroke:#8fada3;stroke-width:2;stroke-dasharray:4 5;fill:none}
+.skill-route-drop{stroke:#8ba79b24;stroke-width:1;fill:none}
+.skill-node{position:absolute;transform:translate(-50%,-16px);display:flex;flex-direction:column;align-items:center;padding:0;width:114px;height:58px;background:none;border:0;color:#a5bfb1;overflow:visible}
+.skill-node-ring{display:grid;place-items:center;width:32px;height:32px;background:#173537;border:1px solid #a79f79;border-radius:50%;outline:5px solid #173537;transition:background .16s,box-shadow .16s}
+.skill-node-ring b{font:12px monospace;color:#c9bb8e}
+.skill-node small{font-size:9px;margin-top:7px;white-space:nowrap}
+.skill-node[aria-pressed=true] .skill-node-ring{background:#d7c28b;border-color:#e5d6a9;box-shadow:0 0 0 7px #d7c28b20}
+.skill-node[aria-pressed=true] .skill-node-ring b{color:#233a35}
+.skill-node.is-application .skill-node-ring{border-style:dashed}
+.skill-node:hover .skill-node-ring{box-shadow:0 0 0 7px #d7c28b20}
+.skill-node-place{position:absolute;font-size:10px;width:126px;line-height:1.35;color:#d3dcca}
+.skill-node[aria-pressed=true] .skill-node-place{color:#f6e5aa}
+.skill-milestone{position:relative;display:grid;grid-template-columns:46px 1fr;gap:14px;min-height:175px;border-top:1px solid #91a39835;padding:23px 0 20px}
+.skill-milestone-number{white-space:nowrap;padding-top:3px}.skill-milestone-number>span{font:32px/1 Georgia,serif;color:#e3d2a2}.skill-milestone-number small{font:9px monospace;color:#6f9286}
+.skill-milestone-meta{font-size:9px;line-height:1.7;letter-spacing:.4px;color:#92aea1;margin:0 64px 6px 0}
+.skill-visit{display:inline-flex;align-items:center;gap:8px;color:#efe3b8;font:500 19px/1.3 Georgia,serif;padding:0;background:none;border:0;text-align:left;min-height:28px}
+.skill-visit:hover{text-decoration:underline;text-underline-offset:4px}
+.skill-independent{display:block;font-size:9px;color:#a5af8d;margin-top:3px}
+.skill-milestone-copy h4{color:#c3d0bb;font-size:11px;font-weight:500;margin:11px 0 0}
+.skill-milestone-copy>p:last-child{color:#b8ccc0;font-size:12px;line-height:1.8;margin:10px 0 0;max-width:58ch}
+.skill-step-controls{position:absolute;right:0;top:18px;display:flex;gap:5px}.skill-step-controls button{width:28px;height:28px;display:grid;place-items:center;background:none;border:1px solid #78998a49;color:#dfd6aa;border-radius:50%}.skill-step-controls button:disabled{opacity:.25;cursor:default}
+.skill-footer{display:flex;justify-content:space-between;align-items:center;gap:15px;border-top:1px solid #91a39835;padding:15px 0 18px;color:#89a79c;font-size:9px;line-height:1.5}
+.skill-footer button{display:flex;align-items:center;gap:5px;flex:none;color:#d4c69b;background:none;border:0;font-size:10px;padding:4px 0}
+@keyframes skill-arrive{from{opacity:.3;transform:translateY(5px) rotate(-5deg)}to{opacity:1;transform:none}}
+@media(max-width:800px){.skill-atlas{grid-template-columns:195px minmax(0,1fr)}.skill-catalog{padding:19px 10px}.skill-workspace{padding:20px 22px 0}.skill-hero{gap:14px}.skill-emblem{width:88px;height:125px}.skill-emblem .atlas-equipment{width:90px;height:90px}.skill-hero h2{font-size:27px}}
+@media(max-width:600px){.game-window-inventory{width:calc(100vw - 22px);max-height:calc(100dvh - 28px)}.game-window-inventory .game-window-heading{padding:5px 9px 5px 17px}.game-window-inventory .game-window-heading h1{font-size:21px}.skill-atlas{display:flex;flex-direction:column}.skill-catalog{display:flex;gap:18px;overflow-x:auto;padding:12px 16px 10px;border-right:0;border-bottom:1px solid #91a39835}.skill-catalog-caption{display:none}.skill-catalog section{flex:none}.skill-catalog section+section{margin:0}.skill-catalog section>div{display:flex;gap:5px}.skill-catalog h2{font-size:9px}.skill-catalog button{width:49px;min-height:49px;flex-direction:column;gap:3px;border-left:0;border-bottom:2px solid transparent;padding:2px;font-size:8px;line-height:1.1;text-align:center}.skill-catalog button[aria-pressed=true]{border-left:0;border-bottom-color:#dfcb93}.skill-catalog button .atlas-equipment{width:27px;height:27px}.skill-catalog button small{display:none}.skill-workspace{padding:16px 18px 0}.skill-hero{min-height:112px;gap:17px;padding-bottom:13px}.skill-emblem{width:80px;height:103px}.skill-emblem .atlas-equipment{width:80px;height:80px}.skill-hero h2{font-size:25px}.skill-eyebrow{font-size:8px;letter-spacing:1px}.skill-definition,.skill-stack{font-size:10px}.skill-growth-heading{padding-top:14px}.skill-growth-heading h3{font-size:10px}.skill-growth-heading>span{font-size:9px}.skill-milestone{grid-template-columns:33px 1fr;gap:10px;min-height:190px;padding-top:19px}.skill-milestone-number>span{font-size:26px}.skill-visit{font-size:17px}.skill-milestone-copy>p:last-child{font-size:11px}.skill-footer{font-size:8px}.skill-route-scroll{margin:0 -6px}}
+@media(prefers-reduced-motion:reduce){.skill-emblem .atlas-equipment{animation:none}.skill-node-ring{transition:none}}
+
+.skill-atlas .skill-node:focus-visible{outline:none}.skill-node:focus-visible .skill-node-ring{outline:2px solid #ead49c;outline-offset:5px}
