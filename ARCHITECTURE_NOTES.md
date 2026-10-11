@@ -16,7 +16,7 @@ Fonts are local WOFF2 files with retained OFL licenses. Only the primary Latin t
 
 Frames are capped at 30 FPS when idle and 60 FPS during interaction. Hidden pages and menus pause the animation loop. Resize and late model/texture completion force a frame, independently of the frame-rate gate. Coarse-pointer devices use a 1024 shadow map and a DPR cap of 1.25; other devices use 1536 and 1.5. These are budgets, not measured performance guarantees. The opt-in development profiler reports actual scene allocations and draw calls.
 
-Five projected area labels orient visitors. Individual object labels appear on hover/focus. Native dialogs provide Escape and focus containment for screenshots and the menu; the 2D page has a skip link and text-first skill histories. Reading position is selected from visible entries without writing scroll activity into browser history.
+Two projected region labels orient visitors at overview scale. Clicking one focuses that region; zooming in reveals Academic, Work, Apps & utilities, Visualization and ML & AI. Separate enter/exit thresholds prevent label flicker, and screen-space placement avoids overlapping labels or menu controls. Individual object labels appear on hover/focus. Native dialogs provide Escape and focus containment for screenshots and the menu; the 2D page has a skip link and text-first skill histories. Reading position is selected from visible entries without writing scroll activity into browser history.
 
 ## Validation
 

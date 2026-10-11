@@ -6,7 +6,8 @@ import { WORLD_CENTER } from './world-layout.js';
 // never open whatever happens to be under the pointer at the end of the gesture.
 export function createWorldCamera(camera, canvas, { surface, reduced, view, onChange, onInteract, onReset, onHoverClear, onPick }) {
   const controls = new OrbitControls(camera,surface);
-  controls.target.fromArray(WORLD_CENTER);
+  const overviewCenter=new THREE.Vector3(...WORLD_CENTER);
+  controls.target.copy(overviewCenter);
   controls.enablePan = false;
   controls.enableDamping = !reduced.matches;
   controls.dampingFactor = .12;
@@ -26,12 +27,19 @@ export function createWorldCamera(camera, canvas, { surface, reduced, view, onCh
   const pointers = new Map();
   if (view) {
     camera.position.fromArray(view.position);
+    if(view.target)controls.target.fromArray(view.target);
     camera.zoom = view.zoom;
     camera.updateProjectionMatrix();
     controls.update();
   }
 
   const changed = () => {
+    // Pull back to the whole island when leaving a focused region.
+    if(camera.zoom<=1.1&&controls.target.distanceTo(overviewCenter)>.01){
+      camera.position.add(overviewCenter.clone().sub(controls.target));
+      controls.target.copy(overviewCenter);
+      controls.update();
+    }
     camera.updateMatrixWorld();
     onChange();
   };
@@ -47,6 +55,9 @@ export function createWorldCamera(camera, canvas, { surface, reduced, view, onCh
   }
   function down(event) {
     if (pointers.size === 0) moved = false;
+    // OrbitControls must not capture a label's pointer and retarget its click
+    // onto the surface. Native buttons keep their ordinary click behavior.
+    if(event.target.closest?.('button')){event.stopPropagation();return;}
     pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
     if (pointers.size > 1) moved = true;
     onHoverClear();
@@ -133,7 +144,18 @@ export function createWorldCamera(camera, canvas, { surface, reduced, view, onCh
   return {
     update: () => controls.update(),
     isInteracting: () => pointers.size > 0,
-    getView: () => ({position:camera.position.toArray(),zoom:camera.zoom,touched}),
+    getView: () => ({position:camera.position.toArray(),target:controls.target.toArray(),zoom:camera.zoom,touched}),
+    focus(target,zoom=1.5) {
+      controls.enableDamping=false;controls.update();
+      const next=new THREE.Vector3(...target);
+      camera.position.add(next.clone().sub(controls.target));
+      controls.target.copy(next);
+      camera.zoom=Math.max(controls.minZoom,Math.min(controls.maxZoom,zoom));
+      camera.updateProjectionMatrix();
+      interact();onHoverClear();controls.update();
+      controls.enableDamping=!reduced.matches;
+      changed();
+    },
     reset,
     resize(w,h,inspecting) {
       width = w; height = h;

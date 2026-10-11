@@ -7,14 +7,14 @@ import { buildPlaza } from './plaza';
 import { buildWorkplaces } from './workplaces';
 import { buildProjectObjects } from './project-objects';
 import { loadWorldModel } from './model-assets';
-import { GAME_AREAS, PROJECT_LAYOUT, STUDY_OFFSET_Z, campusPoint, PLAZA_LAYOUT } from './world-layout';
+import { GAME_AREAS, WORLD_REGIONS, PROJECT_LAYOUT, STUDY_OFFSET_Z, campusPoint, PLAZA_LAYOUT } from './world-layout';
+import { mapLabelLevel, placeMapLabels } from './map-labels';
 import { byId } from './data';
 import { worldRenderSettings } from './render-settings';
 import { SHORE, RIVER_POINTS, RIVER_OUTLET, RIVER_SOURCE, riverHeightAt, waterfallGeometry, CROSSINGS, DOCK, MOUNTAIN_TRAILS, mountainGeometry, mountainHeightAt, ribbonGeometry } from './landscape';
 
 // Editable geometry, with the user-supplied AmiiBot GLB on its NFC display.
 // Campus parcels and paths leave open ground between buildings. Coordinates: x / height / z.
-const LABELS = Object.fromEntries(GAME_AREAS.map(area=>[area.id,area.anchor]));
 const REGION_HOME = {research:'isu',ames:'@quests',...Object.fromEntries(GAME_AREAS.map(area=>[area.id,area.home]))};
 const COLORS = {
   diorama: { sea: '#83bdcb', grass: '#97b66f', grassDark: '#799e68', sand: '#ded0a8', rock: '#abb5a7', green: '#42765c', leaf: '#709851', path: '#e6d4ae', wall: '#eee3c7', roof: '#b9684d', blue: '#56a4ae', trim: '#fff2d4' },
@@ -380,11 +380,13 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   batchWorld(scene,geometries);
   const anchors=clickables.map(g=>({id:g.userData.id,title:g.userData.title,location:g.userData.location,position:new THREE.Box3().setFromObject(g).getCenter(new THREE.Vector3()).toArray()}));
   let previous=0,lastShadow=-Infinity,lastLayout=-Infinity,lastPick=-Infinity,paused=false;
+  let labelLevel='overview',layoutTimer;
   const orbit=createWorldCamera(camera,canvas,{
     surface,reduced,view,onInteract,onReset:onViewReset,onHoverClear:leave,onPick:click,
     onChange() {
       const now=performance.now();
-      if(now-lastLayout>65) {updateLayout();lastLayout=now;}
+      if(now-lastLayout>65) {clearTimeout(layoutTimer);layoutTimer=null;updateLayout();lastLayout=now;}
+      else if(!layoutTimer)layoutTimer=setTimeout(()=>{layoutTimer=null;updateLayout();lastLayout=performance.now();},65-(now-lastLayout));
       render(now,reduced.matches);
     },
   });
@@ -421,8 +423,11 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
     render(performance.now(),true);
   }
   function updateLayout() {
+    labelLevel=mapLabelLevel(camera.zoom,labelLevel);
+    const overview=labelLevel==='overview';
+    const labels=(overview?WORLD_REGIONS:GAME_AREAS).map(area=>({id:area.id,name:area.name,plain:area.plain,kind:overview?'region':'area',...project(area.anchor)}));
     onLayout({
-      regions:Object.fromEntries(Object.entries(LABELS).map(([id,p])=>[id,project(p)])),
+      labelLevel,labels:placeMapLabels(labels,width,height),
       objects:anchors.map(({id,title,location,position})=>({id,title,location,...project(position)})),
     });
   }
@@ -483,10 +488,16 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
 
   return {
     select,resize,getView:orbit.getView,resetView:orbit.reset,
+    focusRegion(id) {
+      const region=WORLD_REGIONS.find(entry=>entry.id===id);
+      if(!region)return;
+      orbit.focus(region.center,region.zoom);updateLayout();render(performance.now(),true);
+    },
     pause(value) {paused=value;visibility();},
     inspect(value) { if(inspecting!==value) { inspecting=value; resize(width,height); } },
     dispose() {
       disposed=true;
+      clearTimeout(layoutTimer);
       profiler?.dispose();
       renderer.setAnimationLoop(null);
       canvas.removeEventListener('pointermove',move);

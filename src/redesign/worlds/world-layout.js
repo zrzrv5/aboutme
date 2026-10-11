@@ -37,11 +37,16 @@ export const PROJECT_LAYOUT={
   fuji:{at:[7.4,.35,5.8],scale:.5,stand:[7.1,.35,6.25]},
 };
 
+export const WORLD_REGIONS=[
+  {id:'experience',name:'Experience',anchor:[-7.2,.4,-1.7],center:[-5.1,0,-5.1],zoom:1.35},
+  {id:'projects',name:'Personal projects',anchor:[7.8,.4,-.25],center:[6.0,0,-3.4],zoom:1.3},
+];
+
 export const GAME_AREAS=[
-  {id:'study',name:'Learning',plain:'Experience · Education',parent:'experience',home:'isu',anchor:[-5.0,.4,-6.5],fallback:{x:30,y:42},plainFocus:'biome:research',members:['cust','wustl','isu','phd'],description:'Undergraduate study at CUST, a master’s at WUSTL, and doctoral research at Iowa State.'},
+  {id:'study',name:'Academic',plain:'Experience · Education & research',parent:'experience',home:'isu',anchor:[-5.0,.4,-6.5],fallback:{x:30,y:42},plainFocus:'biome:research',members:['cust','wustl','isu','phd'],description:'Undergraduate study at CUST, a master’s at WUSTL, and doctoral research at Iowa State.'},
   {id:'work',name:'Work',plain:'Experience · Industry',parent:'experience',home:'sunwoda',anchor:[-5.4,.4,4.5],fallback:{x:30,y:70},plainFocus:'biome:research',members:['sunwoda','seagate','patents'],description:'Battery simulation at Sunwoda and storage-materials research at Seagate. The field kit between work and study follows the skills acquired along the way.'},
-  {id:'apps',name:'Everyday apps',plain:'Personal projects · Life',parent:'projects',home:'amiibot',anchor:[5.0,.4,6.8],fallback:{x:67,y:78},plainFocus:'biome:apps',members:['amiibot','totk','ling','laneloaf','gas','fuji'],description:'Apps for collections, games and everyday life, with smaller experiments along the paths.'},
+  {id:'apps',name:'Apps & utilities',plain:'Personal projects · Apps & utilities',parent:'projects',home:'amiibot',anchor:[5.0,.4,6.8],fallback:{x:67,y:78},plainFocus:'biome:apps',members:['amiibot','totk','ling','laneloaf','gas','fuji'],description:'Apps for collections, games and everyday life, with smaller experiments along the paths.'},
   {id:'software',name:'Visualization',plain:'Personal projects · Visualization',parent:'projects',home:'naiive',anchor:[6.35,.4,-.1],fallback:{x:70,y:55},plainFocus:'biome:software',members:['naiive','trajview'],description:'NAIIVE’s molecular workspace and Quick TrajView’s lightweight trajectory previews.'},
-  {id:'ml',name:'ML / AI',plain:'Personal projects · Machine learning & AI',parent:'projects',home:'slop',anchor:[8.1,mountainHeightAt(8.1,-6.65),-6.65],fallback:{x:72,y:25},plainFocus:'biome:software',members:['slop','dshslop','gradbench','typeshi','dpmetal'],description:'S.L.O.P.’s research runtime, persistent cluster workflows and evaluation tools, alongside atom classification and native ML-potential inference.'},
+  {id:'ml',name:'ML & AI',plain:'Personal projects · Machine learning & AI',parent:'projects',home:'slop',anchor:[8.1,mountainHeightAt(8.1,-6.65),-6.65],fallback:{x:72,y:25},plainFocus:'biome:software',members:['slop','dshslop','gradbench','typeshi','dpmetal'],description:'S.L.O.P.’s research runtime, persistent cluster workflows and evaluation tools, alongside atom classification and native ML-potential inference.'},
 ];
 export const gameAreaById=Object.fromEntries(GAME_AREAS.map(area=>[area.id,area]));

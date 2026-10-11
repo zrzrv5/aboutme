@@ -117,3 +117,23 @@ test('zoom and tilt stay bounded; reduced motion has no trailing drift; disposal
   assert.equal(h.changes(),changes);
   assert.equal(h.picks(),0);
 });
+
+test('region zoom preserves orientation and survives resize, then zooming out restores the overview',()=>{
+  const near=(actual,expected)=>actual.forEach((value,axis)=>assert.ok(Math.abs(value-expected[axis])<.001));
+  const h=setup({reduce:true});
+  const before=h.orbit.getView();
+  h.orbit.focus([-5.1,0,-3.8],1.5);
+  const focused=h.orbit.getView();
+  near(focused.target,[-5.1,0,-3.8]);
+  assert.equal(focused.zoom,1.5);
+  assert.equal(h.picks(),0);
+  for(let axis=0;axis<3;axis++)assert.ok(Math.abs((focused.position[axis]-focused.target[axis])-(before.position[axis]-before.target[axis]))<.001);
+  h.orbit.resize(390,844,true);
+  near(h.orbit.getView().target,focused.target);
+  const restored=setup({reduce:true,view:focused});
+  near(restored.orbit.getView().target,focused.target);
+  for(let i=0;i<3;i++)h.event(h.surface,'keydown',{key:'-'});
+  near(h.orbit.getView().target,before.target);
+  h.orbit.reset();assert.equal(h.camera.zoom,1);
+  h.orbit.dispose();restored.orbit.dispose();
+});
