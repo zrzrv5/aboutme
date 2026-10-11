@@ -252,6 +252,8 @@ body.mg-body-bg { background: #e8e6e0; }
 }
 
 .mg-arrow { flex: none; margin-top: 2px; }
+.mg-arrow-up-left,.mg-arrow-up-right{margin-top:-6px}
+.mg-arrow-up-right{order:1}
 
 .mg-margin { padding-top: 2px; }
 

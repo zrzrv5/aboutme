@@ -155,10 +155,16 @@ export function Scratch({ children, seed = 7, delay = 0 }) {
   );
 }
 
-// Handwritten note. `arrow` draws a small curved arrow pointing left (toward the text it annotates).
+// Match the arrow to the annotation's position relative to its subject.
+const NOTE_ARROWS={
+  left:['M34 8 C 26 4, 14 6, 6 15','M6 15 L8 7 M6 15 L14 14'],
+  'up-left':['M34 27 C 16 29, 5 19, 7 4','M7 4 L2 12 M7 4 L15 10'],
+  'up-right':['M6 27 C 24 29, 35 19, 33 4','M33 4 L25 10 M33 4 L38 12'],
+};
 export function Note({ children, arrow = false, tilt = -2, delay = 250, className = '' }) {
   const ref = useRef(null);
   const seen = useSeen(ref);
+  const direction=typeof arrow==='string'?arrow:'left';
   return (
     <span
       ref={ref}
@@ -166,9 +172,8 @@ export function Note({ children, arrow = false, tilt = -2, delay = 250, classNam
       style={{ '--tilt': `${tilt}deg`, transitionDelay: `${delay}ms` }}
     >
       {arrow && (
-        <svg className="mg-arrow" width="34" height="22" viewBox="0 0 34 22" aria-hidden="true">
-          <path d="M32 6 C 24 2, 12 4, 4 13" />
-          <path d="M4 13 L 6 5 M4 13 L 12 12" />
+        <svg className={`mg-arrow mg-arrow-${direction}`} width="40" height="32" viewBox="0 0 40 32" aria-hidden="true">
+          {(NOTE_ARROWS[direction]??NOTE_ARROWS.left).map((path,index)=><path key={index} d={path}/>)}
         </svg>
       )}
       <span className="mg-note-text">{children}</span>

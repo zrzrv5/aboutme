@@ -29,9 +29,9 @@ function ProjectLinks({project}) {
 }
 
 const APP_NOTES={
-  naiive:<Note arrow tilt={-2}>built to look at my own simulations</Note>,
-  totk:<Note arrow tilt={2}>built in two days, back in 2023</Note>,
-  amiibot:<Note arrow tilt={3}>a pandemic project that unexpectedly went viral</Note>,
+  naiive:<Note arrow="up-left" tilt={-2}>built to look at my own simulations</Note>,
+  totk:<Note arrow="up-right" tilt={2}>built in two days, back in 2023</Note>,
+  amiibot:<Note arrow="up-left" tilt={3}>a pandemic project that unexpectedly went viral</Note>,
   ling:<Note tilt={-3}>bring back Time Travel!</Note>,
 };
 const APP_COPY={
