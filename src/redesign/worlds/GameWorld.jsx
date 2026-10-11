@@ -277,7 +277,7 @@ export default function GameWorld({ focusId, onSwitch }) {
 
       <Privacy/>
       <p className="game-menu-hint">Drag to rotate. Scroll or pinch to zoom.<br/>Arrow keys rotate; + / − zoom; Home resets.<br/><br/>The tool chest holds my skills.<br/>The noticeboard keeps my field journal.<br/>The mirror opens my portfolio.</p>
-      <p className="game-build-credit">Built with GPT-6 Astra :)<br/><a href="https://github.com/zrzrv5/aboutme/tree/claude/website-redesign-exploration-4a44e6" target="_blank" rel="noreferrer">Source on GitHub <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a></p>
+      <p className="game-build-credit">Built with GPT-6 Astra :)<br/><a href="https://github.com/zrzrv5/aboutme/tree/main" target="_blank" rel="noreferrer">Source on GitHub <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a></p>
     </GameWindow> : null}
   </main>;
 }

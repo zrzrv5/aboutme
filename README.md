@@ -41,9 +41,9 @@ npm run dev
 
 The writing supplements the CV with research findings, concrete work and project context. Keep notes sparse, retain the broad openness to roles and collaborations, and distinguish team research from individual contributions. Describe internal workplace tools by purpose, not internal product names.
 
-## Review and deployment
+## Deployment
 
-Current review branch: `claude/website-redesign-exploration-4a44e6`. Pushing this branch does **not** deploy the website. The Pages workflow publishes only on a push to `main` or `v2`, or an explicit manual dispatch. Domain configuration lives in `public/CNAME`.
+`main` is the production branch. The Pages workflow publishes on a push to `main`, or a manual dispatch from `main`; other branches cannot deploy. Domain configuration lives in `public/CNAME`. The `pre-margins-2026-10-11` tag preserves the previous production version for rollback.
 
 Before a public release, verify the production preview and check the site on a physical phone, including first paint, gestures, image viewing and view switching. Browser device emulation does not establish real iPhone performance.
 
