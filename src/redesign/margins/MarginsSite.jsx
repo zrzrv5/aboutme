@@ -95,13 +95,13 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
       cancelAnimationFrame(frame);
       frame=requestAnimationFrame(()=>{
         const anchors=[...document.querySelectorAll('[data-reading-focus]')].map(el=>({id:el.dataset.readingFocus,top:el.getBoundingClientRect().top,bottom:el.getBoundingClientRect().bottom}));
-        const next=readingFocus(anchors,window.innerHeight);
+        const next=readingFocus(anchors,window.innerHeight,focusId);
         readAnchor.current=next;setReading(next);
       });
     };
     update();window.addEventListener('scroll',update,{passive:true});window.addEventListener('resize',update);
     return ()=>{cancelAnimationFrame(frame);window.removeEventListener('scroll',update);window.removeEventListener('resize',update);};
-  },[]);
+  },[focusId]);
   function toggleNotes(){
     const visible=!notes;setNotes(visible);track('notes_toggle',{visible});
     document.documentElement.dataset.marginNotes=visible?'on':'off';
@@ -155,16 +155,19 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
       </section>
 
       <section id="software" tabIndex={-1}>
-        {['naiive','totk','amiibot','ling'].map((id,index)=>{
+        <Row label={<h2 className="mg-h">Software</h2>}/>
+        <div className="mg-software-grid">
+        {['naiive','totk','amiibot','ling'].map(id=>{
           const app=byId[id];
-          return <Row key={id} id={id} project label={index===0?<h2 className="mg-h">Software</h2>:null} note={APP_NOTES[id]} className="mg-app">
+          return <article key={id} id={id} tabIndex={-1} data-project-id={id} data-reading-focus={id} className="mg-app">
             <h3 className="mg-entry-title">{app.title}</h3>
-            <p>{APP_COPY[id]}</p>
-            <p className="mg-app-facts">{appById[id].meta}</p>
+            <div className="mg-app-copy"><p>{APP_COPY[id]}</p><p className="mg-app-facts">{appById[id].meta}</p></div>
             <ProjectMedia title={app.title} media={app.media}/>
-            <ProjectLinks project={app}/>
-          </Row>;
+            <div className="mg-app-links"><ProjectLinks project={app}/></div>
+            <aside className="mg-app-note">{APP_NOTES[id]}</aside>
+          </article>;
         })}
+        </div>
       </section>
 
       <section id="projects" tabIndex={-1}>

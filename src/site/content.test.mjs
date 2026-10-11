@@ -31,6 +31,9 @@ test('scroll context chooses a visible entry and ignores out-of-view or invalid 
   assert.equal(readingFocus([{id:'amiibot',top:-200,bottom:350},{id:'papers',top:-1400,bottom:-500}],800),'amiibot');
   assert.equal(readingFocus([{id:'papers',top:150,bottom:450}],800),'library');
   assert.equal(readingFocus([{id:'profile',top:100,bottom:500}],800),null);
+  const row=[{id:'amiibot',top:150,bottom:550},{id:'ling',top:150,bottom:550}];
+  assert.equal(readingFocus(row,800,'ling'),'ling');
+  assert.equal(readingFocus(row,800,'naiive'),'amiibot');
 });
 test('coarse pointers have a bounded render budget while desktop quality is preserved',()=>{
   assert.deepEqual(worldRenderSettings({coarse:true,dpr:3}),{shadowSize:1024,pixelRatio:1.25});
