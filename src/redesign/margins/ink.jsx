@@ -53,7 +53,8 @@ function scribblePath(w, h, seed = 1) {
 
 // Fires once when the element scrolls into view.
 function useSeen(ref) {
-  const [seen, setSeen] = useState(() => typeof IntersectionObserver === 'undefined');
+  // Server and client both start with readable annotations, including without JS.
+  const [seen, setSeen] = useState(true);
   useEffect(() => {
     const el = ref.current;
     if (!el || typeof IntersectionObserver === 'undefined') return undefined;

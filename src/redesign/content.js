@@ -7,6 +7,8 @@ export const person = {
   nameZh: '周睿',
   location: 'Ames, Iowa',
   graduation: 'May 2027',
+  interests: 'Materials research, simulation, machine learning and software',
+  availability: 'I expect to graduate in May 2027. I welcome roles and collaborations across industries, and am happy to relocate anywhere in the U.S.',
   // Plain, first-person. No taglines.
   intro:
     'I’m a PhD candidate in Materials Science and Engineering at Iowa State University. I study ion transport and deformation in materials — from solid electrolytes to semiconductors, ceramics and metals — and build software for simulations and everyday life.',
@@ -43,6 +45,7 @@ export const experience = [
     start: 2026,
     end: 2026,
     when: 'May – Aug 2026',
+    location: 'Normandale, Minnesota',
     points: [
       'Built an end-to-end thin-film ellipsometry data-analysis and characterization workflow.',
       'Graph neural networks and RDKit descriptors for chemical-property prediction.',
@@ -58,6 +61,7 @@ export const experience = [
     start: 2023,
     end: 2027,
     when: 'Jan 2023 – May 2027 (expected)',
+    location: 'Ames, Iowa',
     points: [
       'DFT and ML-potential molecular dynamics of glassy and crystalline solid electrolytes: interfaces, phase transitions, ion transport.',
       'ML interatomic potentials trained with active learning on reference data from several electronic-structure methods; ML potential + QEq for interfaces.',
@@ -75,6 +79,7 @@ export const experience = [
     start: 2020,
     end: 2022,
     when: 'Dec 2020 – Dec 2022',
+    location: 'Shenzhen, China',
     points: [
       'Developed workflows for ML-potential training, validation and high-throughput cathode calculations.',
       'Built tools for reference-structure generation and MD/DEM data processing.',
@@ -85,16 +90,18 @@ export const experience = [
   },
 ];
 
+export const experienceById = Object.fromEntries(experience.map(entry => [entry.id, entry]));
+
 export const education = [
-  { school: 'Iowa State University', degree: 'PhD, Materials Science and Engineering', when: '2023 – 2027' },
+  { id: 'isu', school: 'Iowa State University', degree: 'PhD, Materials Science and Engineering', when: experienceById.isu.when },
   {
-    school: 'Washington University in St. Louis',
+    id: 'wustl', school: 'Washington University in St. Louis',
     degree: 'MS, Materials Science and Engineering',
     when: '2018 – 2020',
     note: 'Thesis: molecular dynamics of thin-film water evaporation on graphene-coated silicon.',
   },
   {
-    school: 'Changchun University of Science and Technology',
+    id: 'cust', school: 'Changchun University of Science and Technology',
     degree: 'BS, Materials Science and Engineering',
     when: '2014 – 2018',
     note: 'Lab work on carbon anode materials: electrospinning, high-temperature high-pressure synthesis, half-cells.',
@@ -107,24 +114,21 @@ export const tools = {
   code: ['Python', 'Swift', 'Metal', 'MATLAB', 'C', 'Slurm'],
 };
 
-// Pictures that exist in /public. Used as hover previews and figures.
-export const figures = {
-  closo: { src: '/images/publications/ACS_Na2B10H10_large.png', w: 1000, h: 1000 },
-  cover: { src: '/images/publications/ACS_Na2B12H12_large.png', w: 1200, h: 1596 },
-  lisips: { src: '/images/publications/LiSiPS2024_large.png', w: 1000, h: 493 },
-  carbon: { src: '/images/publications/Old2017_large.png', w: 900, h: 508 },
-  naiive: { src: '/images/naiive/naiive_me_banner.png', w: 1200, h: 600 },
-  totk: { src: '/images/totk/banner_large.png', w: 1200, h: 600 },
-  amiibot: { src: '/images/amiibot/old@3x.png', w: 1200, h: 600 },
-  ling: { src: '/images/mytimetable/app@3x.png', w: 1200, h: 600 },
-};
-
+// Public grant records; filing years describe when the Sunwoda work was done.
 export const patents = [
-  { id: 'CN114744187B', title: 'Ternary cathode material and its preparation', year: 2022 },
-  { id: 'CN114169233A', title: 'Optimizing the particle size of electrode material particles', year: 2021 },
-  { id: 'CN115579085A', title: 'Simulation-based design of battery material mixing ratios', year: 2022 },
-  { id: 'CN115392123A', title: 'Parameter identification for secondary-battery physical models', year: 2022 },
-];
+  { key: 'cathode', id: 'CN114744187B', title: 'Ternary cathode material and its preparation', filed: '2022-06-09', granted: '2022-10-28' },
+  { key: 'particles', id: 'CN114169233B', title: 'Optimizing the particle size of electrode material particles', filed: '2021-11-30', granted: '2025-01-07' },
+  { key: 'mixing', id: 'CN115579085B', title: 'Simulation-based design of battery material mixing ratios', filed: '2022-10-14', granted: '2025-11-25' },
+  { key: 'calibration', id: 'CN115392123B', title: 'Parameter identification for secondary-battery physical models', filed: '2022-08-26', granted: '2025-08-08' },
+].map(patent => ({...patent, year: Number(patent.filed.slice(0,4)), href: `https://patents.google.com/patent/${patent.id}/en`}));
+export const patentByKey = Object.fromEntries(patents.map(patent => [patent.key, patent]));
+
+export const appMedia = {
+  naiive: {src:'/images/projects/naiive.webp', preview:'/images/projects/naiive-thumb.webp', alt:'NAIIVE molecular visualization and node editor'},
+  totk: {src:'/images/projects/totk.webp', preview:'/images/projects/totk-thumb.webp', alt:'TotK Companion map and collection tracker'},
+  amiibot: {src:'/images/projects/amiibot.webp', preview:'/images/projects/amiibot-thumb.webp', alt:'AmiiBot collection and NFC features'},
+  ling: {src:'/images/projects/ling.webp', preview:'/images/projects/ling-thumb.webp', alt:'L!NG timetable on Apple Watch'},
+};
 
 export const apps = [
   {
@@ -132,12 +136,13 @@ export const apps = [
     name: 'NAIIVE',
     year: 2026,
     what: 'Visualizer for atomistic simulations and ML-potential datasets, 2D and spatial 3D, with a node editor. Swift and Metal.',
-    meta: 'Beta',
-    note: 'Still a work in progress! TestFlight is the best way to try it.',
+    meta: 'Available on the App Store',
+    note: 'Available on the App Store; TestFlight carries experimental builds.',
     figure: 'naiive',
     href: 'https://naiive.1sec.plus',
     links: [
       { label: 'Website', href: 'https://naiive.1sec.plus' },
+      { label: 'App Store', href: 'https://apps.apple.com/us/app/naiive/id6758065886' },
       { label: 'TestFlight', href: 'https://testflight.apple.com/join/VrYnN9nE' },
       { label: 'GitHub', href: 'https://github.com/zrzrv5/NAIIVE' },
     ],
@@ -177,6 +182,8 @@ export const apps = [
   },
 ];
 
+export const appById = Object.fromEntries(apps.map(app => [app.id, app]));
+
 export const sideProjects = [
   { name: 'Quick TrajView', what: 'VS Code extension that previews MD trajectories.', href: 'https://github.com/zrzrv5/QuickTrajView-vscode' },
   { name: 'LaneLoaf', what: 'Turns dashcam footage into trip logs.', href: 'https://laneloaf.1sec.plus' },
@@ -200,19 +207,11 @@ const VENUE_SHORT = {
   'Chemical Engineering Journal': 'Chem. Eng. J.',
 };
 
-const FIGURE_FOR_TITLE = [
-  [/Closo-Hydroborate/i, 'closo'],
-  [/Na2B12H12/i, 'cover'],
-  [/Lithium Sulfide Glass/i, 'lisips'],
-  [/Nitrogen doped carbon nanofiber/i, 'carbon'],
-];
-
 export function normalizePublications(raw) {
   const list = Array.isArray(raw) ? raw : raw?.publications ?? [];
   return list.map((p) => {
     const authors = p.authors.split(', ');
     const first = authors[0] === 'Rui Zhou';
-    const fig = FIGURE_FOR_TITLE.find(([re]) => re.test(p.title));
     return {
       title: p.title.replace('Na2B12H12', 'Na₂B₁₂H₁₂'),
       authors,
@@ -220,7 +219,6 @@ export function normalizePublications(raw) {
       venue: VENUE_SHORT[p.journal] ?? p.journal,
       year: p.year,
       link: p.link,
-      figure: fig ? fig[1] : null,
     };
   });
 }

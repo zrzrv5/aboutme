@@ -1,83 +1,25 @@
-# Architecture Analysis: BatteryExplorer Component
+# Current portfolio architecture
 
-## Current Issues
+## Two views, shared facts
 
-### 1. Safari Performance Problems (NOW FIXED)
-**Root Causes:**
-- CSS `transition-all` on complex 3D transforms causes compositor flickering in Safari
-- Elements with `opacity: 0` still rendered, creating layering conflicts
-- `preserve-3d` + frequent state updates trigger Safari's slower 3D rendering path
-- React re-renders during scroll events compound the issue
+`App` owns the error boundary. `WorldsSite` owns routing and view transitions. Margins is available in the initial bundle; the Three.js island and GLB loader load only on demand. Dates, institutions, contact links, app status and patent grant records are shared through `content.js`. The game adds narrative descriptions in `worlds/data.js`; skills use the same experiences without displaying game levels in Margins.
 
-**Applied Fixes:**
-- Changed from `opacity: 0` transitions to conditional rendering (`{showAtoms && ...}`)
-- Replaced `transition-all` with targeted CSS animations (`animate-fade-in-scale`)
-- Added `willChange: 'transform, opacity'` for Safari compositor hints
-- Elements now mount/unmount instead of hiding, preventing z-index conflicts
+## First paint
 
-### 2. Architectural Problems (NEEDS REFACTOR)
+The build renders the same `App` tree used by the browser for portfolio routes. A `data-ssr="portfolio"` marker selects `hydrateRoot`, with the embedded publication list and the same initial route. Browser URL focus and saved preferences are applied after hydration. Handwritten notes remain readable without JavaScript. The world and recovery pages have lightweight static fallbacks and use client rendering.
 
-**Current Structure:**
-```
-BatteryExplorer (735 lines)
-├── Scroll logic (useEffect, requestAnimationFrame)
-├── Section detection (distance calculations)
-├── Animation calculations (transforms, scales, opacity)
-├── Content data (8 sections worth)
-├── 3D scene rendering
-├── Content card rendering
-└── Inline styles (100+ lines)
-```
+Fonts are local WOFF2 files with retained OFL licenses. Only the primary Latin text face is preloaded on portfolio routes. Screenshots use lazy WebP thumbnails; full images load inside a native dialog on demand. The social preview is a real JPEG with a matching filename.
 
-**Problems:**
-1. **Single Responsibility Violation**: One component handles scroll, animations, data, and rendering
-2. **Testability**: Can't unit test scroll logic separately from rendering
-3. **Performance**: All visual elements loaded even when inactive
-4. **Maintainability**: Finding bugs requires reading 735 lines
-5. **Reusability**: Can't reuse scroll logic or 3D components elsewhere
+## Island rendering
 
-## Recommended Refactor
+`environment.js` assembles the low-poly scene; campus, workplace, project and terrain modules hold the geometry. `batch-world.js` batches static geometry while retaining independent picking and animation roots. `world-camera.js` separates taps from drag/pinch gestures and preserves camera changes across dialogue resizing.
 
-### Proposed Structure:
-```
-BatteryExplorer/
-├── index.jsx (orchestrator, 50 lines)
-├── hooks/
-│   ├── useScrollProgress.js (scroll detection)
-│   └── useSectionDetection.js (viewport calculations)
-├── components/
-│   ├── BatteryScene.jsx (3D visualization)
-│   ├── AtomView.jsx (Li+ ions)
-│   ├── ParticleView.jsx (DEM visualization)
-│   └── ContentCard.jsx (info cards)
-├── data/
-│   └── sections.js (content configuration)
-└── styles/
-    └── animations.css (keyframes)
-```
+Frames are capped at 30 FPS when idle and 60 FPS during interaction. Hidden pages and menus pause the animation loop. Resize and late model/texture completion force a frame, independently of the frame-rate gate. Coarse-pointer devices use a 1024 shadow map and a DPR cap of 1.25; other devices use 1536 and 1.5. These are budgets, not measured performance guarantees. The opt-in development profiler reports actual scene allocations and draw calls.
 
-### Benefits:
-- **Testable**: Each hook/component tested independently
-- **Performant**: Lazy load scenes, memoize calculations
-- **Maintainable**: Bug fixes touch 1 file, not 735 lines
-- **Reusable**: `useScrollProgress` works for other scroll effects
-- **Type-safe**: Easier to add TypeScript later
+Five projected area labels orient visitors. Individual object labels appear on hover/focus. Native dialogs provide Escape and focus containment for screenshots and the menu; the 2D page has a skip link and text-first skill histories. Reading position is selected from visible entries without writing scroll activity into browser history.
 
-### Migration Path:
-1. Extract `useScrollProgress` hook (non-breaking)
-2. Extract `useSectionDetection` hook (non-breaking)
-3. Split scenes into separate components (non-breaking)
-4. Move content data to separate file (non-breaking)
-5. Replace monolithic component with orchestrator (breaking, but prepared)
+## Validation
 
-**Estimated effort**: 4-6 hours
-**Risk**: Low (can do incrementally)
-**Payoff**: High (makes future changes 3-5x faster)
+Run lint, unit tests and the production build. Check hydration with notes on/off, direct links, Back/Forward, keyboard traversal, screenshots, no-JavaScript output, and first-frame rendering with animation callbacks suspended. Test coarse-pointer sizing separately from real-device performance. An iPhone viewport in a desktop browser is not an iPhone GPU or Safari measurement.
 
-## Decision
-
-Current fixes address the **immediate Safari performance bug**. The architectural refactor should be done **before adding new features** to the engineer tab, but isn't blocking for the current release.
-
----
-*Last updated: 2024*
-
+Historical components and original assets are retained in `archive/` for reference. The directory is neither a production import nor a deployment input.

@@ -32,3 +32,6 @@ body.ws-fun{overflow:hidden;background:#d8e6df}
 .ws-shift-out{animation:site-world-out .3s ease-out both}
 @keyframes site-world-in{from{clip-path:circle(0 at var(--origin))}to{clip-path:circle(150% at var(--origin))}}
 @keyframes site-world-out{from{opacity:1}to{opacity:0}}
+
+.site-skip{position:fixed;z-index:11000;top:8px;left:8px;padding:12px 18px;background:#fffdf8;color:#1d1c1a;transform:translateY(-180%);border:2px solid #2747c4}
+.site-skip:focus{transform:translateY(0)}

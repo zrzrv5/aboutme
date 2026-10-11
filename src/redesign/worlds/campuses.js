@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { buildGilman } from './gilman';
 import { campusPoint, CAMPUS_TRANSFORMS } from './world-layout';
 
-// Hand-built campus miniatures, informed by the universities' own photographs:
+// Procedural campus miniatures, informed by the universities' own photographs:
 // ISU: https://www.fpm.iastate.edu/maps/buildings/building.asp?id=19
 // Gilman: https://www.fpm.iastate.edu/maps/buildings/building.asp?id=48
 // Marston: https://historicexhibits.lib.iastate.edu/buildings/watertower.html

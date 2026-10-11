@@ -2,20 +2,21 @@ import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 
 import { readSiteRoute, writeSiteRoute, VIEW_TITLES, VIEW_PATHS, SITE_ORIGIN } from '../../site/routes';
 import { track, trackPage } from '../../site/analytics';
 
-const MarginsSite=lazy(()=>import('../margins/MarginsSite'));
+import MarginsSite from '../margins/MarginsSite';
 const FunWorld=lazy(()=>import('./FunWorld'));
 
 function Loading({world}) {
   return <div className="site-loading" role="status"><p>{world?'Opening the island…':'Opening the portfolio…'}</p>{world?<a href="/">Read the 2D portfolio</a>:null}</div>;
 }
-export default function WorldsSite() {
-  const [route,setRoute]=useState(()=>readSiteRoute(window.location));
+export default function WorldsSite({initialRoute, initialPublications}) {
+  const [route,setRoute]=useState(()=>initialRoute??readSiteRoute(window.location));
   const [shift,setShift]=useState(null);
   const timers=useRef([]),switching=useRef(false),lastPointer=useRef(null);
   useEffect(()=>{
     const pending=timers.current;
     window.history.scrollRestoration='manual';
     const initial=readSiteRoute(window.location);
+    const focusFrame=requestAnimationFrame(()=>setRoute(initial));
     const keepHome=window.location.pathname==='/'&&!window.location.search;
     if(!initial.notFound)writeSiteRoute(initial.view,initial.focus,{replace:true,home:keepHome});
     const pop=()=>{
@@ -26,7 +27,7 @@ export default function WorldsSite() {
     };
     const pointer=e=>{lastPointer.current={x:e.clientX,y:e.clientY};};
     window.addEventListener('popstate',pop);window.addEventListener('pointerdown',pointer,true);
-    return ()=>{pending.forEach(clearTimeout);window.removeEventListener('popstate',pop);window.removeEventListener('pointerdown',pointer,true);};
+    return ()=>{cancelAnimationFrame(focusFrame);pending.forEach(clearTimeout);window.removeEventListener('popstate',pop);window.removeEventListener('pointerdown',pointer,true);};
   },[]);
   useEffect(()=>{
     document.body.classList.toggle('ws-fun',route.view==='world'&&!route.notFound);
@@ -46,9 +47,8 @@ export default function WorldsSite() {
   },[route.view]);
   if(route.notFound)return <main className="site-recovery"><h1>Page not found</h1><p>This address does not lead to a page on my site.</p><a href="/world/">Explore the island</a><a href="/">View my portfolio</a></main>;
   return <div className="rz-worlds">
-    <Suspense fallback={<Loading world={route.view==='world'}/>}>
-      {route.view==='world'?<FunWorld key={`world-${route.focus}`} focusId={route.focus} onSwitch={at=>go('resume',at)}/>:<MarginsSite key={`resume-${route.focus}`} focusId={route.focus} onSwitch={at=>go('world',at)}/>}
-    </Suspense>
+    <a className="site-skip" href={route.view==='world'?'#world-menu':'#main-content'}>{route.view==='world'?'Skip to island menu':'Skip to content'}</a>
+    {route.view==='world'?<Suspense fallback={<Loading world/>}><FunWorld key={`world-${route.focus}`} focusId={route.focus} onSwitch={at=>go('resume',at)}/></Suspense>:<MarginsSite initialPublications={initialPublications} key={`resume-${route.focus}`} focusId={route.focus} onSwitch={at=>go('world',at)}/>}
     {shift?<div className={`ws-shift ws-shift-${shift.phase}`} aria-hidden="true" style={{'--origin':shift.origin?`${shift.origin.x}px ${shift.origin.y}px`:'50% 50%'}}/>:null}
   </div>;
 }

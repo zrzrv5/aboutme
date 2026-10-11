@@ -1,4 +1,4 @@
-import React, { Component, Suspense } from 'react';
+import React, { Component } from 'react';
 import WorldsSite from './redesign/worlds/WorldsSite';
 
 class SiteBoundary extends Component {
@@ -9,6 +9,6 @@ class SiteBoundary extends Component {
     return this.props.children;
   }
 }
-export default function App(){
-  return <SiteBoundary><Suspense fallback={<div className="site-loading" role="status">Loading…</div>}><WorldsSite/></Suspense></SiteBoundary>;
+export default function App(props){
+  return <SiteBoundary><WorldsSite {...props}/></SiteBoundary>;
 }

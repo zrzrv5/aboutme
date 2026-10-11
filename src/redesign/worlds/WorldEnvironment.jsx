@@ -21,7 +21,6 @@ export default function WorldEnvironment({ art, selection, onSelect, onMiss, onI
   useEffect(() => {
     let world;
     let errorFrame;
-    let readyFrame;
     let ready=false;
     const started=performance.now();
     try {
@@ -44,12 +43,11 @@ export default function WorldEnvironment({ art, selection, onSelect, onMiss, onI
     }
     const observer = new ResizeObserver(([entry]) => {
       world?.resize(entry.contentRect.width, entry.contentRect.height);
-      if(world&&!ready){ready=true;readyFrame=requestAnimationFrame(()=>trackOnce('world_ready','first-render',{load_ms:Math.round(performance.now()-started)}));}
+      if(world&&!ready){ready=true;trackOnce('world_ready','first-render',{load_ms:Math.round(performance.now()-started)});}
     });
     observer.observe(host.current);
     return () => {
       cancelAnimationFrame(errorFrame);
-      cancelAnimationFrame(readyFrame);
       observer.disconnect();
       savedView.current = world?.getView() ?? null;
       world?.dispose();

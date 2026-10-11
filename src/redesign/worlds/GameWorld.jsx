@@ -8,6 +8,7 @@ import ToolKit from './ToolKit';
 import usePublications from '../usePublications';
 import Chem from '../Chem';
 import PaperAuthors from '../PaperAuthors';
+import ProjectMedia from '../ProjectMedia';
 import { skillsForExperience } from './skills';
 import './atlas.css';
 import './game.css';
@@ -45,6 +46,7 @@ function EntityDetails({ entity, papers }) {
     {entity.details?.length ? <ul className="atlas-details">{entity.details.map(detail => <li key={detail}>{detail}</li>)}</ul> : null}
     {entity.list ? <ul className="atlas-details">{entity.list.map(detail => <li key={detail}>{detail}</li>)}</ul> : null}
     <Progress entity={entity} />
+    {entity.media?<ProjectMedia title={entity.title} media={entity.media}/>:null}
     {entity.stats ? <div className="atlas-stats">{entity.stats.map(stat => <span key={stat.label}><b>{stat.value}%</b>{stat.label}</span>)}</div> : null}
     {entity.papers ? <ol className="atlas-papers">{papers.map(paper => <li key={paper.link}>
       <a data-analytics="publication" href={paper.link} target="_blank" rel="noreferrer"><Chem>{paper.title}</Chem> ↗</a>
@@ -222,7 +224,7 @@ export default function GameWorld({ focusId, onSwitch }) {
         onViewReset={() => setCameraMoved(false)} resetKey={cameraReset} />
     </div>
 
-    <button ref={menuButton} className="game-menu-trigger" onClick={() => setSurface('menu')} aria-label="Open game menu" title="Menu · Esc"><Menu size={21}/></button>
+    <button id="world-menu" ref={menuButton} className="game-menu-trigger" onClick={() => setSurface('menu')} aria-label="Open game menu" title="Menu · Esc"><Menu size={21}/></button>
     {cameraMoved ? <button className="game-camera-reset" onClick={resetView} aria-label="Reset island view" title="Reset view"><Compass size={21}/></button> : null}
     {!cameraUsed && !surface ? <p className="game-camera-hint"><span className="camera-hint-desktop">Drag to rotate · Scroll to zoom</span><span className="camera-hint-touch">Drag to rotate · Pinch to zoom</span></p> : null}
 
@@ -275,6 +277,7 @@ export default function GameWorld({ focusId, onSwitch }) {
 
       <Privacy/>
       <p className="game-menu-hint">Drag to rotate. Scroll or pinch to zoom.<br/>Arrow keys rotate; + / − zoom; Home resets.<br/><br/>The tool chest holds my skills.<br/>The noticeboard keeps my field journal.<br/>The mirror opens my portfolio.</p>
+      <p className="game-build-credit">Built with GPT-6 Astra :)<br/><a href="https://github.com/zrzrv5/aboutme/tree/claude/website-redesign-exploration-4a44e6" target="_blank" rel="noreferrer">Source on GitHub ↗</a></p>
     </GameWindow> : null}
   </main>;
 }

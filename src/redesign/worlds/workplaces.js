@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-// Hand-built hardware miniatures. Their silhouettes identify each workplace
+// Procedural hardware miniatures. Their silhouettes identify each workplace
 // without signs: an EV cell for Sunwoda and an open hard drive for Seagate.
 export function buildWorkplaces({ group, box, cylinder, mesh, register, animations, c }) {
   function roundedCase(w,h,d,r=.16) {

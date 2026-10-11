@@ -1,3 +1,4 @@
+import {patentByKey} from '../content.js';
 import { ITEMS } from './data.js';
 
 // Growth stages follow the user's learning history and the work in data.js.
@@ -47,11 +48,11 @@ export const SKILL_JOURNEYS = {
   ],
   dem: [
     { place:'sunwoda', level:1, detail:'LIGGGHTS powder-compaction workflows: fit contact parameters to measured density–pressure curves, then explore particle-size distributions and mixing ratios.' },
-    { place:'patents', level:1, status:'Applied', title:'Electrode-design patents', when:'2021–2022', detail:'Simulation-based particle-size and mixing-ratio design: CN114169233A and CN115579085A.' },
+    { place:'patents', level:1, status:'Applied', title:'Electrode-design patents', when:'2021–2022', detail:`Simulation-based particle-size and mixing-ratio design: ${patentByKey.particles.id} and ${patentByKey.mixing.id}.` },
   ],
   p2d: [
     { place:'sunwoda', level:1, detail:'Parameter identification for P2D, ECM and FEM battery models.' },
-    { place:'patents', level:1, status:'Applied', title:'Battery-model identification patent', when:'2021–2022', detail:'Parameter identification for secondary-battery physical models: CN115392123A.' },
+    { place:'patents', level:1, status:'Applied', title:'Battery-model identification patent', when:'2021–2022', detail:`Parameter identification for secondary-battery physical models: ${patentByKey.calibration.id}.` },
   ],
   gnn: [
     { place:'isu', level:1, detail:'Acquired graph-neural-network skills through materials property prediction and structure-generation research.' },

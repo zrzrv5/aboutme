@@ -148,6 +148,8 @@
 .game-art-options button { flex: 1; padding: 8px 3px; min-height: 38px; color: #b7c8a9; font-size: 11px; border: 1px solid #5e7550; background: none; border-radius: 4px; }
 .game-art-options button.selected { color: #f3e4b0; border-color: #d8c68a; background: #4d603c; }
 .game-menu-hint { color: #9fb48f; font-size: 10px; line-height: 1.9; margin: 22px 0 0 !important; }
+.game-build-credit { color: #c7d2b0; font-size: 11px; line-height: 1.7; margin: 16px 0 0 !important; }
+.game-build-credit a { display: inline-flex; align-items: center; min-height: 32px; color: #eadcad; text-decoration: underline; text-underline-offset: 3px; }
 .game-window :focus-visible, .game-dialogue :focus-visible { outline: 2px solid #e8d28c; outline-offset: 3px; }
 @media (max-width: 700px) {
   .game-menu-trigger, .game-camera-reset { top: max(14px,env(safe-area-inset-top)); right: max(14px,env(safe-area-inset-right)); width: 44px; height: 44px; }
@@ -176,3 +178,12 @@
   .game-dialogue, .game-window[open] { animation: none !important; }
   .game-world *, .game-world *::before { transition: none !important; }
 }
+
+/* A few readable region names orient visitors without labeling every model. */
+.world-region-target{opacity:1;pointer-events:auto;z-index:2;width:auto;min-width:74px;min-height:36px;border-radius:3px;cursor:pointer}
+.world-region-target span{font-size:10px;letter-spacing:.045em;padding:4px 7px;border:0;border-radius:2px;background:#fff8e9e8;color:#354939;box-shadow:0 1px 4px #24362716;line-height:1.25;white-space:nowrap}
+.world-region-target:hover span,.world-region-target:focus-visible span{background:#fffdf5;color:#1d3827}
+.world-region-target:focus-visible{outline:2px solid #284c36;outline-offset:1px}
+@media(pointer:coarse){.world-region-target{min-height:44px}.world-region-target span{font-size:10px}}
+.game-dialogue .project-media-preview{max-width:260px}
+.game-dialogue .project-media-dialog{color:#1d1c1a}

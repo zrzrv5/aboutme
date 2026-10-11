@@ -9,6 +9,7 @@ import { buildProjectObjects } from './project-objects';
 import { loadWorldModel } from './model-assets';
 import { GAME_AREAS, PROJECT_LAYOUT, STUDY_OFFSET_Z, campusPoint, PLAZA_LAYOUT } from './world-layout';
 import { byId } from './data';
+import { worldRenderSettings } from './render-settings';
 import { SHORE, RIVER_POINTS, RIVER_OUTLET, RIVER_SOURCE, riverHeightAt, waterfallGeometry, CROSSINGS, DOCK, MOUNTAIN_TRAILS, mountainGeometry, mountainHeightAt, ribbonGeometry } from './landscape';
 
 // Editable geometry, with the user-supplied AmiiBot GLB on its NFC display.
@@ -43,6 +44,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   const c = COLORS[art] ?? COLORS.diorama;
   const illustrated = art === 'illustrated';
   const pixel = art === 'pixel';
+  const quality=worldRenderSettings({coarse:window.matchMedia('(pointer: coarse)').matches,pixel,dpr:window.devicePixelRatio||1});
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(c.sea);
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !pixel, alpha: false, powerPreference: 'low-power' });
@@ -61,7 +63,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   const sun = new THREE.DirectionalLight('#fff3dc',2.3);
   sun.position.set(-10,22,10);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(1536,1536);
+  sun.shadow.mapSize.set(quality.shadowSize,quality.shadowSize);
   renderer.shadowMap.autoUpdate=false;
   Object.assign(sun.shadow.camera,{ left:-19,right:19,top:21,bottom:-21,near:.5,far:75 });
   sun.shadow.normalBias = .04;
@@ -360,7 +362,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   textures.add(petMap);
   const petMaterial=new THREE.SpriteMaterial({map:petMap,alphaTest:.05});
   const pet=new THREE.Sprite(petMaterial); pet.userData.dynamic=true;
-  pet.scale.set(.72,.78,1);
+  pet.scale.set(.87,.94,1);
   scene.add(pet);
   const destination=new THREE.Vector3(PLAZA_LAYOUT.mirror.stand[0],.87,PLAZA_LAYOUT.mirror.stand[2]);
   pet.position.copy(destination);
@@ -409,10 +411,14 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   function resize(w,h) {
     width=Math.max(1,w); height=Math.max(1,h);
     const aspect=width/height;
-    renderer.setPixelRatio(pixel?1:Math.min(window.devicePixelRatio||1,1.5));
+    renderer.setPixelRatio(quality.pixelRatio);
     const renderWidth=pixel?Math.max(280,Math.round(width/2.2)):width;
     renderer.setSize(renderWidth,pixel?Math.round(renderWidth/aspect):height,false);
     orbit.resize(width,height,inspecting);
+    // setSize clears the drawing buffer. Always paint the sized scene, even
+    // when the animation loop is suspended or a recent frame hit the FPS cap.
+    updateLayout();
+    render(performance.now(),true);
   }
   function updateLayout() {
     onLayout({

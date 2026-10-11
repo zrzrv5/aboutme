@@ -2,16 +2,9 @@
 // content anchors for older links; neither has a building on the island.
 // Facts come from ResumeSlop, publications.json, project READMEs and the current site. Do not invent numbers.
 
-export const LINKS = {
-  email: 'mailto:zrzrv5@gmail.com',
-  emailText: 'zrzrv5@gmail.com',
-  linkedin: 'https://www.linkedin.com/in/zrzrv5/',
-  scholar: 'https://scholar.google.com/citations?user=p27FiGAAAAAJ',
-  orcid: 'https://orcid.org/0000-0002-5789-4629',
-  github: 'https://github.com/zrzrv5',
-  cv: '/ZHOU_Rui_CV-2026-Aug.pdf',
-  resume: '/ZHOU_Rui_Resume.pdf',
-};
+import {links, person, experienceById, education, patents, appById, appMedia, counts} from '../content.js';
+
+export const LINKS = links;
 
 export const HATS = [
   { id: 'research', label: 'PhD candidate', aside: 'Atoms go brrrrr' },
@@ -81,9 +74,9 @@ export const ENTITIES = [
     kind: 'main',
     name: 'Quest board',
     title: 'Open to opportunities',
-    status: 'From May 2027',
-    meta: 'From May 2027',
-    summary: 'I expect to graduate in May 2027 and welcome opportunities across roles and industries. Happy to move anywhere in the U.S.',
+    status: 'Graduating May 2027',
+    meta: 'Graduating May 2027',
+    summary: person.looking,
     details: ['Open to jobs, collaborations and new directions. Get in touch if you have an opportunity in mind.'],
     links: [
       { label: 'Email me', href: LINKS.email },
@@ -98,7 +91,7 @@ export const ENTITIES = [
     kind: 'trophy',
     name: 'Parks Library',
     title: 'Papers',
-    meta: '13 peer-reviewed · 5 first-author',
+    meta: `${counts.papers} peer-reviewed · ${counts.firstAuthor} first-author`,
     summary: 'Every paper so far, newest first. I also review for journals (4 reviews).',
     papers: true,
     links: [{ label: 'Google Scholar', href: LINKS.scholar }],
@@ -112,13 +105,13 @@ export const ENTITIES = [
     name: 'Iowa State Campus',
     roleLabel: 'PhD @ ISU',
     title: 'Iowa State University',
-    period: 'Jan 2023 – May 2027 (expected)',
+    period: experienceById.isu.when,
     sectionLabel: 'Research',
     publicationYears: [2023, 2027],
     publicationLabel: 'Papers during my PhD',
     relatedResearch: ['photo'],
     record: 'phd',
-    meta: 'PhD researcher · Jan 2023 – May 2027',
+    meta: `PhD researcher · ${experienceById.isu.when}`,
     summary: 'Atomic-scale studies of solid electrolytes, semiconductors, ceramics and metals using electronic-structure calculations and ML potentials.',
     details: [
       'Interfaces, phase transitions and ion transport in glassy and crystalline solid electrolytes, including Li–Si–P–S, closo-hydroborates and Li–Al–Cl–O.',
@@ -183,10 +176,10 @@ export const ENTITIES = [
     roleLabel: 'Simulation engineer @ Sunwoda',
     title: 'Sunwoda EV Battery',
     location: 'Shenzhen, China',
-    period: 'Dec 2020 – Dec 2022',
+    period: experienceById.sunwoda.when,
     sectionLabel: 'Work',
     record: 'patents',
-    meta: 'Simulation engineer · Dec 2020 – Dec 2022',
+    meta: `Simulation engineer · ${experienceById.sunwoda.when}`,
     summary: 'I developed simulation workflows and Python tools for battery R&D, alongside studies of cathode materials, powder compaction and cell behavior.',
     details: [
       'Materials modeling: ML-potential training and validation for cathodes, with automated generation of DFT reference structures and analysis of diffusion, lattice changes and stability.',
@@ -202,14 +195,10 @@ export const ENTITIES = [
     kind: 'trophy',
     name: 'Four heart pieces',
     title: 'Patents',
-    meta: '4 granted · 2021–2022',
+    meta: `${patents.length} granted · filed 2021–2022`,
     summary: 'All four came out of the Sunwoda years.',
-    list: [
-      'Ternary cathode material and its preparation · CN114744187B',
-      'Optimizing the particle size of electrode material particles · CN114169233A',
-      'Simulation-based design of battery material mixing ratios · CN115579085A',
-      'Parameter identification for secondary-battery physical models · CN115392123A',
-    ],
+    list: patents.map(p => `${p.title} · ${p.id} · granted ${p.granted}`),
+    links: patents.map(p => ({label:p.id,href:p.href})),
   },
 
   // Semiconductor and storage research
@@ -220,10 +209,10 @@ export const ENTITIES = [
     name: 'Thin-Film Peak',
     roleLabel: 'Intern @ Seagate',
     title: 'Seagate Technology',
-    location: 'Minnesota, USA',
-    period: 'May – Aug 2026',
+    location: experienceById.seagate.location,
+    period: experienceById.seagate.when,
     sectionLabel: 'Work',
-    meta: 'Material discovery intern · May – Aug 2026',
+    meta: `Material discovery intern · ${experienceById.seagate.when}`,
     status: 'Cleared',
     summary: 'Advanced data-storage material discovery.',
     details: [
@@ -258,11 +247,11 @@ export const ENTITIES = [
     kind: 'area',
     name: 'TotK Companion',
     title: 'TotK Companion',
-    meta: '2023 · 10K+ downloads',
+    meta: `${appById.totk.year} · ${appById.totk.meta}`,
     summary: 'Map and tracker for Tears of the Kingdom. Reached #2 in the US App Store after launch (#1 in other regions).',
     details: ['Vibe-coding before it was cool: built in two days with ChatGPT and Midjourney.'],
-    links: [
-      { label: 'App screenshots', href: '/images/totk/banner_large.png' },{ label: 'App Store', href: 'https://apps.apple.com/us/app/tears-of-the-kingdom-companion/id6448892536' }],
+    media: appMedia.totk,
+    links: appById.totk.links,
   },
   {
     id: 'amiibot',
@@ -270,11 +259,11 @@ export const ENTITIES = [
     kind: 'area',
     name: 'AmiiBot',
     title: 'AmiiBot',
-    meta: '2020 · 10K+ downloads',
+    meta: `${appById.amiibot.year} · ${appById.amiibot.meta}`,
     summary: 'Amiibo collection tracker with NFC scanning and writing.',
     details: ['A pandemic side project that turned into an app for other collectors.'],
-    links: [
-      { label: 'App screenshots', href: '/images/amiibot/old@3x.png' },{ label: 'App Store', href: 'https://apps.apple.com/us/app/amiibot/id1514835611' }],
+    media: appMedia.amiibot,
+    links: appById.amiibot.links,
   },
   {
     id: 'ling',
@@ -282,10 +271,11 @@ export const ENTITIES = [
     kind: 'area',
     name: 'L!NG',
     title: 'L!NG',
-    meta: '2017 · 1K–5K downloads · retired',
+    meta: `${appById.ling.year} · ${appById.ling.meta}`,
     summary: 'Timetable app built for the Apple Watch. My first App Store release.',
     details: ['My first App Store release, built around having a timetable on the wrist. Now retired.'],
-    links: [{ label: 'App screenshots', href: '/images/mytimetable/app@3x.png' }],
+    media: appMedia.ling,
+    links: appById.ling.links,
   },
   {
     id: 'naiive',
@@ -293,16 +283,12 @@ export const ENTITIES = [
     kind: 'sub',
     name: 'NAIIVE',
     title: 'NAIIVE',
-    meta: 'Apple platforms · Swift & Metal',
+    meta: `${appById.naiive.year} · ${appById.naiive.meta}`,
     status: 'Released',
     summary: 'Node-based visualization studio for atomistic simulations and ML-potential datasets, in Swift and Metal.',
     details: ['Inspect atomistic trajectories and ML-potential datasets with a node-based editor, real-time rendering and spatial / AR views.', 'Released on Apple platforms; TestFlight carries the latest experiments.'],
-    links: [
-      { label: 'App screenshots', href: '/images/naiive/naiive_me_banner.png' },
-      { label: 'Website', href: 'https://naiive.1sec.plus' },
-      { label: 'TestFlight', href: 'https://testflight.apple.com/join/VrYnN9nE' },
-      { label: 'GitHub', href: 'https://github.com/zrzrv5/NAIIVE' },
-    ],
+    media: appMedia.naiive,
+    links: appById.naiive.links,
   },
   {
     id: 'dpmetal',
@@ -447,11 +433,7 @@ export const ITEMS = [
   { id: 'fluent', name: 'ANSYS Fluent', what: 'CFD simulation', tools: 'ANSYS Fluent · course project', found: 'wustl', used: [] },
 ];
 
-export const EDUCATION = [
-  { id: 'isu', school: 'Iowa State University', degree: 'PhD, Materials Science and Engineering', when: '2023 – 2027' },
-  { id: 'wustl', school: 'Washington University in St. Louis', degree: 'MS, Materials Science and Engineering', when: '2018 – 2020', note: 'Thesis: molecular dynamics of thin-film water evaporation on graphene-coated silicon.' },
-  { id: 'cust', school: 'Changchun University of Science and Technology', degree: 'BS, Materials Science and Engineering', when: '2014 – 2018', note: 'Lab work on carbon anode materials.' },
-];
+export const EDUCATION = education;
 
 export const byId = Object.fromEntries(ENTITIES.map((e) => [e.id, e]));
 export const itemById = Object.fromEntries(ITEMS.map((i) => [i.id, i]));

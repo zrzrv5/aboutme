@@ -13,11 +13,11 @@ const template=await readFile(path.join(dist,'index.html'),'utf8');
 const manifest=JSON.parse(await readFile(path.join(dist,'.vite/manifest.json'),'utf8'));
 const escape=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 const description='Rui Zhou — computational materials researcher, battery simulation engineer, and native app developer. Research, experience, publications, and personal projects.';
-const server=await createServer({server:{middlewareMode:true},appType:'custom'});
+const server=await createServer({server:{middlewareMode:true},appType:'custom',optimizeDeps:{noDiscovery:true,include:[]}});
 let resume;
 try {
-  const {default:MarginsSite}=await server.ssrLoadModule('/src/redesign/margins/MarginsSite.jsx');
-  resume=renderToString(React.createElement(MarginsSite,{initialPublications:publications,onSwitch:()=>{}}));
+  const {default:App}=await server.ssrLoadModule('/src/App.jsx');
+  resume=renderToString(React.createElement(React.StrictMode,null,React.createElement(App,{initialPublications:publications,initialRoute:{view:'resume',focus:null,notFound:false}})));
 } finally {await server.close();}
 const fallback=`<main class="static-fallback"><h1>Rui Zhou 周睿</h1><p>${escape(person.intro)}</p><p>${escape(person.looking)}</p><nav><a href="/">Read my research and projects</a><a href="${links.cv}">Academic CV (PDF)</a><a href="${links.email}">Email</a></nav><p>The interactive island opens with JavaScript. All professional information is also available in the 2D portfolio.</p></main>`;
 const profile={
@@ -33,7 +33,7 @@ const routes=[
 ];
 for(const route of routes){
   const canonical=SITE_ORIGIN+(route.canonical??route.path);
-  const css=route.resume?(manifest['src/redesign/margins/MarginsSite.jsx']?.css??[]):[];
+  const css=route.resume?(manifest['index.html']?.css??[]):[];
   const head=`<title>${escape(route.title)}</title>
   <meta name="description" content="${escape(description)}">
   <meta name="robots" content="${route.noindex?'noindex, follow':'index, follow'}">
@@ -41,12 +41,13 @@ for(const route of routes){
   <link rel="canonical" href="${canonical}">
   <meta property="og:type" content="profile"><meta property="og:site_name" content="Rui Zhou">
   <meta property="og:title" content="${escape(route.title)}"><meta property="og:description" content="${escape(description)}"><meta property="og:url" content="${canonical}">
-  <meta property="og:image" content="${SITE_ORIGIN}/site-preview.png">
-  <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${escape(route.title)}"><meta name="twitter:description" content="${escape(description)}"><meta name="twitter:image" content="${SITE_ORIGIN}/site-preview.png">
+  <meta property="og:image" content="${SITE_ORIGIN}/site-preview.jpg">
+  <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${escape(route.title)}"><meta name="twitter:description" content="${escape(description)}"><meta name="twitter:image" content="${SITE_ORIGIN}/site-preview.jpg">
   ${route.noindex?'':`<script type="application/ld+json">${JSON.stringify({...profile,url:canonical,name:route.title}).replaceAll('<','\\u003c')}</script>`}
-  ${css.map(file=>`<link rel="stylesheet" href="/${file}">`).join('\n  ')}`;
+  ${route.resume?'<link rel="preload" href="/fonts/eb-garamond-normal-latin.woff2" as="font" type="font/woff2" crossorigin>':''}
+  ${css.filter(file=>!template.includes(file)).map(file=>`<link rel="stylesheet" href="/${file}">`).join('\n  ')}`;
   const seed=route.resume?`<script type="application/json" id="site-publications">${JSON.stringify(publications).replaceAll('<','\\u003c')}</script>`:'';
-  const html=template.replace(/<title>[\s\S]*?<\/title>/i,'').replace(/<meta name="description"[^>]*>/i,'').replace(/<link rel="canonical"[^>]*>/i,'').replace('</head>',`${head}\n</head>`).replace('<div id="root"></div>',`<div id="root">${route.body}</div>${seed}`);
+  const html=template.replace(/<title>[\s\S]*?<\/title>/i,'').replace(/<meta name="description"[^>]*>/i,'').replace(/<link rel="canonical"[^>]*>/i,'').replace('</head>',`${head}\n</head>`).replace('<div id="root"></div>',`<div id="root"${route.resume?' data-ssr="portfolio"':''}>${route.body}</div>${seed}`);
   const file=path.join(dist,route.path==='/404.html'?'404.html':route.path==='/'?'index.html':route.path.slice(1)+'index.html');
   await mkdir(path.dirname(file),{recursive:true});await writeFile(file,html);
 }
