@@ -37,13 +37,13 @@ const APP_NOTES={
 };
 const APP_COPY={
   naiive:'A workspace for seeing what a simulation is actually doing. Open trajectories and ML-potential datasets, build a view with nodes, then inspect the atoms on screen or in AR.',
-  totk:'A map and collection tracker for Tears of the Kingdom, with iCloud sync. An early experiment in building an app with ChatGPT and Midjourney; it reached #2 in the US App Store after launch.',
+  totk:'A map and collection tracker for Tears of the Kingdom, with iCloud sync. An early experiment in building an app with ChatGPT and Midjourney; it reached #2 in the US App Store after launch and #1 in other regions.',
   amiibot:'A collection tracker that connects the digital list to the figures on your shelf, using NFC scanning and writing.',
   ling:'My first App Store app: a timetable designed for the wrist. Built around the Apple Watch and its then-new ways of moving through time. Now retired.',
 };
 const EXPERIMENTS=[
-  ['typeshi','Element hypotheses from anonymous atom types and geometry.'],
-  ['dpmetal','ML-potential inference on Apple GPUs, directly from Swift.'],
+  ['typeshi','Element hypotheses from anonymous atom types and geometry. A 1.9 MB model that answers in under a second on a CPU.'],
+  ['dpmetal','ML-potential inference on Apple GPUs, directly from Swift. Verified up to 256,000 atoms on M1 Max and M4.'],
   ['trajview','Preview atomistic trajectories inside VS Code.'],
   ['slop','A research-agent runtime connecting reusable methods, remote machines and long-running calculations.'],
   ['dshslop','Persistent cluster sessions, machine notes and a Slurm/PBS job ledger for research agents.'],
@@ -52,14 +52,15 @@ const EXPERIMENTS=[
   ['gas','Compare cheaper fuel against the extra drive.'],
   ['fuji','A Bluetooth camera shutter on Apple Watch.'],
 ];
+const EXPERIMENT_STATUS={slop:'Private project',dshslop:'In development',gradbench:'In development',fuji:'Unreleased'};
 const SCHOOL_NAMES=Object.fromEntries(EDUCATION.map(school=>[school.id,school.school]));
 const JOURNEY=[
   {id:'isu',title:'Iowa State University',role:'PhD candidate · Materials Science and Engineering',period:experienceById.isu.when,text:'Electronic-structure calculations, active learning and ML potentials are my day-to-day tools for studying atomic motion. I also build the software I need to inspect and organize the resulting data.'},
-  {id:'seagate',title:'Seagate Technology',role:'Advanced Data Storage Material Discovery Intern',period:`${experienceById.seagate.when} · ${experienceById.seagate.location}`,text:'At Seagate, I built machine-learning workflows for thin-film ellipsometry and chemical-property prediction, and used molecular dynamics to study reader-head and coating materials.'},
+  {id:'seagate',title:'Seagate Technology',role:'Advanced Data Storage Material Discovery Intern',period:`${experienceById.seagate.when} · ${experienceById.seagate.location}`,text:'At Seagate, I developed an end-to-end machine-learning workflow for thin-film ellipsometry data analysis, built graph-neural-network and RDKit-descriptor models for chemical-property prediction, and used molecular dynamics to study reader-head coating materials.'},
   {id:'sunwoda',title:experienceById.sunwoda.org,role:'Simulation Engineer',period:`${experienceById.sunwoda.when} · ${experienceById.sunwoda.location}`,text:byId.sunwoda.summary,work:[
-    {title:'ML potentials & research software',text:'I worked on cathode ML-potential training and validation, and built tools to generate reference structures and analyze diffusion, lattice changes and material stability.'},
-    {title:'Powder compaction',text:'I fitted DEM contact parameters to experimental density–pressure curves, then used the calibrated models to explore particle-size distributions and mixing ratios.'},
-    {title:'Automatic model fitting',text:'I built Python tools to fit models across rates and temperatures, using particle-swarm and differential-evolution algorithms and interfaces to COMSOL.'},
+    {title:'ML potentials & research software',text:'I worked on cathode ML-potential training and validation, and built tools to generate reference structures and analyze diffusion, lattice changes and material stability. I also ran high-throughput DFT and force-field screening of dopants for NCM and LFMP cathodes (patent CN114744187B).'},
+    {title:'Powder compaction',text:'I fitted DEM contact parameters to experimental density–pressure curves, then used the calibrated models to explore particle-size distributions and mixing ratios (patents CN114169233B and CN115579085B).'},
+    {title:'Automatic model fitting',text:'I built Python tools to identify parameters for DEM, P2D/ECM and FEM battery models across rates and temperatures, using particle-swarm and differential-evolution algorithms and interfaces to COMSOL (patent CN115392123B).'},
   ]},
 ];
 
@@ -124,10 +125,10 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
         <Row note={<Note tilt={-3} delay={300}>atoms go brrrrr</Note>}>
           <h1>Rui Zhou</h1>
           <p className="mg-role">I study materials and build software to work with them.</p>
-          <p className="mg-intro">My work spans battery materials, semiconductors, ceramics and metals. I use atomic simulations and machine learning to understand how they behave — and make tools for exploring the results.</p>
-          <p className="mg-current">PhD candidate · Iowa State University</p>
+          <p className="mg-intro">My work spans battery materials, semiconductors, ceramics and metals. I train ML interatomic potentials with active learning, run DFT and molecular dynamics, and use Bayesian optimization to search electrolyte compositions — and I build tools for exploring the results.</p>
+          <p className="mg-current">PhD candidate · Iowa State University<br/><span>Previously <a href="#seagate">Seagate</a> (R&amp;D intern, {experienceById.seagate.start})</span> · <span><a href="#sunwoda">{experienceById.sunwoda.org}</a> (simulation engineer, {experienceById.sunwoda.start}–{String(experienceById.sunwoda.end).slice(2)})</span></p>
           <p className="mg-availability">{person.availability}</p>
-          <p className="mg-proof"><strong>{papers.length||counts.papers}</strong> peer-reviewed papers · <strong>{selectedPapers.length||counts.firstAuthor}</strong> first-author · <strong>{patents.length}</strong> granted patents</p>
+          <p className="mg-proof"><strong>{papers.length||counts.papers}</strong> peer-reviewed papers · <strong>{selectedPapers.length||counts.firstAuthor}</strong> first-author · <strong>{patents.length}</strong> granted patents · <strong>{counts.apps}</strong> released apps</p>
           <p className="mg-contact"><a href={links.email}>Email</a><a href={links.linkedin}>LinkedIn</a><a href={links.scholar}>Google Scholar</a><a href={links.github}>GitHub</a></p>
         </Row>
       </header>
@@ -141,13 +142,13 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
         </Row>
         <Row>
           <h3 className="mg-entry-title">Defects and mechanical response</h3>
-          <p>Other collaborations follow dislocations in high-entropy carbides and Mg–Bi alloys, and the effect of light on ZnS and CdTe. Electronic-structure calculations and ML potentials help connect atomic changes to <Hl>mechanical response</Hl>.</p>
+          <p>I also contribute to studies of <Hl>how crystals deform</Hl>, using ML potentials: dislocation slip in Mg–Bi alloys and high-entropy carbides, and photoplasticity in ZnS and CdTe, where constrained DFT provides the excited-state reference data.</p>
           <p className="mg-result">In our ZnS study, photoexcitation increased the stress needed for dislocations to move, helping explain why illumination makes the crystal harder to deform.</p>
           <p className="mg-project-links"><a data-analytics="publication" href="https://doi.org/10.1021/acsaenm.4c00280" target="_blank" rel="noreferrer">Carbide ceramics <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1103/l83s-dwqz" target="_blank" rel="noreferrer">Mg–Bi alloys <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1021/acsmaterialslett.4c01982" target="_blank" rel="noreferrer">ZnS photoplasticity <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1016/j.ijmecsci.2025.110765" target="_blank" rel="noreferrer">CdTe photoplasticity <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a></p>
         </Row>
         <Row id="papers" className="mg-pub">
-          <details className="mg-reading" open={focusId==='library'||undefined}>
-            <summary>Selected papers &amp; authors</summary>
+          <details className="mg-reading" open>
+            <summary>First-author papers</summary>
             {status==='loading'?<p role="status">Loading publications…</p>:status==='error'?<p>Find the publication list on <a href={links.scholar}>Google Scholar</a>.</p>:null}
             <ol>{selectedPapers.map(p=><li key={p.link}><a data-analytics="publication" href={p.link} target="_blank" rel="noreferrer"><Chem>{p.title}</Chem></a><PaperAuthors authors={p.authors}/><small>{p.venue} · {p.year}</small></li>)}</ol>
             <a href={links.scholar}>All publications on Google Scholar <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a>
@@ -175,7 +176,7 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
         <Row label={<h2 className="mg-h">Experiments</h2>}><p className="mg-section-intro">Smaller tools and open questions, often prompted by something I wanted to use myself.</p></Row>
         <div className="mg-experiments-grid">
           {EXPERIMENTS.map(([id,description])=>{const project=byId[id];return <article id={id} tabIndex={-1} data-project-id={id} data-reading-focus={id} key={id} className="mg-experiment">
-            <h3>{project.title}</h3><p>{description}</p>{['slop','dshslop','gradbench'].includes(id)?<small className="mg-project-status">{id==='slop'?'Private project':'In development'}</small>:null}<ProjectLinks project={project}/>
+            <h3>{project.title}</h3><p>{description}</p>{EXPERIMENT_STATUS[id]?<small className="mg-project-status">{EXPERIMENT_STATUS[id]}</small>:null}<ProjectLinks project={project}/>
           </article>;})}
         </div>
       </section>
@@ -189,7 +190,7 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
       </section>
 
       <section id="education" tabIndex={-1}>
-        <Row label={<h2 className="mg-h">Earlier</h2>} id="wustl"><h3 className="mg-entry-title">Washington University in St. Louis</h3><p className="mg-title">Master of Science · Materials Science and Engineering</p><p className="mg-when">2018 – 2020 · St. Louis, Missouri</p><p>Studying water evaporating from graphene-coated silicon introduced me to molecular dynamics and working on a cluster.</p><p className="mg-coursework">Course projects added MEMS microfabrication — a team project building a passive-mixer microfluidic device — and CFD simulation with ANSYS Fluent.</p><p className="mg-project-links"><a data-analytics="publication" href="https://openscholarship.wustl.edu/eng_etds/694/" target="_blank" rel="noreferrer">Read the thesis <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a></p></Row>
+        <Row label={<h2 className="mg-h">Earlier</h2>} id="wustl"><h3 className="mg-entry-title">Washington University in St. Louis</h3><p className="mg-title">Master of Science · Materials Science and Engineering</p><p className="mg-when">2018 – 2019 · St. Louis, Missouri</p><p>Studying water evaporating from graphene-coated silicon introduced me to molecular dynamics and working on a cluster.</p><p className="mg-coursework">Course projects added MEMS microfabrication — a team project building a passive-mixer microfluidic device — and CFD simulation with ANSYS Fluent.</p><p className="mg-project-links"><a data-analytics="publication" href="https://openscholarship.wustl.edu/eng_etds/694/" target="_blank" rel="noreferrer">Read the thesis <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a></p></Row>
         <Row id="cust"><h3 className="mg-entry-title">Changchun University of Science and Technology</h3><p className="mg-title">Bachelor of Science · Materials Science and Engineering</p><p className="mg-when">2014 – 2018 · Changchun, China</p><p>My starting point was experimental: carbon anode materials, electrospinning, synthesis and half-cell testing. Python and MATLAB began here, too.</p><p className="mg-project-links"><a data-analytics="publication" href="https://doi.org/10.1016/j.jcis.2017.07.117" target="_blank" rel="noreferrer">Carbon nanofibers <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a></p></Row>
       </section>
 
@@ -206,7 +207,7 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
 
       <footer className="mg-footer">
         <Row label={<h2 className="mg-h">Say hello</h2>}>
-          <p>I welcome roles, collaborations and new directions across industries. If you have something in mind, <Under seed={4}>I’d like to hear from you</Under>.</p>
+          <p>If you have a role or a project in mind, <Under seed={4}>I’d like to hear from you</Under>.</p>
           <p className="mg-project-links"><a href={links.email}>{links.emailText}</a><a href={links.cv}>Academic CV (PDF)</a><a href={links.resume}>Résumé (PDF)</a><a href={links.linkedin}>LinkedIn</a></p>
         </Row>
       </footer>

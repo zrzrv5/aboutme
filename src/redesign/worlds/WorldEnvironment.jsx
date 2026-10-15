@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { byId, itemById } from './data';
 import { GAME_AREAS, gameAreaById } from './world-layout';
 import { createEnvironment } from './environment';
@@ -13,6 +13,7 @@ export default function WorldEnvironment({ art, selection, onSelect, onMiss, onI
   const [layout, setLayout] = useState({ labelLevel:'overview',labels:[], objects:[] });
   const [hovered, setHovered] = useState(null);
   const [unavailable, setUnavailable] = useState(false);
+  const labelKey = layout.labels.map(label => label.id).join();
 
   useEffect(() => { callbacks.current = { onSelect, onMiss, selection, onInteract, onViewReset }; }, [onSelect, onMiss, selection, onInteract, onViewReset]);
 
@@ -32,6 +33,7 @@ export default function WorldEnvironment({ art, selection, onSelect, onMiss, onI
         onViewReset: () => callbacks.current.onViewReset?.(),
       });
       environment.current = world;
+      world.attachLabels(host.current.querySelectorAll('[data-label-id]'));
       const initial = callbacks.current.selection;
       world.select(initial.startsWith('item:') ? itemById[initial.slice(5)]?.found : initial, true);
     } catch (error) {
@@ -58,6 +60,8 @@ export default function WorldEnvironment({ art, selection, onSelect, onMiss, onI
     environment.current?.select(target);
   }, [selection, art]);
 
+  // The scene positions labels itself, every frame; React only mounts them.
+  useLayoutEffect(() => { environment.current?.attachLabels(host.current.querySelectorAll('[data-label-id]')); }, [labelKey, art]);
   useEffect(() => { environment.current?.pause(paused); }, [paused,art]);
   useEffect(() => { environment.current?.inspect(inspecting); }, [inspecting, art]);
   useEffect(() => { if (resetKey) environment.current?.resetView(); }, [resetKey]);
@@ -65,10 +69,10 @@ export default function WorldEnvironment({ art, selection, onSelect, onMiss, onI
   return <div ref={host} className="world-environment" data-renderer={art} data-label-level={layout.labelLevel}>
     <canvas ref={canvas} className="world-canvas" tabIndex={0} aria-label="Rui’s island. Drag or use arrow keys to rotate. Scroll, pinch, or use plus and minus to zoom. Home resets the view. Click a place or object to explore, or Tab to discover places." role="img" />
     {layout.objects.map(target => <button key={target.id} hidden={target.hidden} className={`world-accessible-target ${target.id.startsWith('@') ? 'world-prop-target' : ''}`} style={{left:`${target.x}%`,top:`${target.y}%`}} aria-label={target.title} onClick={() => onSelect(target.id)} onFocus={() => setHovered(target)} onBlur={() => setHovered(null)} onMouseEnter={() => setHovered(target)} onMouseLeave={() => setHovered(null)} />)}
-    {!unavailable&&layout.labels.map(label => <button key={label.id} hidden={label.hidden} className={`world-accessible-target world-region-target world-label-${label.kind}`} style={{left:`${label.x}%`,top:`${label.y}%`}} onClick={() => {
+    {!unavailable&&layout.labels.map(label => <button key={label.id} data-label-id={label.id} className={`world-accessible-target world-region-target world-label-${label.kind}`} onClick={() => {
       if(label.kind==='region'){canvas.current.focus({preventScroll:true});environment.current?.focusRegion(label.id);}
       else onSelect(`biome:${label.id}`);
-    }} aria-label={label.kind==='region'?`Zoom into ${label.name}`:`${label.name}: ${label.plain}`}><span>{label.name}{label.kind==='region'?<small aria-hidden="true">＋</small>:null}</span></button>)}
+    }} aria-label={label.kind==='region'?`Zoom into ${label.name}`:`${label.name}: ${label.plain}`}><span>{label.name}</span></button>)}
     {hovered && !unavailable ? <div className="world-object-label" style={{left:`${Math.min(80,Math.max(20,hovered.x))}%`,top:`${Math.max(8,hovered.y)}%`}}>{hovered.title}{hovered.location ? <small>{hovered.location}</small> : null}</div> : null}
     {unavailable ? <div className="world-unavailable"><p>The interactive map needs WebGL.</p><a href="/">Read the 2D portfolio</a><small>Choose an area to explore its projects.</small>{GAME_AREAS.map(area => <button key={area.id} onClick={() => onSelect(`biome:${area.id}`)}>{area.plain}</button>)}</div> : null}
     <span className="world-selection" aria-live="polite">{byId[selection]?.roleLabel ?? byId[selection]?.title ?? gameAreaById[selection.replace('biome:','')]?.plain ?? ''}</span>

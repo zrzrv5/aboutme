@@ -45,6 +45,7 @@ test('contact, documents, papers and project destinations are classified without
   assert.deepEqual(classify('mailto:private@example.com?body=private'),['contact_click',{contact_method:'email'}]);
   assert.deepEqual(classify('/ZHOU_Rui_Resume_2025.pdf'),['document_open',{document_id:'resume',file_extension:'pdf'}]);
   assert.deepEqual(classify('/ZHOU_Rui_Resume.pdf'),['document_open',{document_id:'resume',file_extension:'pdf'}]);
+  assert.deepEqual(classify('/ZHOU_Rui_CV.pdf'),['document_open',{document_id:'cv',file_extension:'pdf'}]);
   assert.deepEqual(classify('/ZHOU_Rui_CV-2026-Aug.pdf'),['document_open',{document_id:'cv',file_extension:'pdf'}]);
   assert.equal(classify('/about/'),null);assert.equal(classify('javascript:alert(1)'),null);
   assert.deepEqual(linkEvent({href:'https://testflight.apple.com/join/example?email=private',origin:'https://me.1sec.plus',projectId:'naiive'}),['project_link',{project_id:'naiive',link_kind:'testflight',link_domain:'testflight.apple.com'}]);

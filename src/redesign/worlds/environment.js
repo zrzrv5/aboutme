@@ -8,10 +8,10 @@ import { buildWorkplaces } from './workplaces';
 import { buildProjectObjects } from './project-objects';
 import { loadWorldModel } from './model-assets';
 import { GAME_AREAS, WORLD_REGIONS, PROJECT_LAYOUT, STUDY_OFFSET_Z, campusPoint, PLAZA_LAYOUT } from './world-layout';
-import { mapLabelLevel, placeMapLabels } from './map-labels';
+import { mapLabelLevel, resolveMapLabels } from './map-labels';
 import { byId } from './data';
 import { worldRenderSettings } from './render-settings';
-import { SHORE, RIVER_POINTS, RIVER_OUTLET, RIVER_SOURCE, riverHeightAt, waterfallGeometry, CROSSINGS, DOCK, MOUNTAIN_TRAILS, mountainGeometry, mountainHeightAt, ribbonGeometry } from './landscape';
+import { GROUND, SHORE, RIVER_POINTS, RIVER_OUTLET, RIVER_SOURCE, riverHeightAt, waterfallGeometry, CROSSINGS, DOCK, MOUNTAIN_TRAILS, mountainGeometry, mountainHeightAt, ribbonGeometry } from './landscape';
 
 // Editable geometry, with the user-supplied AmiiBot GLB on its NFC display.
 // Campus parcels and paths leave open ground between buildings. Coordinates: x / height / z.
@@ -113,6 +113,25 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   const box = (parent,w,h,d,color,x=0,y=0,z=0,outline=false) => mesh(parent,new THREE.BoxGeometry(w,h,d),color,[x,y,z],outline);
   const cylinder = (parent,top,bottom,height,color,x=0,y=0,z=0,n=12) => mesh(parent,new THREE.CylinderGeometry(top,bottom,height,n),color,[x,y,z],true);
   const ball = (parent,r,color,x=0,y=0,z=0) => mesh(parent,new THREE.IcosahedronGeometry(r,art === 'diorama' ? 1 : 0),color,[x,y,z]);
+  // A device screen: a rounded rectangle showing a bitmap, unlit so it reads
+  // as a display. The image arrives after the first frame, then repaints.
+  function screen(parent,url,w,h,r,position=[0,0,0]) {
+    const shape=new THREE.Shape(),x=-w/2,y=-h/2;
+    shape.moveTo(x+r,y); shape.lineTo(x+w-r,y); shape.quadraticCurveTo(x+w,y,x+w,y+r);
+    shape.lineTo(x+w,y+h-r); shape.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    shape.lineTo(x+r,y+h); shape.quadraticCurveTo(x,y+h,x,y+h-r);
+    shape.lineTo(x,y+r); shape.quadraticCurveTo(x,y,x+r,y);
+    const geometry=new THREE.ShapeGeometry(shape,6),uv=geometry.attributes.uv,points=geometry.attributes.position;
+    for(let i=0;i<points.count;i++)uv.setXY(i,(points.getX(i)-x)/w,(points.getY(i)-y)/h);
+    geometries.add(geometry);
+    const map=new THREE.TextureLoader().load(url,()=>{if(!disposed)render(performance.now(),true);});
+    map.colorSpace=THREE.SRGBColorSpace; map.anisotropy=4;
+    textures.add(map);
+    const face=new THREE.Mesh(geometry,new THREE.MeshBasicMaterial({map,toneMapped:false}));
+    modelMaterials.add(face.material);
+    face.position.set(...position); parent.add(face);
+    return face;
+  }
 
   function group(name, x, z, parent=scene) {
     const g = new THREE.Group();
@@ -287,7 +306,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
 
   buildWorkplaces({group,box,cylinder,mesh,register,animations,c});
 
-  buildProjectObjects({group,box,cylinder,mesh,register,animations,c,ownMaterial:material=>{modelMaterials.add(material);return material;},isActive:g=>g===hovered || g===selected,
+  buildProjectObjects({group,box,cylinder,mesh,screen,register,animations,c,ownMaterial:material=>{modelMaterials.add(material);return material;},isActive:g=>g===hovered || g===selected,
     loadModel:(parent,url,options)=>loadWorldModel(parent,url,{...options,isDisposed:()=>disposed,
       adopt:loaded=> {
         loaded.geometries.forEach(value=>geometries.add(value));
@@ -380,14 +399,18 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   // every mesh again on every frame of a camera drag.
   batchWorld(scene,geometries);
   const anchors=clickables.map(g=>({id:g.userData.id,title:g.userData.title,location:g.userData.location,position:new THREE.Box3().setFromObject(g).getCenter(new THREE.Vector3()).toArray()}));
-  let previous=0,lastShadow=-Infinity,lastLayout=-Infinity,lastPick=-Infinity,paused=false;
-  let labelLevel='overview',layoutTimer;
+  let previous=0,lastShadow=-Infinity,lastMove=-Infinity,lastPick=-Infinity,paused=false;
+  let labelLevel='overview',settleTimer,mapLabels=[];
+  const labelPoint=new THREE.Vector3();
   const orbit=createWorldCamera(camera,canvas,{
     surface,reduced,view,onInteract,onReset:onViewReset,onHoverClear:leave,onPick:click,
     onChange() {
-      const now=performance.now();
-      if(now-lastLayout>65) {clearTimeout(layoutTimer);layoutTimer=null;updateLayout();lastLayout=now;}
-      else if(!layoutTimer)layoutTimer=setTimeout(()=>{layoutTimer=null;updateLayout();lastLayout=performance.now();},65-(now-lastLayout));
+      // Map labels follow the camera inside render(). React only hears about
+      // a change of label level, and the hidden keyboard targets move once the
+      // camera settles.
+      const now=performance.now();lastMove=now;
+      if(mapLabelLevel(camera.zoom,labelLevel)!==labelLevel)updateLayout();
+      clearTimeout(settleTimer);settleTimer=setTimeout(updateLayout,160);
       render(now,reduced.matches);
     },
   });
@@ -424,13 +447,55 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
     render(performance.now(),true);
   }
   function updateLayout() {
+    clearTimeout(settleTimer);
     labelLevel=mapLabelLevel(camera.zoom,labelLevel);
     const overview=labelLevel==='overview';
-    const labels=(overview?WORLD_REGIONS:GAME_AREAS).map(area=>({id:area.id,name:area.name,plain:area.plain,kind:overview?'region':'area',...project(area.anchor)}));
     onLayout({
-      labelLevel,labels:placeMapLabels(labels,width,height),
+      labelLevel,
+      labels:(overview?WORLD_REGIONS:GAME_AREAS).map(area=>({id:area.id,name:area.name,plain:area.plain,kind:overview?'region':'area'})),
       objects:anchors.map(({id,title,location,position})=>({id,title,location,...project(position)})),
     });
+  }
+  // Same frame as the canvas: write each label's screen position as a
+  // transform (no layout, no React), then fade any label that collides.
+  function pinLabels() {
+    if(!mapLabels.length)return;
+    const portrait=width/height<.85;
+    for(const label of mapLabels) {
+      labelPoint.set(...(portrait&&label.area.portraitAnchor||label.area.anchor)).project(camera);
+      label.x=(labelPoint.x+1)/2*width;label.y=(1-labelPoint.y)/2*height;
+      label.offscreen=Math.abs(labelPoint.x)>1||Math.abs(labelPoint.y)>1||Math.abs(labelPoint.z)>1;
+      // Near a side edge, slide the text inward while its anchor stays under it.
+      const half=label.w/2,inside=Math.min(Math.max(label.x,half+8),width-half-8);
+      if(Math.abs(inside-label.x)<=half)label.x=inside;
+      label.el.style.transform=`translate3d(${label.x.toFixed(1)}px,${label.y.toFixed(1)}px,0) translate(-50%,-50%)`;
+    }
+    resolveMapLabels(mapLabels,width,height).forEach((visible,index)=>{
+      const label=mapLabels[index],state=visible?'shown':'hidden';
+      label.shown=visible;
+      if(label.state!==state){label.state=state;label.el.dataset.state=state;}
+    });
+  }
+  // An upright phone is far taller than the island at any zoom we allow, so a
+  // region-centred view leaves one big empty band. Centre the island instead:
+  // the spare space splits evenly above and below, and both sides crop equally.
+  const groundPlane=new THREE.Plane(new THREE.Vector3(0,1,0),-GROUND);
+  function groundAt(sx,sy) {
+    raycaster.setFromCamera(pointer.set(sx/width*2-1,1-sy/height*2),camera);
+    return raycaster.ray.intersectPlane(groundPlane,new THREE.Vector3());
+  }
+  function islandCentredTarget() {
+    let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+    for(const [x,z] of SHORE) {
+      labelPoint.set(x,GROUND,z).project(camera);
+      const sx=(labelPoint.x+1)/2*width,sy=(1-labelPoint.y)/2*height;
+      minX=Math.min(minX,sx);maxX=Math.max(maxX,sx);minY=Math.min(minY,sy);maxY=Math.max(maxY,sy);
+    }
+    const here=groundAt(width/2,height/2),there=groundAt((minX+maxX)/2,(minY+maxY)/2);
+    return here&&there?new THREE.Vector3(...orbit.getView().target).add(there.sub(here)):null;
+  }
+  function measureLabels() {
+    for(const label of mapLabels){const text=label.el.firstElementChild??label.el;label.w=text.offsetWidth;label.h=text.offsetHeight;}
   }
   function hit(event) {
     const rect=canvas.getBoundingClientRect();
@@ -460,7 +525,8 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   canvas.addEventListener('pointerleave',leave);
   function render(now,force=false) {
     if(disposed || document.hidden) return;
-    const interval=1000/(orbit.isInteracting()?60:30);
+    // Full rate while dragging and while the camera glides to a stop.
+    const interval=1000/(orbit.isInteracting()||now-lastMove<300?60:30);
     if(!force&&(paused||now-previous<interval-.5))return;
     profiler?.begin();
     previous=force?now:now-((now-previous)%interval);
@@ -474,6 +540,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
     petMap.offset.x=(reduced.matches?0:Math.floor(t*5)%6)/8;
     if(now-lastShadow>120) {renderer.shadowMap.needsUpdate=true;lastShadow=now;}
     renderer.render(scene,camera);
+    pinLabels();
     profiler?.end();
   }
   function visibility() {
@@ -492,13 +559,24 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
     focusRegion(id) {
       const region=WORLD_REGIONS.find(entry=>entry.id===id);
       if(!region)return;
-      orbit.focus(region.center,region.zoom);updateLayout();render(performance.now(),true);
+      orbit.focus(region.center,region.zoom);
+      if(width/height<.85){const centred=islandCentredTarget();if(centred)orbit.focus(centred.toArray(),region.zoom);}
+      updateLayout();render(performance.now(),true);
     },
     pause(value) {paused=value;visibility();},
+    // Called by React after the label buttons for the current level mount.
+    attachLabels(elements) {
+      const areaById=Object.fromEntries((labelLevel==='overview'?WORLD_REGIONS:GAME_AREAS).map(area=>[area.id,area]));
+      // A label that just mounted competes as if visible; only one that has
+      // been hidden needs the extra clearance to come back.
+      mapLabels=[...elements].filter(el=>areaById[el.dataset.labelId]).map(el=>({el,area:areaById[el.dataset.labelId],state:el.dataset.state,shown:el.dataset.state!=='hidden',x:0,y:0,w:0,h:0}));
+      measureLabels();pinLabels();
+      document.fonts?.ready.then(()=>{if(!disposed){measureLabels();pinLabels();}});
+    },
     inspect(value) { if(inspecting!==value) { inspecting=value; resize(width,height); } },
     dispose() {
       disposed=true;
-      clearTimeout(layoutTimer);
+      clearTimeout(settleTimer);mapLabels=[];
       profiler?.dispose();
       renderer.setAnimationLoop(null);
       canvas.removeEventListener('pointermove',move);

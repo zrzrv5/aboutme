@@ -8,11 +8,11 @@ export const person = {
   location: 'Ames, Iowa',
   graduation: 'May 2027',
   interests: 'Materials research, simulation, machine learning and software',
-  availability: 'I expect to graduate in May 2027. I welcome roles and collaborations across industries, and am happy to relocate anywhere in the U.S.',
+  availability: 'I expect to graduate in May 2027 and can start in June 2027. I’m looking for roles in computational materials and machine learning for science, and I’m happy to relocate anywhere in the U.S.',
   // Plain, first-person. No taglines.
   intro:
     'I’m a PhD candidate in Materials Science and Engineering at Iowa State University. I study ion transport and deformation in materials — from solid electrolytes to semiconductors, ceramics and metals — and build software for simulations and everyday life.',
-  looking: 'I expect to graduate in May 2027 and welcome opportunities across roles and industries. Happy to move anywhere in the U.S.',
+  looking: 'I expect to graduate in May 2027 and can start in June 2027. I’m looking for roles in computational materials and machine learning for science, and I’m happy to relocate anywhere in the U.S.',
 };
 
 // The old site's "I'm ___" switch, with its original one-liners.
@@ -29,7 +29,7 @@ export const links = {
   scholar: 'https://scholar.google.com/citations?user=p27FiGAAAAAJ',
   orcid: 'https://orcid.org/0000-0002-5789-4629',
   github: 'https://github.com/zrzrv5',
-  cv: '/ZHOU_Rui_CV-2026-Aug.pdf',
+  cv: '/ZHOU_Rui_CV.pdf',
   resume: '/ZHOU_Rui_Resume.pdf',
 };
 
@@ -49,7 +49,7 @@ export const experience = [
     points: [
       'Built an end-to-end thin-film ellipsometry data-analysis and characterization workflow.',
       'Graph neural networks and RDKit descriptors for chemical-property prediction.',
-      'Molecular dynamics of reader-head and advanced coating materials.',
+      'Molecular dynamics of reader-head coating materials.',
     ],
   },
   {
@@ -97,7 +97,7 @@ export const education = [
   {
     id: 'wustl', school: 'Washington University in St. Louis',
     degree: 'MS, Materials Science and Engineering',
-    when: '2018 – 2020',
+    when: '2018 – 2019',
     note: 'Thesis: molecular dynamics of thin-film water evaporation on graphene-coated silicon.',
   },
   {

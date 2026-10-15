@@ -34,7 +34,7 @@ npm run dev
 - `src/redesign/worlds/data.js` adds island descriptions and project context.
 - `src/redesign/worlds/skills.js` records where skills were acquired and applied. Levels appear only in the game.
 - `public/publications.json` supplies the paper list and first-author counts.
-- `public/ZHOU_Rui_CV-2026-Aug.pdf` and `public/ZHOU_Rui_Resume.pdf` are the current downloads.
+- `public/ZHOU_Rui_CV.pdf` and `public/ZHOU_Rui_Resume.pdf` are the current downloads. Replace them in place so shared links keep working; the build also serves the older dated CV address.
 - `public/images/projects/` contains compressed screenshots from the real apps. Projects without public screenshots or links have none; do not invent substitute diagrams.
 - `public/fonts/` contains local fonts and their licenses.
 - `archive/` preserves older designs and original assets outside the deployed site.

@@ -327,6 +327,8 @@ body.mg-body-bg { background: #e8e6e0; }
 /* Margins is a portfolio notebook, with the full CV one link away. */
 .mg-intro{margin-top:16px;max-width:40em;font-size:18px;line-height:1.5}
 .mg-current{margin-top:16px;color:var(--dim);font-size:15px}
+.mg-current a{border-bottom:1px solid var(--rule)}
+.mg-current span{white-space:nowrap}
 .mg-contact{margin-top:8px;gap:8px 20px}
 .mg-contact a{border-bottom:1px solid var(--rule)}
 .mg-entry-title{font-size:20px;line-height:1.3;font-weight:600;margin:0 0 6px}

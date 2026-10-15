@@ -3,23 +3,21 @@ export function mapLabelLevel(zoom, previous='overview') {
   return zoom >= (previous==='areas'?1.12:1.28) ? 'areas' : 'overview';
 }
 
-// Place only a handful of map labels. Try nearby screen-space positions before
-// suppressing a collision; picking the actual models remains available.
-export function placeMapLabels(labels,width,height) {
-  const occupied=[{left:width-78,right:width-10,top:10,bottom:122}];
-  return labels.map(label=>{
-    if(label.hidden)return label;
-    const w=Math.max(74,label.name.length*(label.kind==='region'?8.5:7)+(label.kind==='region'?44:24)),h=44;
-    if(width<w+24)return {...label,hidden:true};
-    const x=Math.max(w/2+12,Math.min(width-w/2-12,label.x*width/100));
-    for(const offset of [0,-56,56]){
-      const y=label.y*height/100+offset;
-      const box={left:x-w/2,right:x+w/2,top:y-h/2,bottom:y+h/2};
-      if(box.top<14||box.bottom>height-14)continue;
-      if(occupied.some(other=>box.left<other.right+12&&box.right>other.left-12&&box.top<other.bottom+10&&box.bottom>other.top-10))continue;
-      occupied.push(box);
-      return {...label,x:x/width*100,y:y/height*100};
-    }
-    return {...label,hidden:true};
-  });
+// Labels stay pinned to their anchors and never move to dodge each other.
+// When two collide, the one already on screen keeps its place and the other
+// fades out; a hidden label needs a little extra room from its neighbours
+// before it returns, so nothing flickers while the camera turns. Boxes are in CSS pixels.
+export function resolveMapLabels(labels,width,height,{gap=10,hysteresis=12}={}) {
+  const taken=[{left:width-78,right:width-10,top:10,bottom:122}];
+  const order=labels.map((label,index)=>({label,index})).sort((a,b)=>(b.label.shown?1:0)-(a.label.shown?1:0)||a.index-b.index);
+  const visible=labels.map(()=>false);
+  for(const {label,index} of order) {
+    if(label.offscreen||!label.w)continue;
+    const box={left:label.x-label.w/2,right:label.x+label.w/2,top:label.y-label.h/2,bottom:label.y+label.h/2};
+    if(box.left<4||box.right>width-4||box.top<4||box.bottom>height-4)continue;
+    const room=gap+(label.shown?0:hysteresis);
+    if(taken.some(other=>box.left<other.right+room&&box.right>other.left-room&&box.top<other.bottom+room&&box.bottom>other.top-room))continue;
+    taken.push(box);visible[index]=true;
+  }
+  return visible;
 }

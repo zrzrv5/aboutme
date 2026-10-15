@@ -13,7 +13,7 @@ export const SKILL_JOURNEYS = {
     { place:'wustl', level:1, title:'MS thesis', detail:'Thin-film water evaporation on graphene-coated silicon.' },
     { place:'sunwoda', level:2, detail:'Atomistic modeling and force-field screening of battery materials.' },
     { place:'isu', level:3, detail:'ML-potential molecular dynamics of phase transitions, interfaces and ion transport.' },
-    { place:'seagate', level:3, status:'Applied', detail:'Molecular dynamics of reader-head and advanced coating materials.' },
+    { place:'seagate', level:3, status:'Applied', detail:'Molecular dynamics of reader-head coating materials.' },
   ],
   mlip: [
     { place:'sunwoda', level:1, detail:'Built cathode ML-potential training and validation workflows, with automated DFT reference-structure generation and comparison against electronic-structure calculations.' },

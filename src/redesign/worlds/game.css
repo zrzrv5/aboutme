@@ -12,8 +12,6 @@
 }
 .world-prop-target { pointer-events: auto; cursor: pointer; }
 .world-accessible-target:focus-visible { opacity: 1; outline: 3px dashed #fff7cb; outline-offset: 3px; }
-.world-region-target { width: auto; min-width: 88px; }
-.world-region-target span { display: inline-block; padding: 5px 10px; background: #1b3d32; color: #f5eccc; border: 1px solid #c8cc98; border-radius: 4px; white-space: nowrap; font-size: 12px; }
 .game-world .world-object-label { background: #203c30; border: 1px solid #b2bb8a; color: #f8efce; font-size: 11px; padding: 5px 10px; box-shadow: 0 2px 0 #112a2280; }
 .game-world .world-object-label small { display: block; margin-top: 3px; color: #c2d1b3; font-size: 10px; }
 .game-world .world-unavailable button { display: block; margin: 12px auto; padding: 8px 14px; border: 1px solid currentColor; }
@@ -179,13 +177,21 @@
   .game-world *, .game-world *::before { transition: none !important; }
 }
 
-/* Overview regions give way to smaller area labels as the camera zooms in. */
-.world-region-target{opacity:1;pointer-events:auto;z-index:2;width:auto;min-width:74px;min-height:36px;border-radius:3px;cursor:pointer}
-.world-region-target span{font-size:11px;letter-spacing:.05em;padding:5px 8px;border:0;border-radius:2px;background:#fff8e9d9;color:#354939;box-shadow:none;line-height:1.25;white-space:nowrap}
-.world-label-region span{font-size:13px;font-weight:600;letter-spacing:.06em;background:#fff8e9bd;padding:7px 10px;border-bottom:1px solid #52694966;border-radius:0}
-.world-label-region small{font-size:12px;font-weight:400;margin-left:9px;opacity:.65}
-.world-region-target:hover span,.world-region-target:focus-visible span{background:#fffdf5;color:#1d3827}
-.world-region-target:focus-visible{outline:2px solid #284c36;outline-offset:1px}
-@media(pointer:coarse){.world-region-target{min-height:44px}.world-label-area span{font-size:10px}}
+/* Overview regions give way to smaller area labels as the camera zooms in.
+   environment.js pins each label to its anchor every frame and fades out any
+   label that would collide with another. */
+.world-region-target{left:0;top:0;opacity:1;pointer-events:auto;z-index:2;width:auto;min-width:74px;height:auto;min-height:36px;border-radius:3px;cursor:pointer;will-change:transform,opacity;transition:opacity .22s ease,visibility 0s}
+.world-region-target:not([data-state=shown]){opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s ease,visibility 0s linear .22s}
+.world-region-target span{display:inline-block;padding:2px 6px;background:none;border:0;border-radius:0;box-shadow:none;white-space:nowrap;line-height:1.15}
+.world-region-target:hover span{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
+.world-region-target:focus-visible{outline:2px solid #284c36;outline-offset:2px}
+/* Map type, set in the portfolio's serif, with a paper halo instead of a box. */
+.world-region-target span{font-family:'EB Garamond',Georgia,serif;color:#22402f;text-shadow:0 0 2px #f4efdc,0 0 4px #f4efdc,0 0 8px #f4efdc,0 0 14px #f4efdcd0}
+.world-label-region span{font-size:19px;font-weight:500;letter-spacing:.16em;text-transform:uppercase}
+.world-label-area span{font-size:19px;font-style:italic;letter-spacing:.01em}
+@media(pointer:coarse){.world-region-target{min-height:44px}}
+@media(max-width:600px){.world-label-region span{font-size:16px;letter-spacing:.13em}.world-label-area span{font-size:17px}}
+.game-world .world-object-label{font-family:'EB Garamond',Georgia,serif;font-size:14px;letter-spacing:.01em}
+.game-world .world-object-label small{font-size:12px;font-style:italic}
 .game-dialogue .project-media-preview{max-width:260px}
 .game-dialogue .project-media-dialog{color:#1d1c1a}

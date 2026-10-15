@@ -65,7 +65,7 @@
             "title": "Unraveling Superionic Conductivity in Na2B12H12: Molecular Dynamics Study of Phase Transition, Anion Reorientation, and Ionic Conductivity via Machine Learning Force Field",
             "authors": "Rui Zhou, Kun Luo, Ling Fei, Qi An",
             "journal": "ACS Electrochemistry",
-            "year": 2024,
+            "year": 2025,
             "abstract": "Metal closo-hydroborates, particularly Na2B12H12, have emerged as promising solid-state electrolytes for sodium-ion batteries, owing to their high ionic conductivity at elevated temperatures. Despite their potential, the mechanisms underpinning their superionic conduction and phase transitions remain incompletely understood. In this study, we develop a machine learning force field (ML-FF) for Na2B12H12, enabling large-scale molecular dynamics simulations that capture the intricacies of its phase transition, anion reorientation dynamics, and ionic conductivity. Our simulations reveal a martensitic transformation from a monoclinic to a body-centered cubic (bcc) phase at ∼675 K, resulting in a dramatic enhancement in Na+ conductivity and a significant decrease in the activation energy for anion reorientation. Additionally, cooling simulations indicate an incomplete reverse phase transition due to rapid cooling, highlighting the complexities of phase stability in Na2B12H12. These findings emphasize the critical role of anion reorientation and the cooperative movement of cations and anions in facilitating superionic conduction. By leveraging the accuracy and efficiency of ML-FFs, this study provides unprecedented atomistic insights into the mechanisms driving high-temperature conductivity in Na2B12H12, offering pathways for the optimization of closo-hydroborates as next-generation solid-state electrolytes.",
             "coverImage": {
                 "large": "/images/publications/ACS_Na2B12H12_large.png",
@@ -93,7 +93,7 @@
             "title": "Unraveling Photoplasticity in ZnS: Enhanced Peierls Stress under Photoexcitation using Machine Learning Potentials",
             "authors": "Kun Luo, Rui Zhou, Qi An",
             "journal": "ACS Materials Letters",
-            "year": 2024,
+            "year": 2025,
             "abstract": "Photoplasticity, the light-induced alteration of mechanical properties in semiconductors, is crucial for the development of advanced optoelectronic devices and the understanding of semiconductor mechanics. Despite progress in understanding this phenomenon, atomic-scale mechanisms, particularly under photoexcitation, remain complex and are partially understood. Here, we introduce a new computational framework combining constrained density functional theory (CDFT) with machine learning potential (MLP) to explore Peierls stress and dislocation dynamics in zinc sulfide (ZnS) under both ground and excited states. Our results reveal that photoexcitation significantly increases Peierls stress by reducing strain concentration at the dislocation core, contributing to the transition from ductility to brittleness under light exposure. Importantly, this enhancement occurs without substantial changes in the dislocation core structure. These insights provide an understanding of the atomic-scale mechanisms behind photoplasticity in ZnS, demonstrating that integrating CDFT with MLP is a highly accurate and efficient approach to study complex material behaviors under photoexcitation.",
             "link": "https://doi.org/10.1021/acsmaterialslett.4c01982"
         },

@@ -226,7 +226,7 @@ export default function GameWorld({ focusId, onSwitch }) {
 
     <button id="world-menu" ref={menuButton} className="game-menu-trigger" onClick={() => setSurface('menu')} aria-label="Open game menu" title="Menu · Esc"><Menu size={21}/></button>
     {cameraMoved ? <button className="game-camera-reset" onClick={resetView} aria-label="Reset island view" title="Reset view"><Compass size={21}/></button> : null}
-    {!cameraUsed && !surface ? <p className="game-camera-hint"><span className="camera-hint-desktop">Drag to rotate · Scroll to zoom</span><span className="camera-hint-touch">Drag to rotate · Pinch to zoom</span></p> : null}
+    {!cameraUsed && !surface ? <p className="game-camera-hint"><span className="camera-hint-desktop">Click a place to read about it · Drag to rotate · Scroll to zoom</span><span className="camera-hint-touch">Tap a place to read about it · Pinch to zoom</span></p> : null}
 
     {surface === 'talk' && (entity || biome) ? <section className={`game-dialogue ${expanded || entity?.roleLabel ? 'is-expanded' : ''}`} role="dialog" aria-labelledby="game-speaker" data-project-id={entity && !entity.roleLabel ? entity.id : undefined}>
       <div className="game-speaker-row">
