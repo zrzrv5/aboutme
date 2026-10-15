@@ -125,7 +125,7 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
         <Row note={<Note tilt={-3} delay={300}>atoms go brrrrr</Note>}>
           <h1>Rui Zhou</h1>
           <p className="mg-role">I study materials and build software to work with them.</p>
-          <p className="mg-intro">My work spans battery materials, semiconductors, ceramics and metals. I train ML interatomic potentials with active learning, run DFT and molecular dynamics, and use Bayesian optimization to search electrolyte compositions — and I build tools for exploring the results.</p>
+          <p className="mg-intro">My work spans battery materials, semiconductors, ceramics and metals. I combine DFT and molecular dynamics with machine-learned interatomic potentials to understand how they behave — and build tools for exploring the results.</p>
           <p className="mg-current">PhD candidate · Iowa State University<br/><span>Previously <a href="#seagate">Seagate</a> (R&amp;D intern, {experienceById.seagate.start})</span> · <span><a href="#sunwoda">{experienceById.sunwoda.org}</a> (simulation engineer, {experienceById.sunwoda.start}–{String(experienceById.sunwoda.end).slice(2)})</span></p>
           <p className="mg-availability">{person.availability}</p>
           <p className="mg-proof"><strong>{papers.length||counts.papers}</strong> peer-reviewed papers · <strong>{selectedPapers.length||counts.firstAuthor}</strong> first-author · <strong>{patents.length}</strong> granted patents · <strong>{counts.apps}</strong> released apps</p>
