@@ -5,7 +5,7 @@ import { mountainHeightAt } from './landscape';
 
 // Project souvenirs and the user-supplied AmiiBot model share the world's lighting,
 // picking, geometry disposal and reduced-motion clock.
-export function buildProjectObjects({ group, box, cylinder, mesh, register, animations, c, isActive, loadModel, ownMaterial=material=>material }) {
+export function buildProjectObjects({ group, box, cylinder, mesh, screen, register, animations, c, isActive, loadModel, ownMaterial=material=>material }) {
   const dark='#354c54', silver='#b7c9c2', ivory='#fff2d7', gold='#c9a15d';
   const part=(parent,x=0,y=0,z=0)=> {
     const g=new THREE.Group(); g.position.set(x,y,z); parent.add(g); return g;
@@ -170,10 +170,9 @@ export function buildProjectObjects({ group, box, cylinder, mesh, register, anim
     for(let i=0;i<3;i++) rounded(watch,.14,.04,.012,.015,'#4f7778',[0,side*(1.05+i*.16),.073]);
   }
   rounded(watch,1.30,1.53,.28,.28,silver);
-  rounded(watch,1.12,1.35,.055,.23,'#263e48',[0,0,.17]);
-  rounded(watch,.48,.055,.02,.02,ivory,[-.21,.48,.207]);
-  const blocks=[[-.29,.20,.31,.24,'#d2af71'],[.16,.20,.41,.24,'#8baeb0'],[-.29,-.15,.31,.31,'#8cac75'],[.16,-.15,.41,.31,'#c38d76'],[-.28,-.44,.33,.12,'#90a6b6'],[.17,-.44,.42,.12,'#8baeb0']];
-  blocks.forEach(([x,y,w,h,color])=>rounded(watch,w,h,.016,.035,color,[x,y,.211]));
+  rounded(watch,1.12,1.35,.055,.23,'#26414c',[0,0,.17]);
+  // Timetable face redrawn from L!NG's own screens in the island palette.
+  screen(watch,'/game/ling-screen.webp',1.02,1.25,.18,[0,0,.2]);
   const crown=cylinder(watch,.115,.115,.15,gold,.73,.20,0,12); crown.userData.dynamic=true; crown.rotation.z=Math.PI/2;
   box(watch,.055,.23,.09,dark,.68,-.20,0,true);
   rounded(watch,.83,.10,.035,.03,'#aac1ba',[0,-1.59,.095]);
