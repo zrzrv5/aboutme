@@ -67,7 +67,7 @@ export default function WorldEnvironment({ art, selection, onSelect, onMiss, onI
   useEffect(() => { if (resetKey) environment.current?.resetView(); }, [resetKey]);
 
   return <div ref={host} className="world-environment" data-renderer={art} data-label-level={layout.labelLevel}>
-    <canvas ref={canvas} className="world-canvas" tabIndex={0} aria-label="Rui’s island. Drag or use arrow keys to rotate. Scroll, pinch, or use plus and minus to zoom. Home resets the view. Click a place or object to explore, or Tab to discover places." role="img" />
+    <canvas ref={canvas} className="world-canvas" tabIndex={0} aria-label="Rui’s island. Drag or use arrow keys to rotate. Scroll, pinch, or use plus and minus to zoom. When zoomed in, Shift-drag, right-drag, two fingers or W A S D pan. Home resets the view. Click a place or object to explore, click open ground to send the frog there, or Tab to discover places." role="img" />
     {layout.objects.map(target => <button key={target.id} hidden={target.hidden} className={`world-accessible-target ${target.id.startsWith('@') ? 'world-prop-target' : ''}`} style={{left:`${target.x}%`,top:`${target.y}%`}} aria-label={target.title} onClick={() => onSelect(target.id)} onFocus={() => setHovered(target)} onBlur={() => setHovered(null)} onMouseEnter={() => setHovered(target)} onMouseLeave={() => setHovered(null)} />)}
     {!unavailable&&layout.labels.map(label => <button key={label.id} data-label-id={label.id} className={`world-accessible-target world-region-target world-label-${label.kind}`} onClick={() => {
       if(label.kind==='region'){canvas.current.focus({preventScroll:true});environment.current?.focusRegion(label.id);}

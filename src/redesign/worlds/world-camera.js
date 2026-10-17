@@ -1,6 +1,11 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { WORLD_CENTER } from './world-layout.js';
+import { SHORE } from './landscape.js';
+
+// Panning stops at the shoreline's bounding box.
+const BOUNDS=SHORE.reduce((b,[x,z])=>({minX:Math.min(b.minX,x),maxX:Math.max(b.maxX,x),minZ:Math.min(b.minZ,z),maxZ:Math.max(b.maxZ,z)}),{minX:Infinity,maxX:-Infinity,minZ:Infinity,maxZ:-Infinity});
+const KEY_PAN=40; // pixels per key press
 
 // Keep picking separate from the orbit gesture: releasing a drag or pinch must
 // never open whatever happens to be under the pointer at the end of the gesture.
@@ -8,7 +13,11 @@ export function createWorldCamera(camera, canvas, { surface, reduced, view, onCh
   const controls = new OrbitControls(camera,surface);
   const overviewCenter=new THREE.Vector3(...WORLD_CENTER);
   controls.target.copy(overviewCenter);
-  controls.enablePan = false;
+  // Drag rotates; Shift-drag, the middle or right button and a two-finger
+  // drag pan across the ground plane once the island is zoomed in.
+  controls.enablePan = true;
+  controls.screenSpacePanning = false;
+  controls.panSpeed = .9;
   controls.enableDamping = !reduced.matches;
   controls.dampingFactor = .12;
   controls.rotateSpeed = .65;
@@ -17,8 +26,9 @@ export function createWorldCamera(camera, canvas, { surface, reduced, view, onCh
   controls.maxPolarAngle = Math.PI * .39;
   controls.minZoom = .7;
   controls.maxZoom = 2.5;
-  controls.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
-  controls.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
+  controls.mouseButtons.MIDDLE = THREE.MOUSE.PAN;
+  controls.mouseButtons.RIGHT = THREE.MOUSE.PAN;
+  controls.touches.TWO = THREE.TOUCH.DOLLY_PAN;
   controls.cursorStyle = 'grab';
 
   let width = 1, height = 1;
@@ -33,13 +43,21 @@ export function createWorldCamera(camera, canvas, { surface, reduced, view, onCh
     controls.update();
   }
 
+  const clampTarget = () => {
+    const t=controls.target,x=Math.min(BOUNDS.maxX,Math.max(BOUNDS.minX,t.x)),z=Math.min(BOUNDS.maxZ,Math.max(BOUNDS.minZ,t.z));
+    if(Math.abs(x-t.x)<1e-6&&Math.abs(z-t.z)<1e-6)return false;
+    // Slide camera and target together, so the orbit itself is untouched.
+    camera.position.x+=x-t.x;camera.position.z+=z-t.z;t.x=x;t.z=z;
+    return true;
+  };
   const changed = () => {
-    // Pull back to the whole island when leaving a focused region.
+    // Pull back to the whole island when leaving a focused region; while
+    // zoomed in, keep the view's centre over the island.
     if(camera.zoom<=1.1&&controls.target.distanceTo(overviewCenter)>.01){
       camera.position.add(overviewCenter.clone().sub(controls.target));
       controls.target.copy(overviewCenter);
       controls.update();
-    }
+    } else clampTarget();
     camera.updateMatrixWorld();
     onChange();
   };
@@ -109,21 +127,27 @@ export function createWorldCamera(camera, canvas, { surface, reduced, view, onCh
   }
   function key(event) {
     if (event.target !== canvas || event.metaKey || event.ctrlKey || event.altKey) return;
+    const pan = event.shiftKey;
     const actions = {
-      ArrowLeft: () => controls.rotateLeft(.15),
-      ArrowRight: () => controls.rotateLeft(-.15),
-      ArrowUp: () => controls.rotateUp(.1),
-      ArrowDown: () => controls.rotateUp(-.1),
+      ArrowLeft: () => pan ? controls.pan(KEY_PAN,0) : controls.rotateLeft(.15),
+      ArrowRight: () => pan ? controls.pan(-KEY_PAN,0) : controls.rotateLeft(-.15),
+      ArrowUp: () => pan ? controls.pan(0,KEY_PAN) : controls.rotateUp(.1),
+      ArrowDown: () => pan ? controls.pan(0,-KEY_PAN) : controls.rotateUp(-.1),
+      w: () => controls.pan(0,KEY_PAN),
+      s: () => controls.pan(0,-KEY_PAN),
+      a: () => controls.pan(KEY_PAN,0),
+      d: () => controls.pan(-KEY_PAN,0),
       '+': () => controls.dollyIn(1 / 1.15),
       '=': () => controls.dollyIn(1 / 1.15),
       '-': () => controls.dollyOut(1 / 1.15),
       Home: reset,
     };
-    if (!actions[event.key]) return;
+    const name = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+    if (!actions[name]) return;
     event.preventDefault();
     onHoverClear();
-    if (event.key !== 'Home') interact();
-    actions[event.key]();
+    if (name !== 'Home') interact();
+    actions[name]();
   }
   function motionPreference() {
     controls.enableDamping = !reduced.matches;
@@ -155,6 +179,15 @@ export function createWorldCamera(camera, canvas, { surface, reduced, view, onCh
       interact();onHoverClear();controls.update();
       controls.enableDamping=!reduced.matches;
       changed();
+    },
+    // Ease the view after a point (the walking frog) once it nears the edge of
+    // the viewport, so a zoomed-in camera keeps it in sight without jumping.
+    follow(point) {
+      const ndc=point.clone().project(camera);
+      if(Math.abs(ndc.x)<.55&&Math.abs(ndc.y)<.55)return;
+      const shift=new THREE.Vector3(point.x-controls.target.x,0,point.z-controls.target.z).multiplyScalar(.06);
+      controls.target.add(shift);camera.position.add(shift);
+      if(!controls.update())changed();
     },
     reset,
     resize(w,h,inspecting) {

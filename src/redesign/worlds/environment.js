@@ -11,6 +11,7 @@ import { GAME_AREAS, WORLD_REGIONS, PROJECT_LAYOUT, STUDY_OFFSET_Z, campusPoint,
 import { mapLabelLevel, resolveMapLabels } from './map-labels';
 import { byId } from './data';
 import { worldRenderSettings } from './render-settings';
+import { walkTarget, planWalk, groundHeightAt } from './walk';
 import { GROUND, SHORE, RIVER_POINTS, RIVER_OUTLET, RIVER_SOURCE, riverHeightAt, waterfallGeometry, CROSSINGS, DOCK, MOUNTAIN_TRAILS, mountainGeometry, mountainHeightAt, ribbonGeometry } from './landscape';
 
 // Editable geometry, with the user-supplied AmiiBot GLB on its NFC display.
@@ -306,7 +307,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
 
   buildWorkplaces({group,box,cylinder,mesh,register,animations,c});
 
-  buildProjectObjects({group,box,cylinder,mesh,screen,register,animations,c,ownMaterial:material=>{modelMaterials.add(material);return material;},isActive:g=>g===hovered || g===selected,
+  buildProjectObjects({group,box,cylinder,mesh,screen,register,animations,c,ownMaterial:material=>{modelMaterials.add(material);return material;},ownGeometry:geometry=>{geometries.add(geometry);return geometry;},isActive:g=>g===hovered || g===selected,
     loadModel:(parent,url,options)=>loadWorldModel(parent,url,{...options,isDisposed:()=>disposed,
       adopt:loaded=> {
         loaded.geometries.forEach(value=>geometries.add(value));
@@ -387,7 +388,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   const destination=new THREE.Vector3(PLAZA_LAYOUT.mirror.stand[0],.87,PLAZA_LAYOUT.mirror.stand[2]);
   pet.position.copy(destination);
   const from=destination.clone();
-  let hopStart=-1000;
+  let hopStart=-1e4,walk=planWalk(destination.toArray(),destination.toArray());
   let selected=null;
   let hovered=null;
   let width=1,height=1;
@@ -423,16 +424,33 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
     const v=new THREE.Vector3(...position).project(camera);
     return {x:(v.x+1)*50,y:(1-v.y)*50,hidden:Math.abs(v.x)>1 || Math.abs(v.y)>1 || Math.abs(v.z)>1};
   }
-  function select(id,instant=false) {
-    selected=findObject(id);
+  // Send the frog somewhere on foot. Nothing waits for it: cards open at
+  // once, and a new click simply retargets a walk already under way.
+  function travel(p,instant=false) {
     from.copy(pet.position);
-    // Home is now an open arrival plaza, not a selectable building.
-    const p=selected?.userData.stand ?? PLAZA_LAYOUT.mirror.stand;
     destination.set(p[0],p[1]+.52,p[2]);
-    hopStart=instant || reduced.matches ? -1000 : performance.now();
+    walk=planWalk(from.toArray(),destination.toArray());
+    hopStart=instant || reduced.matches ? -1e4 : performance.now();
     if(instant || reduced.matches) pet.position.copy(destination);
     ring.position.set(p[0],p[1]+.05,p[2]);
+  }
+  function select(id,instant=false) {
+    selected=findObject(id);
+    // Home is now an open arrival plaza, not a selectable building.
+    travel(selected?.userData.stand ?? PLAZA_LAYOUT.mirror.stand,instant);
     render(performance.now(),true);
+  }
+  // The ground under a click: intersect the ray with the terrain height
+  // field, then keep only places the frog can stand.
+  function groundPoint(event) {
+    const rect=canvas.getBoundingClientRect();
+    pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);
+    raycaster.setFromCamera(pointer,camera);
+    const {origin,direction}=raycaster.ray;
+    if(Math.abs(direction.y)<1e-6)return null;
+    let x=0,y=GROUND,z=0;
+    for(let i=0;i<4;i++){const t=(y-origin.y)/direction.y;x=origin.x+direction.x*t;z=origin.z+direction.z*t;y=groundHeightAt(x,z);}
+    return walkTarget(x,z);
   }
   function resize(w,h) {
     width=Math.max(1,w); height=Math.max(1,h);
@@ -520,7 +538,13 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
     render(performance.now(),true);
   }
   function leave() { hovered=null; onHover(null); canvas.style.cursor='grab'; render(performance.now(),true); }
-  function click(event) { const picked=hit(event); if(picked) onSelect(picked.userData.id); else onMiss?.(); }
+  function click(event) {
+    const picked=hit(event);
+    if(picked){onSelect(picked.userData.id);return;}
+    const target=groundPoint(event);
+    if(target){travel(target);render(performance.now(),true);}
+    onMiss?.();
+  }
   canvas.addEventListener('pointermove',move);
   canvas.addEventListener('pointerleave',leave);
   function render(now,force=false) {
@@ -533,10 +557,14 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
     const t=reduced.matches?0:now/1000;
     animations.forEach(update=>update(t));
     clickables.forEach(g=> {const target=g===hovered?1.035:1; g.scale.setScalar(THREE.MathUtils.lerp(g.scale.x,target,.18));});
-    const progress=Math.min(1,Math.max(0,(now-hopStart)/550));
-    const easing=progress*progress*(3-2*progress);
-    pet.position.lerpVectors(from,destination,easing);
-    pet.position.y+=reduced.matches?0:Math.sin(progress*Math.PI)*1.25;
+    const progress=Math.min(1,Math.max(0,(now-hopStart)/walk.duration)),walking=progress<1;
+    pet.position.lerpVectors(from,destination,walk.hops===1?progress*progress*(3-2*progress):progress);
+    if(walking&&!reduced.matches) {
+      // Ride the terrain, settling out of a mid-air retarget within the first hop.
+      const settle=Math.min(1,progress*walk.hops);
+      pet.position.y=THREE.MathUtils.lerp(from.y,groundHeightAt(pet.position.x,pet.position.z)+.52,settle)+Math.sin((progress*walk.hops)%1*Math.PI)*walk.height;
+      if(camera.zoom>1.4&&!orbit.isInteracting())orbit.follow(pet.position);
+    }
     petMap.offset.x=(reduced.matches?0:Math.floor(t*5)%6)/8;
     if(now-lastShadow>120) {renderer.shadowMap.needsUpdate=true;lastShadow=now;}
     renderer.render(scene,camera);
@@ -545,7 +573,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   }
   function visibility() {
     profiler?.reset(document.hidden?'hidden':paused?'paused':'running');
-    if(reduced.matches) hopStart=-1000;
+    if(reduced.matches) hopStart=-1e4;
     renderer.setAnimationLoop(document.hidden || paused || reduced.matches ? null : animate);
     if(!document.hidden) render(performance.now(),true);
   }

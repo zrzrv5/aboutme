@@ -1,11 +1,13 @@
 import * as THREE from 'three';
-import { createNAIIVEGeometry } from './naiive-geometry';
-import { createHologramMaterial } from './hologram';
+import { createNAIIVECrystal,sampleNAIIVESequence,memberPresence,anionOrientation,sodiumPosition,NAIIVE_ICON_SCALE,NAIIVE_RB,NAIIVE_BH } from './naiive-crystal';
+import { createHologramMaterial,createHologramInstanceMaterial } from './hologram';
 import { mountainHeightAt } from './landscape';
 
 // Project souvenirs and the user-supplied AmiiBot model share the world's lighting,
 // picking, geometry disposal and reduced-motion clock.
-export function buildProjectObjects({ group, box, cylinder, mesh, screen, register, animations, c, isActive, loadModel, ownMaterial=material=>material }) {
+const WHITE=new THREE.Color('#fff'),IDENTITY=new THREE.Quaternion(),UP=new THREE.Vector3(0,1,0),X_AXIS=new THREE.Vector3(1,0,0),ORIGIN=new THREE.Vector3();
+
+export function buildProjectObjects({ group, box, cylinder, mesh, screen, register, animations, c, isActive, loadModel, ownMaterial=material=>material, ownGeometry=geometry=>geometry }) {
   const dark='#354c54', silver='#b7c9c2', ivory='#fff2d7', gold='#c9a15d';
   const part=(parent,x=0,y=0,z=0)=> {
     const g=new THREE.Group(); g.position.set(x,y,z); parent.add(g); return g;
@@ -41,17 +43,19 @@ export function buildProjectObjects({ group, box, cylinder, mesh, screen, regist
     cylinder(parent,r,r+.08,.12,c.sand,0,.06,0,16);
   }
 
-  // NAIIVE: regular ico cage and the exact three logo bonds. The frame and
-  // edge identities follow app-store-creative/d_scene.py from the reference.
+  // NAIIVE, after concept D of the App Store motion drafts: the logo
+  // icosahedron tilts out of its 3-fold view, grows twelve B–H bonds into
+  // closo-B12H12²⁻, becomes the body centre of the high-temperature Na2B12H12
+  // cell while Na⁺ hop and corner anions reorient, then folds back. Every atom
+  // is one instanced hologram draw call and every bond another.
   const naiive=group('NAIIVE / RGB icosahedron',4.8,-3.6);
   plinth(naiive,1.65);
   cylinder(naiive,1.05,1.27,.24,dark,0,.22,0,12);
   cylinder(naiive,.88,.95,.07,silver,0,.38,0,12);
   ring(naiive,.73,.425,'#72bca8');
   const ico=part(naiive,0,2.2,0); ico.userData.dynamic=true;
-  const cage=part(ico); cage.userData.dynamic=true;
-  const {points,edges,rgb,key,axis,pose}=createNAIIVEGeometry();
-  ico.quaternion.copy(pose);
+  const {unit,edges,rgb,key,axis,pose,anions,sodium,corners,cellEdges}=createNAIIVECrystal();
+  const S=NAIIVE_ICON_SCALE,RB=NAIIVE_RB*S,BH=NAIIVE_BH*S;
   const hologramTime={value:0},hologramMaterials=new Map();
   const project=(model,color='#389daa',strength=1)=> {
     const key=color+strength;
@@ -59,17 +63,46 @@ export function buildProjectObjects({ group, box, cylinder, mesh, screen, regist
     model.material=hologramMaterials.get(key);model.castShadow=false;model.receiveShadow=false;
     return model;
   };
-  for(const [i,j] of edges) {
-    const color=rgb.get(key(i,j));
-    project(link(cage,points[i].clone().multiplyScalar(1.52).toArray(),points[j].clone().multiplyScalar(1.52).toArray(),color ? .062 : .032,color ?? '#389daa'),color ?? '#389daa',color?1.25:.85);
-  }
-  points.forEach(p=>project(sphere(cage,.10,'#83d6e4',...p.clone().multiplyScalar(1.52).toArray())));
-  const shell=new THREE.BufferGeometry().setFromPoints(points.map(p=>p.clone().multiplyScalar(1.52)));
+  const shell=new THREE.BufferGeometry().setFromPoints(unit.map(p=>p.clone().multiplyScalar(RB)));
   const faces=[];
-  for(let i=0;i<points.length;i++)for(let j=i+1;j<points.length;j++)for(let k=j+1;k<points.length;k++)if(points[i].distanceTo(points[j])<1.06&&points[j].distanceTo(points[k])<1.06&&points[k].distanceTo(points[i])<1.06){const outward=points[j].clone().sub(points[i]).cross(points[k].clone().sub(points[i])).dot(points[i])>0;faces.push(i,outward?j:k,outward?k:j);}
+  for(let i=0;i<unit.length;i++)for(let j=i+1;j<unit.length;j++)for(let k=j+1;k<unit.length;k++)if(unit[i].distanceTo(unit[j])<1.06&&unit[j].distanceTo(unit[k])<1.06&&unit[k].distanceTo(unit[i])<1.06){const outward=unit[j].clone().sub(unit[i]).cross(unit[k].clone().sub(unit[i])).dot(unit[i])>0;faces.push(i,outward?j:k,outward?k:j);}
   shell.setIndex(faces);shell.computeVertexNormals();
-  project(mesh(cage,shell,'#83d6e4'),'#83d6e4',.08);
-  project(mesh(naiive,new THREE.CylinderGeometry(1.2,.22,1.65,24,1,true),'#83d6e4',[0,1.28,0]),'#83d6e4',.035);
+  project(mesh(ico,shell,'#83d6e4'),'#83d6e4',.08);
+  const instanceMaterial=ownMaterial(createHologramInstanceMaterial(hologramTime));
+  const instanced=(geometry,count)=> {
+    const model=new THREE.InstancedMesh(ownGeometry(geometry),instanceMaterial,count);
+    geometry.setAttribute('instanceAlpha',new THREE.InstancedBufferAttribute(new Float32Array(count),1).setUsage(THREE.DynamicDrawUsage));
+    model.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    for(let i=0;i<count;i++)model.setColorAt(i,WHITE);
+    model.instanceColor.setUsage(THREE.DynamicDrawUsage);
+    // Extents change every frame; keep a generous fixed bound for picking.
+    model.frustumCulled=false;model.boundingSphere=new THREE.Sphere(new THREE.Vector3(),8);
+    model.castShadow=model.receiveShadow=false;model.userData.dynamic=true;
+    ico.add(model); return model;
+  };
+  const atoms=instanced(new THREE.SphereGeometry(1,12,8),anions.length*24+sodium.length);
+  const bonds=instanced(new THREE.CylinderGeometry(1,1,1,6,1,true),anions.length*42+cellEdges.length);
+  bonds.raycast=()=>{};
+  const atomAlpha=atoms.geometry.attributes.instanceAlpha,bondAlpha=bonds.geometry.attributes.instanceAlpha;
+  const tint=new THREE.Color(),turn=new THREE.Quaternion(),spin=new THREE.Quaternion(),place=new THREE.Matrix4();
+  const mid=new THREE.Vector3(),dir=new THREE.Vector3(),size=new THREE.Vector3(),centre=new THREE.Vector3(),pa=new THREE.Vector3(),pb=new THREE.Vector3();
+  const boron=anions.map(()=>unit.map(()=>new THREE.Vector3())),hydrogen=anions.map(()=>unit.map(()=>new THREE.Vector3()));
+  let atomIndex=0,bondIndex=0;
+  const atom=(p,r,color,alpha)=> {
+    const i=atomIndex++;
+    atomAlpha.setX(i,alpha);atoms.setColorAt(i,tint.set(color));
+    atoms.setMatrixAt(i,place.compose(p,IDENTITY,size.setScalar(alpha>0?r:0)));
+  };
+  const bond=(p,q,r,color,alpha)=> {
+    const i=bondIndex++;
+    bondAlpha.setX(i,alpha);bonds.setColorAt(i,tint.set(color));
+    const length=dir.subVectors(q,p).length();
+    if(length>1e-6)turn.setFromUnitVectors(UP,dir.multiplyScalar(1/length));else turn.identity();
+    bonds.setMatrixAt(i,place.compose(mid.addVectors(p,q).multiplyScalar(.5),turn,size.set(alpha>0?r:0,length,alpha>0?r:0)));
+  };
+  const CAGE='#83d6e4',EDGE='#389daa',HYDROGEN='#eef8f7',BOND='#bfe9ef',SODIUM='#c9a3ff',CELL='#e5f5f7';
+  const cone=project(mesh(naiive,new THREE.CylinderGeometry(1.2,.22,1.65,24,1,true),'#83d6e4',[0,1.28,0]),'#83d6e4',.035);
+  cone.userData.dynamic=true;
   const scanRing=project(ring(naiive,1.45,2.2,'#83d6e4',.012),'#83d6e4',.32);
   scanRing.userData.dynamic=true;
   const control=part(naiive,0,.52,1.12); control.rotation.x=-.65;
@@ -80,10 +113,41 @@ export function buildProjectObjects({ group, box, cylinder, mesh, screen, regist
   }
   register(naiive,'naiive','NAIIVE',[4.8,.35,-1.75]);
   animations.push(t=> {
-    // The outer top and bottom logo tips stay fixed; rotate around their line.
-    cage.quaternion.setFromAxisAngle(axis,(t*Math.PI/12)%(Math.PI*2));
+    const s=sampleNAIIVESequence(t);
     hologramTime.value=t;
-    const sweep=Math.sin(t*.55);scanRing.position.y=2.2+sweep*1.2;scanRing.scale.setScalar(Math.sqrt(1-sweep*sweep*.65));
+    // One full turn per loop around the outer top and bottom logo tips, with
+    // the tilt out of the 3-fold view applied on top; the whole cell rides along.
+    ico.quaternion.copy(pose).multiply(turn.setFromAxisAngle(X_AXIS,s.tilt)).multiply(spin.setFromAxisAngle(axis,s.spin));
+    ico.scale.setScalar(s.zoom);ico.position.y=2.2+.35*s.crystal;
+    const thick=Math.pow(s.zoom,-.7); // keep bonds visible as the cell shrinks
+    atomIndex=bondIndex=0;
+    anions.forEach((anion,n)=> {
+      const k=anion.central?1:memberPresence(s.t,anion.e);
+      if(k<.01) {for(let i=0;i<24;i++)atom(ORIGIN,0,CAGE,0);for(let i=0;i<42;i++)bond(ORIGIN,UP,0,CAGE,0);return;}
+      anionOrientation(anion,s.t,turn);
+      const hk=anion.central?s.hydrogen:1,b=boron[n],h=hydrogen[n];
+      centre.copy(anion.centre).multiplyScalar(S);
+      unit.forEach((u,i)=> {
+        b[i].copy(u).multiplyScalar(RB).applyQuaternion(turn).add(centre);
+        h[i].copy(u).multiplyScalar(RB+BH*hk).applyQuaternion(turn).add(centre);
+      });
+      const rB=anion.central?THREE.MathUtils.lerp(.11,.3*S,1-s.icon):.3*S*k;
+      b.forEach(p=>atom(p,rB,CAGE,anion.central?1:.7*k));
+      h.forEach((p,i)=> {atom(p,.2*S*hk*k,HYDROGEN,(anion.central?.9:.65)*hk*k);bond(b[i],p,.045*thick*k,BOND,(anion.central?.7:.5)*hk*k);});
+      for(const [i,j] of edges) {
+        const c=anion.central?rgb.get(key(i,j)):null;
+        bond(b[i],b[j],(c?.062:anion.central?.032:.026)*thick,c??(anion.central?EDGE:CAGE),anion.central?(c?1.25:.85):.5*k);
+      }
+    });
+    for(const ion of sodium) {const k=memberPresence(s.t,ion.e);atom(sodiumPosition(ion,s.t,pa).multiplyScalar(S),.6*S*k,SODIUM,k);}
+    for(const [i,j] of cellEdges)bond(pa.copy(corners[i]).multiplyScalar(S),pb.copy(corners[j]).multiplyScalar(S),.03*thick,CELL,.45*s.cell);
+    atoms.instanceMatrix.needsUpdate=atoms.instanceColor.needsUpdate=atomAlpha.needsUpdate=true;
+    bonds.instanceMatrix.needsUpdate=bonds.instanceColor.needsUpdate=bondAlpha.needsUpdate=true;
+    // The projector opens up for the cell; the scan ring sweeps twice per loop.
+    cone.scale.set(1+.18*s.crystal,1,1+.18*s.crystal);
+    const sweep=Math.sin(Math.PI*2*t/8);
+    scanRing.position.y=ico.position.y+sweep*(1.2+.3*s.crystal);
+    scanRing.scale.setScalar(Math.sqrt(1-sweep*sweep*.65)*(1+.06*s.crystal));
   });
 
   // AmiiBot: the user's original figurine rotates on the reader while the
@@ -269,9 +333,9 @@ export function buildProjectObjects({ group, box, cylinder, mesh, screen, regist
 
   const typeshi=group('TypeSHI / atom classifier',3.5,-.9);
   plinth(typeshi,.49);
-  const atoms=[[-.23,.40,0],[.20,.60,0],[.03,.33,.28]];
-  link(typeshi,atoms[0],atoms[1],.035,silver); link(typeshi,atoms[1],atoms[2],.035,silver);
-  atoms.forEach((p,i)=>sphere(typeshi,.16,['#caa778','#8badb0','#99af7b'][i],...p));
+  const classified=[[-.23,.40,0],[.20,.60,0],[.03,.33,.28]];
+  link(typeshi,classified[0],classified[1],.035,silver); link(typeshi,classified[1],classified[2],.035,silver);
+  classified.forEach((p,i)=>sphere(typeshi,.16,['#caa778','#8badb0','#99af7b'][i],...p));
   const lensFrame=part(typeshi,.28,.97,.20); lensFrame.rotation.set(-.45,0,-.25);
   mesh(lensFrame,new THREE.TorusGeometry(.23,.045,6,20),gold);
   link(lensFrame,[.14,-.17,0],[.38,-.46,0],.055,dark);

@@ -137,3 +137,51 @@ test('region zoom preserves orientation and survives resize, then zooming out re
   h.orbit.reset();assert.equal(h.camera.zoom,1);
   h.orbit.dispose();restored.orbit.dispose();
 });
+
+test('Shift-drag, a two-finger drag and WASD pan the zoomed-in view, and stop at the shoreline',()=>{
+  const near=(actual,expected)=>actual.forEach((value,axis)=>assert.ok(Math.abs(value-expected[axis])<.001,`${value} != ${expected[axis]}`));
+  const h=setup({reduce:true});
+  h.orbit.focus([0,0,-2.4],1.6);
+  const start=h.orbit.getView();
+  // Shift-drag pans: target and camera move together, no place opens.
+  h.event(h.surface,'pointerdown',{shiftKey:true});h.move(480,300);h.up(480,300);
+  const panned=h.orbit.getView();
+  assert.ok(Math.hypot(panned.target[0]-start.target[0],panned.target[2]-start.target[2])>.5,'Shift-drag should pan');
+  assert.ok(Math.abs(panned.target[1]-start.target[1])<1e-6,'panning stays on the ground plane');
+  for(let axis=0;axis<3;axis++)assert.ok(Math.abs((panned.position[axis]-panned.target[axis])-(start.position[axis]-start.target[axis]))<.001);
+  h.event(h.surface,'click');assert.equal(h.picks(),0);
+  // A plain drag still rotates about the panned target.
+  h.down();h.move(470,300);h.up(470,300);
+  near(h.orbit.getView().target,panned.target);
+  // Two fingers moving together pan on touch.
+  const beforeTouch=h.orbit.getView();
+  h.down(300,300,1,true);h.down(500,300,2,true);h.move(300,380,1,true);h.move(500,380,2,true);h.up(300,380,1,true);h.up(500,380,2,true);
+  const afterTouch=h.orbit.getView();
+  assert.ok(Math.hypot(afterTouch.target[0]-beforeTouch.target[0],afterTouch.target[2]-beforeTouch.target[2])>.3,'two-finger drag should pan');
+  assert.ok(Math.abs(afterTouch.zoom-beforeTouch.zoom)<.01);
+  // Keys pan too, and however long you hold one the centre stays over the island.
+  const beforeKeys=h.orbit.getView();
+  h.event(h.surface,'keydown',{key:'d'});
+  assert.ok(h.orbit.getView().target[0]!==beforeKeys.target[0]);
+  for(let i=0;i<400;i++)h.event(h.surface,'keydown',{key:'d'});
+  assert.ok(h.orbit.getView().target[0]<=12.2+1e-6,'target left the island');
+  for(let i=0;i<400;i++)h.event(h.surface,'keydown',{key:'ArrowUp',shiftKey:true});
+  assert.ok(h.orbit.getView().target[2]>=-14.6-1e-6);
+  // Zooming back out restores the overview centre as before.
+  for(let i=0;i<4;i++)h.event(h.surface,'keydown',{key:'-'});
+  near(h.orbit.getView().target,[0,0,-2.4]);
+  h.orbit.dispose();
+});
+
+test('follow eases the view toward a point only once it nears the edge',()=>{
+  const h=setup({reduce:true});
+  h.orbit.focus([0,0,-2.4],1.8);
+  const start=h.orbit.getView();
+  h.orbit.follow({x:0,y:.35,z:-2,clone(){return new (Object.getPrototypeOf(h.camera.position).constructor)(this.x,this.y,this.z);}});
+  assert.deepEqual(h.orbit.getView().target,start.target);
+  const far={x:12,y:.35,z:-2.4,clone(){return new (Object.getPrototypeOf(h.camera.position).constructor)(this.x,this.y,this.z);}};
+  for(let i=0;i<40;i++)h.orbit.follow(far);
+  const after=h.orbit.getView();
+  assert.ok(after.target[0]>3&&after.target[0]<=12.2,'the view should have moved toward the point without overshooting');
+  h.orbit.dispose();
+});

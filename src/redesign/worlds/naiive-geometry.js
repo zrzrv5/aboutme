@@ -35,5 +35,9 @@ export function createNAIIVEGeometry() {
   const poles=[pick(90,false),pick(-90,false)];
   const axis=points[poles[0]].clone().sub(points[poles[1]]).normalize();
   const worldAxis=axis.clone().applyQuaternion(pose);
-  return {points,edges,rgb,key,axis,pose,worldAxis,frontFace,poles};
+  // Cubic crystal axes expressed in the icon frame: the cage keeps its standard
+  // setting (2-fold axes on the cube axes), so a bcc cell is seen down [111] here.
+  const basis={ex,ey,ez};
+  const toIcon=v=>new THREE.Vector3(v.dot(ex),v.dot(ey),v.dot(ez));
+  return {points,edges,rgb,key,axis,pose,worldAxis,frontFace,poles,basis,toIcon};
 }

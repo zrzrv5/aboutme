@@ -12,7 +12,7 @@ Fonts are local WOFF2 files with retained OFL licenses. Only the primary Latin t
 
 ## Island rendering
 
-`environment.js` assembles the low-poly scene; campus, workplace, project and terrain modules hold the geometry. `batch-world.js` batches static geometry while retaining independent picking and animation roots. `world-camera.js` separates taps from drag/pinch gestures and preserves camera changes across dialogue resizing.
+`environment.js` assembles the low-poly scene; campus, workplace, project and terrain modules hold the geometry. `batch-world.js` batches static geometry while retaining independent picking and animation roots. `world-camera.js` separates taps from drag/pinch gestures and preserves camera changes across dialogue resizing. Dragging rotates; once zoomed in past the overview, Shift-drag, the middle or right button, a two-finger drag and W A S D pan across the ground plane, with the target clamped to the shoreline's bounding box and snapped back to the island centre when zooming out. A click on open ground sends the frog there on foot (`walk.js` validates lawn, hillside and bridge decks and plans constant-speed hops); cards still open immediately, and a zoomed-in camera eases after the frog only when it nears the viewport edge.
 
 Frames are capped at 30 FPS when idle and 60 FPS during interaction. Hidden pages and menus pause the animation loop. Resize and late model/texture completion force a frame, independently of the frame-rate gate. Coarse-pointer devices use a 1024 shadow map and a DPR cap of 2, bounded by a two-million-pixel drawing buffer; other devices use 1536 and 1.5. These are budgets, not measured performance guarantees. The opt-in development profiler reports actual scene allocations and draw calls.
 

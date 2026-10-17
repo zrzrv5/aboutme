@@ -79,3 +79,66 @@ test('the full river lip meets the waterfall without a height or width gap',()=>
   near(lip.getY(0),riverHeightAt(...RIVER_OUTLET.at));assert.ok(lip.getY(2)<-.78);
   river.dispose();fall.dispose();
 });
+
+test('the NAIIVE hologram cell is bcc Na2B12H12 with tetrahedral Na⁺ and 2.81 Å hops',async()=>{
+  const {createNAIIVECrystal,sodiumPosition,anionOrientation,NAIIVE_LATTICE}=await import('./naiive-crystal.js');
+  const {anions,sodium,corners,cellEdges,unit}=createNAIIVECrystal();
+  const a=NAIIVE_LATTICE,h=a/2;
+  assert.equal(anions.length,9);assert.equal(anions.filter(x=>x.central).length,1);
+  for(const anion of anions.filter(x=>!x.central))near(anion.centre.length(),h*Math.sqrt(3));
+  // Every occupied site sits 0.559a from two body centres and two corners.
+  const lattice=[];
+  for(let i=-2;i<=2;i++)for(let j=-2;j<=2;j++)for(let k=-2;k<=2;k++)if((i&1)===(j&1)&&(j&1)===(k&1))lattice.push([i*h,j*h,k*h]);
+  const {toIcon}=createNAIIVECrystal();
+  const sites=lattice.map(p=>toIcon(new THREE.Vector3(...p)));
+  const neighbours=p=>sites.filter(s=>Math.abs(s.distanceTo(p)-a*Math.sqrt(5)/4)<1e-6).length;
+  for(const ion of sodium) {
+    assert.equal(neighbours(ion.site),4,'Na⁺ must occupy a tetrahedral interstice');
+    if(ion.hop){assert.equal(neighbours(ion.hop.to),4);near(ion.hop.to.distanceTo(ion.site),a*Math.SQRT2/4);}
+    // Rest positions before and after the hop are the sites themselves, offset only by the fixed displacement.
+    near(sodiumPosition(ion,0).distanceTo(ion.site),.25);
+    if(ion.hop)near(sodiumPosition(ion,ion.hop.t+1).distanceTo(ion.hop.to),.25);
+  }
+  for(const [i,j] of cellEdges)near(corners[i].distanceTo(corners[j]),a);
+  // Corner anions only ever rest in the two Im-3m orientations, 60° apart about a 3-fold axis.
+  for(const anion of anions.filter(x=>!x.central)) {
+    const q=anionOrientation(anion,20);
+    const angle=2*Math.acos(Math.min(1,Math.abs(q.w)));
+    const rest=((angle/(Math.PI/3))%1+1)%1;
+    assert.ok(rest<1e-6||rest>1-1e-6,`anion at rest between orientations: ${angle}`);
+    const turned=unit.map(p=>p.clone().applyQuaternion(q));
+    assert.ok(turned.every(p=>unit.some(v=>v.distanceTo(p)<1e-8))||turned.every(p=>!unit.some(v=>v.distanceTo(p)<1e-8)));
+  }
+});
+
+test('the NAIIVE loop starts and ends as the logo and shows the whole cell in between',async()=>{
+  const {sampleNAIIVESequence,memberPresence,createNAIIVECrystal,NAIIVE_LOOP}=await import('./naiive-crystal.js');
+  const {anions,sodium}=createNAIIVECrystal();
+  for(const t of [0,NAIIVE_LOOP,-NAIIVE_LOOP]) {
+    const s=sampleNAIIVESequence(t);
+    near(s.icon,1);near(s.tilt,0);near(s.hydrogen,0);near(s.zoom,1);near(s.cell,0);near(s.spin%(Math.PI*2),0);
+    for(const member of [...anions.filter(x=>!x.central),...sodium])near(memberPresence(s.t,member.e),0);
+  }
+  const mid=sampleNAIIVESequence(9.2);
+  near(mid.icon,0);near(mid.hydrogen,1);near(mid.cell,1);assert.ok(mid.zoom<.3&&mid.tilt>.3);
+  for(const member of [...anions.filter(x=>!x.central),...sodium])near(memberPresence(9.2,member.e),1);
+  // Each Na⁺ hop and anion jump happens while the cell is fully present.
+  for(const ion of sodium)if(ion.hop)for(const t of [ion.hop.t,ion.hop.t+.6])near(memberPresence(t,ion.e),1);
+  for(const anion of anions)for(const jump of anion.jumps)for(const t of [jump.t,jump.t+.3])near(memberPresence(t,anion.e),1);
+});
+
+test('the NAIIVE hologram never reaches past the projector plinth at any moment of the loop',async()=>{
+  const {createNAIIVECrystal,sampleNAIIVESequence,memberPresence,sodiumPosition,NAIIVE_LOOP,NAIIVE_ICON_SCALE,NAIIVE_RB,NAIIVE_BH}=await import('./naiive-crystal.js');
+  const {anions,sodium,unit}=createNAIIVECrystal();
+  const S=NAIIVE_ICON_SCALE,plinth=1.65;
+  let widest=0;
+  for(let t=0;t<NAIIVE_LOOP;t+=.05) {
+    const s=sampleNAIIVESequence(t);
+    let reach=NAIIVE_RB+(NAIIVE_BH+.2)*s.hydrogen+.13*(1-s.hydrogen);   // central anion with its hydrogens or logo vertices, Å
+    for(const anion of anions.filter(x=>!x.central))if(memberPresence(t,anion.e)>.01)reach=Math.max(reach,anion.centre.length()+NAIIVE_RB+NAIIVE_BH+.2);
+    for(const ion of sodium)if(memberPresence(t,ion.e)>.01)reach=Math.max(reach,sodiumPosition(ion,t).length()+.6);
+    widest=Math.max(widest,reach*S*s.zoom);
+  }
+  assert.ok(widest<=plinth+.02,`hologram reaches ${widest.toFixed(2)} units, plinth radius is ${plinth}`);
+  assert.ok(unit.length===12);
+});
