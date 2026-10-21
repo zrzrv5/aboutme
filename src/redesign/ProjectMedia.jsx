@@ -1,8 +1,9 @@
 import React, {useEffect, useId, useRef, useState} from 'react';
 import { ArrowUpRight } from 'lucide-react';
+import { track } from '../site/analytics';
 import './project-media.css';
 
-export default function ProjectMedia({media, title}) {
+export default function ProjectMedia({media, title, projectId}) {
   const [open,setOpen]=useState(false);
   const dialog=useRef(null);
   const heading=useId();
@@ -13,7 +14,7 @@ export default function ProjectMedia({media, title}) {
   },[open]);
   if(!media)return null;
   return <div className="project-media">
-    <button className="project-media-preview" aria-haspopup="dialog" aria-label={`View ${title} screenshots`} onClick={()=>setOpen(true)}>
+    <button className="project-media-preview" aria-haspopup="dialog" aria-label={`View ${title} screenshots`} onClick={()=>{setOpen(true);track('media_open',{project_id:projectId??title});}}>
       <img src={media.preview} srcSet={`${media.preview} 1x, ${media.src} 2x`} width="600" height="300" alt={media.alt} loading="lazy" decoding="async"/>
       <span>View screenshots <span aria-hidden="true"><ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></span></span>
     </button>

@@ -15,6 +15,14 @@ export const EVENT_FIELDS={
   world_ready:['load_ms'],
   world_error:['error_kind'],
   web_vital:['metric_name','metric_value','metric_rating','metric_id','entry_view'],
+  entry_focus:['content_id'],
+  scroll_depth:['percent'],
+  content_close:['content_id','dwell_s'],
+  media_open:['project_id'],
+  world_gesture:['gesture'],
+  world_performance:['frame_ms','pointer_type','pixel_ratio'],
+  page_print:[],
+  app_error:['error_kind','error_message'],
 };
 export function analyticsMode({production,hostname,debug=false,optedOut=false}) {
   if(optedOut)return 'off';

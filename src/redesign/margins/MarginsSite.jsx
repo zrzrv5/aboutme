@@ -99,6 +99,8 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
         const anchors=[...document.querySelectorAll('[data-reading-focus]')].map(el=>({id:el.dataset.readingFocus,top:el.getBoundingClientRect().top,bottom:el.getBoundingClientRect().bottom}));
         const next=readingFocus(anchors,window.innerHeight,focusId);
         readAnchor.current=next;setReading(next);
+        const depth=(window.scrollY+window.innerHeight)/document.documentElement.scrollHeight*100;
+        for(const mark of [25,50,75,100])if(depth>=mark-.5)trackOnce('scroll_depth',String(mark),{percent:mark});
       });
     };
     update();window.addEventListener('scroll',update,{passive:true});window.addEventListener('resize',update);
@@ -164,7 +166,7 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
           return <article key={id} id={id} tabIndex={-1} data-project-id={id} data-reading-focus={id} className="mg-app">
             <h3 className="mg-entry-title">{app.title}</h3>
             <div className="mg-app-copy"><p>{APP_COPY[id]}</p><p className="mg-app-facts">{appById[id].meta}</p></div>
-            <ProjectMedia title={app.title} media={app.media}/>
+            <ProjectMedia title={app.title} media={app.media} projectId={id}/>
             <div className="mg-app-links"><ProjectLinks project={app}/></div>
             <aside className="mg-app-note">{APP_NOTES[id]}</aside>
           </article>;

@@ -22,10 +22,8 @@ body.ws-fun{overflow:hidden;background:#d8e6df}
 .static-fallback nav{display:flex;gap:20px;flex-wrap:wrap}
 .static-fallback img{max-width:240px;height:auto}
 .static-fallback ul{padding-left:24px}
-.site-privacy{font:12px/1.6 system-ui,sans-serif;max-width:620px;margin:20px auto;color:inherit}
-.site-privacy summary{cursor:pointer;text-decoration:underline;text-underline-offset:3px}
-.site-privacy p{margin:10px 0}
-.site-privacy button{color:inherit;background:transparent;border:1px solid currentColor;padding:5px 9px;border-radius:4px}
+.site-privacy{font:12px/1.6 system-ui,sans-serif;max-width:620px;margin:20px auto 0;color:inherit;text-wrap:pretty}
+.site-privacy button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .game-pause .site-privacy{color:inherit}
 @media print{.site-privacy{display:none}}
 .ws-shift{position:fixed;inset:0;z-index:10000;pointer-events:all;background:#e8ece2}

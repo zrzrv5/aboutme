@@ -13,7 +13,7 @@ body.mg-body-bg { background: #e8e6e0; }
   background: var(--desk);
   color: var(--ink);
   min-height: 100vh;
-  padding: 56px 24px 96px;
+  padding: 56px 24px 40px;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -276,7 +276,7 @@ body.mg-body-bg { background: #e8e6e0; }
 /* ---------- small screens ---------- */
 
 @media (max-width: 900px) {
-  .rz-margins { padding: 64px 0 80px; }
+  .rz-margins { padding: 64px 0 36px; }
   .mg-sheet { padding: 40px 18px 48px; box-shadow: none; }
   .mg-row,
   .mg-head .mg-row { grid-template-columns: minmax(0, 1fr); }
@@ -349,7 +349,7 @@ body.mg-body-bg { background: #e8e6e0; }
 .mg-reading .paper-authors,.mg-reading small{display:block;color:var(--dim);font-size:14px;line-height:1.45;margin-top:3px}
 .mg-when{white-space:normal;margin-bottom:6px;font-size:15px}
 .mg-footer{border-top:1px solid var(--rule);margin-top:36px;padding-top:26px}
-.rz-margins>.site-privacy{margin:24px auto 0}
+.rz-margins>.site-privacy{margin:20px auto 0}
 @media(max-width:900px){.mg-intro{font-size:18px}.mg-entry-title{font-size:20px}.mg-tools{flex-wrap:nowrap}.mg-current{font-size:14px}.mg-margin:empty{display:none}}
 @media(prefers-reduced-motion:reduce){.mg-tools a,.mg-tools button,.mg-project-image img{transition:none}}
 

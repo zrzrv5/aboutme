@@ -27,8 +27,9 @@ function setup({reduce = false, view} = {}) {
   camera.lookAt(0,0,0);
   let picks = 0;
   let changes = 0;
+  const gestures = [];
   const orbit = createWorldCamera(camera,surface,{
-    surface,reduced,view,onChange:()=>changes++,onHoverClear:()=>{},onPick:()=>picks++,
+    surface,reduced,view,onChange:()=>changes++,onHoverClear:()=>{},onPick:()=>picks++,onGesture:kind=>gestures.push(kind),
   });
   orbit.resize(800,600,false);
   function event(target,type,props = {}) {
@@ -40,7 +41,7 @@ function setup({reduce = false, view} = {}) {
   const down = (x=400,y=300,id=1,touch=false) => event(surface,'pointerdown',{clientX:x,clientY:y,pageX:x,pageY:y,pointerId:id,pointerType:touch?'touch':'mouse'});
   const move = (x,y,id=1,touch=false) => event(surface.ownerDocument,'pointermove',{clientX:x,clientY:y,pageX:x,pageY:y,pointerId:id,pointerType:touch?'touch':'mouse'});
   const up = (x=400,y=300,id=1,touch=false) => event(surface.ownerDocument,'pointerup',{clientX:x,clientY:y,pageX:x,pageY:y,pointerId:id,pointerType:touch?'touch':'mouse'});
-  return {surface,reduced,camera,orbit,event,down,move,up,picks:()=>picks,changes:()=>changes};
+  return {surface,reduced,camera,orbit,event,down,move,up,picks:()=>picks,changes:()=>changes,gestures};
 }
 
 test('a drag rotates the world without opening a place; the next tap still opens it', () => {
@@ -183,5 +184,25 @@ test('follow eases the view toward a point only once it nears the edge',()=>{
   for(let i=0;i<40;i++)h.orbit.follow(far);
   const after=h.orbit.getView();
   assert.ok(after.target[0]>3&&after.target[0]<=12.2,'the view should have moved toward the point without overshooting');
+  h.orbit.dispose();
+});
+
+test('each gesture reports its kind once it really moves the camera, and region focus reports none',()=>{
+  const h=setup({reduce:true});
+  h.orbit.focus([0,0,-2.4],1.6);
+  assert.deepEqual(h.gestures,[]);
+  h.down();h.move(470,300);h.up(470,300);
+  assert.equal(h.gestures.at(-1),'rotate');
+  h.event(h.surface,'pointerdown',{shiftKey:true});h.move(480,300);h.up(480,300);
+  assert.equal(h.gestures.at(-1),'pan');
+  h.event(h.surface,'wheel');
+  assert.equal(h.gestures.at(-1),'zoom');
+  h.event(h.surface,'keydown',{key:'d'});assert.equal(h.gestures.at(-1),'pan');
+  h.event(h.surface,'keydown',{key:'ArrowLeft'});assert.equal(h.gestures.at(-1),'rotate');
+  h.event(h.surface,'keydown',{key:'-'});assert.equal(h.gestures.at(-1),'zoom');
+  h.down(300,300,1,true);h.down(500,300,2,true);h.move(300,380,1,true);h.move(500,380,2,true);h.up(300,380,1,true);h.up(500,380,2,true);
+  assert.equal(h.gestures.at(-1),'pan');
+  // A tap that never moves is not a gesture.
+  const before=h.gestures.length;h.down();h.up();assert.equal(h.gestures.length,before);
   h.orbit.dispose();
 });

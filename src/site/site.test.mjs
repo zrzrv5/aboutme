@@ -40,6 +40,21 @@ test('page views deduplicate StrictMode while preserving switches, referrers and
   tracker.once('world_ready','scene',{load_ms:123});tracker.once('world_ready','scene',{load_ms:145});assert.equal(events.filter(e=>e[0]==='world_ready').length,1);
   enabled=false;tracker.event('notes_toggle',{visible:false});assert.equal(events.length,5);
 });
+test('engagement events carry only their allow-listed fields and dedupe per key',()=>{
+  const events=[];const tracker=createTracker({send:(...event)=>events.push(event)});
+  tracker.once('scroll_depth','75',{percent:75,scrollY:1234});tracker.once('scroll_depth','75',{percent:75});
+  tracker.event('content_close',{content_id:'naiive',dwell_s:42,title:'private'});
+  tracker.event('world_gesture',{gesture:'walk'});
+  tracker.event('world_performance',{frame_ms:3.21,pointer_type:'fine',pixel_ratio:1.5,renderer:'GPU name'});
+  tracker.once('app_error','uncaught:boom',{error_kind:'uncaught',error_message:'boom'});
+  tracker.once('page_print','print',{});
+  tracker.event('media_open',{project_id:'ling'});tracker.event('entry_focus',{content_id:'isu'});
+  assert.deepEqual(events.map(e=>e[0]),['scroll_depth','content_close','world_gesture','world_performance','app_error','page_print','media_open','entry_focus']);
+  assert.deepEqual(events[0][1],{site_view:'resume',percent:75});
+  assert.deepEqual(events[1][1],{site_view:'resume',content_id:'naiive',dwell_s:42});
+  assert.deepEqual(events[3][1],{site_view:'resume',frame_ms:3.21,pointer_type:'fine',pixel_ratio:1.5});
+  assert.deepEqual(events[5][1],{site_view:'resume'});
+});
 test('contact, documents, papers and project destinations are classified without sensitive URL values',()=>{
   const classify=href=>linkEvent({href,origin:'https://me.1sec.plus'});
   assert.deepEqual(classify('mailto:private@example.com?body=private'),['contact_click',{contact_method:'email'}]);

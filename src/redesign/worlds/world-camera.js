@@ -9,7 +9,7 @@ const KEY_PAN=40; // pixels per key press
 
 // Keep picking separate from the orbit gesture: releasing a drag or pinch must
 // never open whatever happens to be under the pointer at the end of the gesture.
-export function createWorldCamera(camera, canvas, { surface, reduced, view, onChange, onInteract, onReset, onHoverClear, onPick }) {
+export function createWorldCamera(camera, canvas, { surface, reduced, view, onChange, onInteract, onGesture, onReset, onHoverClear, onPick }) {
   const controls = new OrbitControls(camera,surface);
   const overviewCenter=new THREE.Vector3(...WORLD_CENTER);
   controls.target.copy(overviewCenter);
@@ -67,9 +67,12 @@ export function createWorldCamera(camera, canvas, { surface, reduced, view, onCh
     ? new THREE.Vector3(30,42,2).add(new THREE.Vector3(...WORLD_CENTER))
     : new THREE.Vector3(0,34,24).add(new THREE.Vector3(...WORLD_CENTER));
 
-  function interact() {
+  // OrbitControls' state numbers: 0/3/6 rotate, 2/4/5 pan, 1 dolly.
+  const GESTURES = ['rotate','zoom','pan','rotate','pan','pan','rotate'];
+  function interact(kind = GESTURES[controls.state] ?? 'rotate') {
     touched = true;
     onInteract?.();
+    onGesture?.(kind);
   }
   function down(event) {
     if (pointers.size === 0) moved = false;
@@ -81,16 +84,19 @@ export function createWorldCamera(camera, canvas, { surface, reduced, view, onCh
     onHoverClear();
     canvas.style.cursor = 'grabbing';
   }
-  function move(event) {
+  function move(event, settling = false) {
     const start = pointers.get(event.pointerId);
     if (!start) return;
     const threshold = event.pointerType === 'touch' ? 10 : 6;
     if (Math.hypot(event.clientX-start.x,event.clientY-start.y) >= threshold) moved = true;
-    if (moved) interact();
+    if (!moved) return;
+    // A release only settles the drag: by then a lifted second finger has
+    // already put OrbitControls back into one-finger rotate state.
+    if (settling) { touched = true; onInteract?.(); } else interact();
   }
   function up(event) {
     if (!pointers.has(event.pointerId)) return;
-    move(event);
+    move(event, true);
     pointers.delete(event.pointerId);
     if (event.type !== 'pointerup') moved = true;
     if (pointers.size === 0) canvas.style.cursor = 'grab';
@@ -107,7 +113,7 @@ export function createWorldCamera(camera, canvas, { surface, reduced, view, onCh
     if (!event.target.closest('button')) onPick(event);
   }
   function wheel() {
-    interact();
+    interact('zoom');
     onHoverClear();
   }
   function reset() {
@@ -146,7 +152,7 @@ export function createWorldCamera(camera, canvas, { surface, reduced, view, onCh
     if (!actions[name]) return;
     event.preventDefault();
     onHoverClear();
-    if (name !== 'Home') interact();
+    if (name !== 'Home') interact(/^[wasd]$/.test(name) || pan ? 'pan' : name.startsWith('Arrow') ? 'rotate' : 'zoom');
     actions[name]();
   }
   function motionPreference() {
@@ -176,7 +182,7 @@ export function createWorldCamera(camera, canvas, { surface, reduced, view, onCh
       controls.target.copy(next);
       camera.zoom=Math.max(controls.minZoom,Math.min(controls.maxZoom,zoom));
       camera.updateProjectionMatrix();
-      interact();onHoverClear();controls.update();
+      touched = true;onInteract?.();onHoverClear();controls.update();
       controls.enableDamping=!reduced.matches;
       changed();
     },

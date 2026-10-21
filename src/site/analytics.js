@@ -43,6 +43,11 @@ export function initAnalytics(){
     const value=linkEvent({href:a.href,origin:location.origin,publication:a.dataset.analytics==='publication',projectId:content?.dataset.projectId});
     if(value)tracker.event(...value);
   });
+  window.addEventListener('beforeprint',()=>tracker.once('page_print','print',{}));
+  // Script failures, once per distinct message, so a broken island shows up in the same report as its load time.
+  const fail=(kind,detail)=>tracker.once('app_error',kind+':'+detail,{error_kind:kind,error_message:detail});
+  window.addEventListener('error',event=>fail('uncaught',String(event.message||'').slice(0,100)));
+  window.addEventListener('unhandledrejection',event=>fail('rejection',String(event.reason?.message||event.reason||'').slice(0,100)));
   const observeVitals=()=>import('web-vitals').then(({onCLS,onINP,onLCP})=>{
     const report=({name,value,rating,id})=>tracker.event('web_vital',{metric_name:name,metric_value:Math.round(value*1000)/1000,metric_rating:rating,metric_id:id,entry_view:readSiteRoute(url).view});
     onCLS(report);onINP(report);onLCP(report);

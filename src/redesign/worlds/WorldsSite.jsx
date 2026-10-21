@@ -1,6 +1,6 @@
 import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { readSiteRoute, writeSiteRoute, VIEW_TITLES, VIEW_PATHS, SITE_ORIGIN } from '../../site/routes';
-import { track, trackPage } from '../../site/analytics';
+import { track, trackOnce, trackPage } from '../../site/analytics';
 
 import MarginsSite from '../margins/MarginsSite';
 const FunWorld=lazy(()=>import('./FunWorld'));
@@ -16,6 +16,7 @@ export default function WorldsSite({initialRoute, initialPublications}) {
     const pending=timers.current;
     window.history.scrollRestoration='manual';
     const initial=readSiteRoute(window.location);
+    if(initial.focus)trackOnce('entry_focus',initial.focus,{content_id:initial.focus});
     const focusFrame=requestAnimationFrame(()=>setRoute(initial));
     const keepHome=window.location.pathname==='/'&&!window.location.search;
     if(!initial.notFound)writeSiteRoute(initial.view,initial.focus,{replace:true,home:keepHome});

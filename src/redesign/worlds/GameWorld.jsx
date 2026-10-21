@@ -46,7 +46,7 @@ function EntityDetails({ entity, papers }) {
     {entity.details?.length ? <ul className="atlas-details">{entity.details.map(detail => <li key={detail}>{detail}</li>)}</ul> : null}
     {entity.list ? <ul className="atlas-details">{entity.list.map(detail => <li key={detail}>{detail}</li>)}</ul> : null}
     <Progress entity={entity} />
-    {entity.media?<ProjectMedia title={entity.title} media={entity.media}/>:null}
+    {entity.media?<ProjectMedia title={entity.title} media={entity.media} projectId={entity.id}/>:null}
     {entity.stats ? <div className="atlas-stats">{entity.stats.map(stat => <span key={stat.label}><b>{stat.value}%</b>{stat.label}</span>)}</div> : null}
     {entity.papers ? <ol className="atlas-papers">{papers.map(paper => <li key={paper.link}>
       <a data-analytics="publication" href={paper.link} target="_blank" rel="noreferrer"><Chem>{paper.title}</Chem> <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a>
@@ -151,6 +151,15 @@ export default function GameWorld({ focusId, onSwitch }) {
   const [cameraUsed, setCameraUsed] = useState(false);
   const [cameraMoved, setCameraMoved] = useState(false);
   const [cameraReset, setCameraReset] = useState(0);
+  // How long each card stays open, reported when it closes or gives way to another.
+  const openCard = useRef(null);
+  const closeCard = () => { const open = openCard.current; openCard.current = null; if (open && performance.now() - open.at >= 500) track('content_close', {content_id: open.id, dwell_s: Math.round((performance.now() - open.at) / 1000)}); };
+  useEffect(() => {
+    const current = surface === 'talk' ? selection : null;
+    if (openCard.current && openCard.current.id !== current) closeCard();
+    if (current && !openCard.current) openCard.current = {id: current, at: performance.now()};
+  }, [surface, selection]);
+  useEffect(() => closeCard, []);
   const art='illustrated';
   const menuButton = useRef(null);
   const talkClose = useRef(null);
@@ -221,6 +230,7 @@ export default function GameWorld({ focusId, onSwitch }) {
       <WorldEnvironment art={art} selection={sceneTarget} paused={surface === 'items' || surface === 'quests' || surface === 'menu'} onSelect={select}
         onMiss={() => { if (surface === 'talk') setSurface(null); }} inspecting={surface === 'talk'}
         onInteract={() => { setCameraUsed(true); setCameraMoved(true); }}
+        onGesture={kind => trackOnce('world_gesture', kind, {gesture: kind})} onMeasure={report => trackOnce('world_performance', 'first', report)}
         onViewReset={() => setCameraMoved(false)} resetKey={cameraReset} />
     </div>
 

@@ -4,18 +4,18 @@ import { GAME_AREAS, gameAreaById } from './world-layout';
 import { createEnvironment } from './environment';
 import {trackOnce} from '../../site/analytics';
 
-export default function WorldEnvironment({ art, selection, onSelect, onMiss, onInteract, onViewReset, resetKey = 0, inspecting = false, paused = false }) {
+export default function WorldEnvironment({ art, selection, onSelect, onMiss, onInteract, onGesture, onMeasure, onViewReset, resetKey = 0, inspecting = false, paused = false }) {
   const canvas = useRef(null);
   const host = useRef(null);
   const environment = useRef(null);
-  const callbacks = useRef({ onSelect, onMiss, selection, onInteract, onViewReset });
+  const callbacks = useRef({ onSelect, onMiss, selection, onInteract, onGesture, onMeasure, onViewReset });
   const savedView = useRef(null);
   const [layout, setLayout] = useState({ labelLevel:'overview',labels:[], objects:[] });
   const [hovered, setHovered] = useState(null);
   const [unavailable, setUnavailable] = useState(false);
   const labelKey = layout.labels.map(label => label.id).join();
 
-  useEffect(() => { callbacks.current = { onSelect, onMiss, selection, onInteract, onViewReset }; }, [onSelect, onMiss, selection, onInteract, onViewReset]);
+  useEffect(() => { callbacks.current = { onSelect, onMiss, selection, onInteract, onGesture, onMeasure, onViewReset }; }, [onSelect, onMiss, selection, onInteract, onGesture, onMeasure, onViewReset]);
 
   useEffect(() => {
     let world;
@@ -30,6 +30,8 @@ export default function WorldEnvironment({ art, selection, onSelect, onMiss, onI
         onHover: setHovered,
         onLayout: setLayout,
         onInteract: () => callbacks.current.onInteract?.(),
+        onGesture: kind => callbacks.current.onGesture?.(kind),
+        onMeasure: report => callbacks.current.onMeasure?.(report),
         onViewReset: () => callbacks.current.onViewReset?.(),
       });
       environment.current = world;

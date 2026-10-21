@@ -41,7 +41,7 @@ function roofGeometry(w, h, d) {
   return flat;
 }
 
-export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, onMiss, surface = canvas, view, onInteract, onViewReset }) {
+export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, onMiss, surface = canvas, view, onInteract, onGesture, onMeasure, onViewReset }) {
   const c = COLORS[art] ?? COLORS.diorama;
   const illustrated = art === 'illustrated';
   const pixel = art === 'pixel';
@@ -401,10 +401,12 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   batchWorld(scene,geometries);
   const anchors=clickables.map(g=>({id:g.userData.id,title:g.userData.title,location:g.userData.location,position:new THREE.Box3().setFromObject(g).getCenter(new THREE.Vector3()).toArray()}));
   let previous=0,lastShadow=-Infinity,lastMove=-Infinity,lastPick=-Infinity,paused=false;
+  // Mean CPU cost of a frame over the first ten seconds, reported once.
+  let sampleStart=0,sampleSum=0,sampleFrames=0,sampled=!onMeasure;
   let labelLevel='overview',settleTimer,mapLabels=[];
   const labelPoint=new THREE.Vector3();
   const orbit=createWorldCamera(camera,canvas,{
-    surface,reduced,view,onInteract,onReset:onViewReset,onHoverClear:leave,onPick:click,
+    surface,reduced,view,onInteract,onGesture,onReset:onViewReset,onHoverClear:leave,onPick:click,
     onChange() {
       // Map labels follow the camera inside render(). React only hears about
       // a change of label level, and the hidden keyboard targets move once the
@@ -542,7 +544,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
     const picked=hit(event);
     if(picked){onSelect(picked.userData.id);return;}
     const target=groundPoint(event);
-    if(target){travel(target);render(performance.now(),true);}
+    if(target){travel(target);onGesture?.('walk');render(performance.now(),true);}
     onMiss?.();
   }
   canvas.addEventListener('pointermove',move);
@@ -570,6 +572,10 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
     renderer.render(scene,camera);
     pinLabels();
     profiler?.end();
+    if(!sampled) {
+      const cost=performance.now()-now;sampleStart||=now;sampleSum+=cost;sampleFrames++;
+      if(now-sampleStart>10000&&sampleFrames>=30){sampled=true;onMeasure({frame_ms:Math.round(sampleSum/sampleFrames*100)/100,pointer_type:coarse?'coarse':'fine',pixel_ratio:Math.round(renderer.getPixelRatio()*100)/100});}
+    }
   }
   function visibility() {
     profiler?.reset(document.hidden?'hidden':paused?'paused':'running');
