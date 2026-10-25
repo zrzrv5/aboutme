@@ -401,3 +401,9 @@ html[data-margin-notes='off'] .mg-ink{display:none}
 
 .mg-proof strong{font-weight:600;color:var(--ink)}
 @media(max-width:600px){.mg-tools{background:var(--paper);padding-left:10px}.mg-contact a,.mg-project-links a{display:inline-flex;align-items:center;min-height:36px}}
+
+/* Corrections: struck print with a handwritten replacement. */
+.mg-fix del,.mg-fix ins{text-decoration:none}
+.mg-fix-new{margin-right:.12em;font-family:'Caveat','Bradley Hand',cursive !important;font-size:1.3em;line-height:1;color:var(--pen);white-space:nowrap}
+.notes-off .mg-fix-new,html[data-margin-notes='off'] .mg-fix-new{display:none}
+@media print{.mg-fix-new{display:none}}

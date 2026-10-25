@@ -155,6 +155,17 @@ export function Scratch({ children, seed = 7, delay = 0 }) {
   );
 }
 
+// A correction: the printed words struck through in red, with the
+// handwritten replacement after them. With notes off, the print reads alone.
+export function Fix({ children, to, seed = 7, delay = 400 }) {
+  return (
+    <span className="mg-fix">
+      <del><Scratch seed={seed} delay={delay}>{children}</Scratch></del>{' '}
+      <ins className="mg-fix-new">{to}</ins>
+    </span>
+  );
+}
+
 // Match the arrow to the annotation's position relative to its subject.
 const NOTE_ARROWS={
   left:['M34 8 C 26 4, 14 6, 6 15','M6 15 L8 7 M6 15 L14 14'],

@@ -31,6 +31,6 @@ export function marginTarget(focus) {
   const id=validSiteFocus(focus);
   if(!id)return 'profile';
   if(id.startsWith('item:'))return 'skills';
-  const aliases={library:'papers',phd:'isu',photo:'isu',job:'profile','biome:study':'education','biome:work':'experience','biome:research':'experience','biome:software':'projects','biome:ml':'projects','biome:apps':'software'};
+  const aliases={library:'papers',phd:'isu',photo:'isu',job:'profile','biome:study':'education','biome:work':'experience','biome:research':'experience','biome:software':'projects','biome:ml':'projects','biome:apps':'software',gas:'projects',fuji:'projects'};
   return aliases[id]??id;
 }

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { ArrowUpRight } from 'lucide-react';
 import { links, patents, person, counts, experienceById, appById } from '../content';
 import usePublications from '../usePublications';
-import { Hl, Under, Note } from './ink';
+import { Hl, Under, Note, Fix } from './ink';
 import Chem from '../Chem';
 import PaperAuthors from '../PaperAuthors';
 import { ITEMS, EDUCATION, byId } from '../worlds/data';
@@ -43,17 +43,15 @@ const APP_COPY={
 };
 const EXPERIMENTS=[
   ['dpmetal',<>ML-potential inference on Apple GPUs, called directly from Swift. Verified up to <Hl>256,000 atoms</Hl> on M1 Max and M4.</>],
-  ['mud','Labels every atom’s local environment from local descriptors and a small neural network: 13 crystal types, plus disordered or unknown. Runs inside NAIIVE.'],
+  ['mud','Structure identification from local descriptors and a small neural network, built into NAIIVE.'],
   ['typeshi','Element hypotheses from anonymous atom types and geometry. A set transformer on partial-RDF descriptors; the 1.9 MB model answers in under a second on a CPU.'],
   ['trajview','Preview atomistic trajectories inside VS Code.'],
   ['slop','A research-agent runtime connecting reusable methods, remote machines and long-running calculations.'],
   ['dshslop','Persistent cluster sessions, machine notes and a Slurm/PBS job ledger for research agents.'],
   ['gradbench','Research-workflow benchmarks for comparing models and harnesses on recovery, completion and verification.'],
   ['laneloaf','Dashcam footage turned into trip logs.'],
-  ['gas','Compare cheaper fuel against the extra drive.'],
-  ['fuji','A Bluetooth camera shutter on Apple Watch.'],
 ];
-const EXPERIMENT_STATUS={mud:'In development',slop:'Private project',dshslop:'In development',gradbench:'In development',fuji:'Unreleased'};
+const EXPERIMENT_STATUS={mud:'In development',slop:'Private project',dshslop:'In development',gradbench:'In development'};
 const SCHOOL_NAMES=Object.fromEntries(EDUCATION.map(school=>[school.id,school.school]));
 const JOURNEY=[
   {id:'isu',title:'Iowa State University',role:'PhD candidate · Materials Science and Engineering',period:experienceById.isu.when,text:'Electronic-structure calculations, active learning and ML potentials are my day-to-day tools for studying atomic motion. I also build the software I need to inspect and organize the resulting data.',note:<Note arrow="left" tilt={-2}>I train the ML potentials myself, with active learning</Note>},
@@ -128,7 +126,7 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
         <Row note={<Note arrow="left" tilt={-3} delay={300}>simulations by day, App Store by night</Note>}>
           <h1>Rui Zhou</h1>
           <p className="mg-role">I simulate materials at the atomic scale — and <Hl>ship the software</Hl> to work with them.</p>
-          <p className="mg-intro">My work spans battery materials, semiconductors, ceramics and metals. I combine DFT and molecular dynamics with machine-learned interatomic potentials to understand how they behave, and I write the tools myself — from Python workflows on HPC clusters to native Swift and Metal apps.</p>
+          <p className="mg-intro">My work spans battery materials, semiconductors, ceramics and metals. I combine DFT and molecular dynamics with machine-learned interatomic potentials to understand how they behave, and I build the tools <Fix to="with Fable & Opus">myself</Fix> — from Python workflows on HPC clusters to native Swift and Metal apps.</p>
           <p className="mg-current">PhD candidate · Iowa State University<br/><span>Previously <a href="#seagate">Seagate</a> (R&amp;D intern, {experienceById.seagate.start})</span> · <span><a href="#sunwoda">{experienceById.sunwoda.org}</a> (simulation engineer, {experienceById.sunwoda.start}–{String(experienceById.sunwoda.end).slice(2)})</span></p>
           <p className="mg-availability"><Under seed={6}>{person.availableFrom}</Under> {person.seeking}</p>
           <p className="mg-proof"><strong>{papers.length||counts.papers}</strong> peer-reviewed papers (<strong>{selectedPapers.length||counts.firstAuthor}</strong> first-author, one a journal cover) · <strong>{patents.length}</strong> granted patents · <strong>{counts.apps}</strong> released apps</p>
@@ -176,7 +174,7 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
       </section>
 
       <section id="projects" tabIndex={-1}>
-        <Row label={<h2 className="mg-h">Experiments</h2>}><p className="mg-section-intro">Smaller tools and open questions, usually built because I needed them for my own research.</p></Row>
+        <Row label={<h2 className="mg-h">Experiments</h2>}><p className="mg-section-intro">Smaller tools and open questions, usually <Fix seed={9} to="prompted into existence">built</Fix> because I needed them for my own research.</p></Row>
         <div className="mg-experiments-grid">
           {EXPERIMENTS.map(([id,description])=>{const project=byId[id];return <article id={id} tabIndex={-1} data-project-id={id} data-reading-focus={id} key={id} className="mg-experiment">
             <h3>{project.title}</h3><p>{description}</p>{project.media?<ProjectMedia title={project.title} media={project.media} projectId={id}/>:null}{EXPERIMENT_STATUS[id]?<small className="mg-project-status">{EXPERIMENT_STATUS[id]}</small>:null}<ProjectLinks project={project}/>
@@ -209,7 +207,7 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
       </section>
 
       <footer className="mg-footer">
-        <Row label={<h2 className="mg-h">Say hello</h2>}>
+        <Row label={<h2 className="mg-h">Say hello</h2>} note={<Note arrow="left" tilt={-3}>a human replies. no agents. promise.</Note>}>
           <p>If you have a role or a project in mind, <Under seed={4}>email me</Under> — I’d like to hear from you.</p>
           <p className="mg-project-links"><a href={links.email}>{links.emailText}</a><a href={links.cv}>Academic CV (PDF)</a><a href={links.resume}>Résumé (PDF)</a><a href={links.linkedin}>LinkedIn</a></p>
         </Row>
