@@ -55,6 +55,7 @@ export const ML_SITES={
   gradbench:{x:9.65,z:-7.6,height:1.00,radius:.80},
   typeshi:{x:4.7,z:-8.75,height:1.23,radius:.80},
   dpmetal:{x:6.85,z:-7.8,height:1.28,radius:1.05},
+  mud:{x:5.0,z:-6.45,height:.80,radius:.62},
 };
 function desiredHeight(x,z) {
   const peak=(cx,cz,rx,rz,h)=>Math.max(0,1-Math.hypot((x-cx)/rx,(z-cz)/rz))*h;
@@ -155,6 +156,7 @@ export const MOUNTAIN_TRAILS=[
   [[8.85,-7.1],[9.65,-6.95]],
   [[7.6,-9.4],[6.25,-9.1],[5.3,-8.35],[4.7,-7.95]],
   [[6.25,-9.1],[6.2,-8.1],[6.85,-6.95]],
+  [[5.0,-4.95],[5.0,-5.75]],
 ];
 
 // Subdivide across the trail as well as along it: a wide quad can otherwise

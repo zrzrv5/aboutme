@@ -30,20 +30,21 @@ function ProjectLinks({project}) {
 }
 
 const APP_NOTES={
-  naiive:<Note arrow="up-left" tilt={-2}>built to look at my own simulations</Note>,
-  totk:<Note arrow="up-right" tilt={2}>built in two days, back in 2023</Note>,
-  amiibot:<Note arrow="up-left" tilt={3}>a pandemic project that unexpectedly went viral</Note>,
-  ling:<Note tilt={-3}>bring back Time Travel!</Note>,
+  naiive:<Note arrow="up-left" tilt={-2}>needed it for my own simulations, so I built it</Note>,
+  totk:<Note arrow="up-right" tilt={2}>two days from idea to #2 in the US App Store</Note>,
+  amiibot:<Note arrow="up-left" tilt={3}>10K+ downloads, NFC read &amp; write</Note>,
+  ling:<Note tilt={-3}>first App Store release, 2017</Note>,
 };
 const APP_COPY={
-  naiive:'A workspace for seeing what a simulation is actually doing. Open trajectories and ML-potential datasets, build a view with nodes, then inspect the atoms on screen or in AR.',
-  totk:'A map and collection tracker for Tears of the Kingdom, with iCloud sync. An early experiment in building an app with ChatGPT and Midjourney; it reached #2 in the US App Store after launch and #1 in other regions.',
+  naiive:'A workspace for seeing what a simulation is actually doing. Open trajectories and ML-potential datasets, build a view with nodes, then inspect the atoms on screen or in AR. Written in Swift and Metal; on the App Store.',
+  totk:'A map and collection tracker for Tears of the Kingdom, with iCloud sync. Built in two days with ChatGPT and Midjourney; it reached #2 in the US App Store after launch and #1 in other regions.',
   amiibot:'A collection tracker that connects the digital list to the figures on your shelf, using NFC scanning and writing.',
   ling:'My first App Store app: a timetable designed for the wrist. Built around the Apple Watch and its then-new ways of moving through time. Now retired.',
 };
 const EXPERIMENTS=[
-  ['typeshi','Element hypotheses from anonymous atom types and geometry. A 1.9 MB model that answers in under a second on a CPU.'],
-  ['dpmetal','ML-potential inference on Apple GPUs, directly from Swift. Verified up to 256,000 atoms on M1 Max and M4.'],
+  ['dpmetal',<>ML-potential inference on Apple GPUs, called directly from Swift. Verified up to <Hl>256,000 atoms</Hl> on M1 Max and M4.</>],
+  ['mud','Labels every atom’s local environment from local descriptors and a small neural network: 13 crystal types, plus disordered or unknown. Runs inside NAIIVE.'],
+  ['typeshi','Element hypotheses from anonymous atom types and geometry. A set transformer on partial-RDF descriptors; the 1.9 MB model answers in under a second on a CPU.'],
   ['trajview','Preview atomistic trajectories inside VS Code.'],
   ['slop','A research-agent runtime connecting reusable methods, remote machines and long-running calculations.'],
   ['dshslop','Persistent cluster sessions, machine notes and a Slurm/PBS job ledger for research agents.'],
@@ -52,13 +53,13 @@ const EXPERIMENTS=[
   ['gas','Compare cheaper fuel against the extra drive.'],
   ['fuji','A Bluetooth camera shutter on Apple Watch.'],
 ];
-const EXPERIMENT_STATUS={slop:'Private project',dshslop:'In development',gradbench:'In development',fuji:'Unreleased'};
+const EXPERIMENT_STATUS={mud:'In development',slop:'Private project',dshslop:'In development',gradbench:'In development',fuji:'Unreleased'};
 const SCHOOL_NAMES=Object.fromEntries(EDUCATION.map(school=>[school.id,school.school]));
 const JOURNEY=[
-  {id:'isu',title:'Iowa State University',role:'PhD candidate · Materials Science and Engineering',period:experienceById.isu.when,text:'Electronic-structure calculations, active learning and ML potentials are my day-to-day tools for studying atomic motion. I also build the software I need to inspect and organize the resulting data.'},
-  {id:'seagate',title:'Seagate Technology',role:'Advanced Data Storage Material Discovery Intern',period:`${experienceById.seagate.when} · ${experienceById.seagate.location}`,text:'At Seagate, I developed an end-to-end machine-learning workflow for thin-film ellipsometry data analysis, built graph-neural-network and RDKit-descriptor models for chemical-property prediction, and used molecular dynamics to study reader-head coating materials.'},
-  {id:'sunwoda',title:experienceById.sunwoda.org,role:'Simulation Engineer',period:`${experienceById.sunwoda.when} · ${experienceById.sunwoda.location}`,text:byId.sunwoda.summary,work:[
-    {title:'ML potentials & research software',text:'I worked on cathode ML-potential training and validation, and built tools to generate reference structures and analyze diffusion, lattice changes and material stability. I also ran high-throughput DFT and force-field screening of dopants for NCM and LFMP cathodes (patent CN114744187B).'},
+  {id:'isu',title:'Iowa State University',role:'PhD candidate · Materials Science and Engineering',period:experienceById.isu.when,text:'Electronic-structure calculations, active learning and ML potentials are my day-to-day tools for studying atomic motion. I also build the software I need to inspect and organize the resulting data.',note:<Note arrow="left" tilt={-2}>I train the ML potentials myself, with active learning</Note>},
+  {id:'seagate',title:'Seagate Technology',role:'Advanced Data Storage Material Discovery Intern',period:`${experienceById.seagate.when} · ${experienceById.seagate.location}`,text:'At Seagate, I built an end-to-end machine-learning workflow for thin-film ellipsometry analysis, graph-neural-network and RDKit-descriptor models for chemical-property prediction, and molecular-dynamics studies of reader-head coating materials.',note:<Note arrow="left" tilt={2}>ML + simulation, in an industry lab</Note>},
+  {id:'sunwoda',title:experienceById.sunwoda.org,role:'Simulation Engineer',period:`${experienceById.sunwoda.when} · ${experienceById.sunwoda.location}`,text:<>Two years of simulation engineering for EV battery R&amp;D: ML potentials and high-throughput DFT for cathodes, DEM for powder compaction, and parameter fitting for cell models. <Hl>This work led to four granted patents.</Hl></>,note:<Note arrow="left" tilt={-2}>industry R&amp;D before the PhD</Note>,work:[
+    {title:'ML potentials & research software',text:'I trained and validated cathode ML potentials, and built tools to generate reference structures and analyze diffusion, lattice changes and material stability. I also ran high-throughput DFT and force-field screening of dopants for NCM and LFMP cathodes (patent CN114744187B).'},
     {title:'Powder compaction',text:'I fitted DEM contact parameters to experimental density–pressure curves, then used the calibrated models to explore particle-size distributions and mixing ratios (patents CN114169233B and CN115579085B).'},
     {title:'Automatic model fitting',text:'I built Python tools to identify parameters for DEM, P2D/ECM and FEM battery models across rates and temperatures, using particle-swarm and differential-evolution algorithms and interfaces to COMSOL (patent CN115392123B).'},
   ]},
@@ -124,27 +125,27 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
 
     <main id="main-content" className="mg-sheet" aria-label="Rui Zhou’s research and projects" tabIndex={-1}>
       <header className="mg-head" id="profile" tabIndex={-1}>
-        <Row note={<Note tilt={-3} delay={300}>atoms go brrrrr</Note>}>
+        <Row note={<Note arrow="left" tilt={-3} delay={300}>simulations by day, App Store by night</Note>}>
           <h1>Rui Zhou</h1>
-          <p className="mg-role">I study materials and build software to work with them.</p>
-          <p className="mg-intro">My work spans battery materials, semiconductors, ceramics and metals. I combine DFT and molecular dynamics with machine-learned interatomic potentials to understand how they behave — and build tools for exploring the results.</p>
+          <p className="mg-role">I simulate materials at the atomic scale — and <Hl>ship the software</Hl> to work with them.</p>
+          <p className="mg-intro">My work spans battery materials, semiconductors, ceramics and metals. I combine DFT and molecular dynamics with machine-learned interatomic potentials to understand how they behave, and I write the tools myself — from Python workflows on HPC clusters to native Swift and Metal apps.</p>
           <p className="mg-current">PhD candidate · Iowa State University<br/><span>Previously <a href="#seagate">Seagate</a> (R&amp;D intern, {experienceById.seagate.start})</span> · <span><a href="#sunwoda">{experienceById.sunwoda.org}</a> (simulation engineer, {experienceById.sunwoda.start}–{String(experienceById.sunwoda.end).slice(2)})</span></p>
-          <p className="mg-availability">{person.availability}</p>
-          <p className="mg-proof"><strong>{papers.length||counts.papers}</strong> peer-reviewed papers · <strong>{selectedPapers.length||counts.firstAuthor}</strong> first-author · <strong>{patents.length}</strong> granted patents · <strong>{counts.apps}</strong> released apps</p>
+          <p className="mg-availability"><Under seed={6}>{person.availableFrom}</Under> {person.seeking}</p>
+          <p className="mg-proof"><strong>{papers.length||counts.papers}</strong> peer-reviewed papers (<strong>{selectedPapers.length||counts.firstAuthor}</strong> first-author, one a journal cover) · <strong>{patents.length}</strong> granted patents · <strong>{counts.apps}</strong> released apps</p>
           <p className="mg-contact"><a href={links.email}>Email</a><a href={links.linkedin}>LinkedIn</a><a href={links.scholar}>Google Scholar</a><a href={links.github}>GitHub</a></p>
         </Row>
       </header>
 
       <section data-reading-focus="isu" id="summary" tabIndex={-1}>
-        <Row label={<h2 className="mg-h">Research</h2>}>
+        <Row label={<h2 className="mg-h">Research</h2>} note={<Note arrow="left" tilt={-2}>first author on all three</Note>}>
           <h3 className="mg-entry-title">Ion transport and interfacial reactions</h3>
-          <p>In solid electrolytes, I study how disorder, phase changes and interfaces shape <Hl>ion transport</Hl>. My systems include thiophosphate glasses, closo-hydroborates and metal oxyhalides.</p>
-          <p className="mg-result">At lithium–sulfide interfaces, our simulations linked faster interphase growth to phosphorus-rich chemistry and showed how a crystallization event could slow further thickening.</p>
-          <p className="mg-project-links"><a data-analytics="publication" href="https://doi.org/10.1039/D6TA01253A" target="_blank" rel="noreferrer">Lithium–electrolyte interfaces <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1021/acsaem.6c00367" target="_blank" rel="noreferrer">Closo-hydroborates <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a></p>
+          <p>In solid electrolytes, I study how disorder, phase changes and interfaces shape ion transport. My systems include thiophosphate glasses, closo-hydroborates and metal oxyhalides.</p>
+          <p className="mg-result">At lithium–sulfide interfaces, our simulations <Hl>linked faster interphase growth to phosphorus-rich chemistry</Hl> and showed how a crystallization event could slow further thickening.</p>
+          <p className="mg-project-links"><a data-analytics="publication" href="https://doi.org/10.1039/D6TA01253A" target="_blank" rel="noreferrer">Lithium–electrolyte interfaces <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1021/acsaem.6c00367" target="_blank" rel="noreferrer">Closo-hydroborates <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1021/acselectrochem.4c00077" target="_blank" rel="noreferrer">Na₂B₁₂H₁₂ cover article <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a></p>
         </Row>
         <Row>
           <h3 className="mg-entry-title">Defects and mechanical response</h3>
-          <p>I also contribute to studies of <Hl>how crystals deform</Hl>, using ML potentials: dislocation slip in Mg–Bi alloys and high-entropy carbides, and photoplasticity in ZnS and CdTe, where constrained DFT provides the excited-state reference data.</p>
+          <p>I also contribute to studies of how crystals deform, using ML potentials: dislocation slip in Mg–Bi alloys and high-entropy carbides, and photoplasticity in ZnS and CdTe, where constrained DFT provides the excited-state reference data.</p>
           <p className="mg-result">In our ZnS study, photoexcitation increased the stress needed for dislocations to move, helping explain why illumination makes the crystal harder to deform.</p>
           <p className="mg-project-links"><a data-analytics="publication" href="https://doi.org/10.1021/acsaenm.4c00280" target="_blank" rel="noreferrer">Carbide ceramics <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1103/l83s-dwqz" target="_blank" rel="noreferrer">Mg–Bi alloys <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1021/acsmaterialslett.4c01982" target="_blank" rel="noreferrer">ZnS photoplasticity <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1016/j.ijmecsci.2025.110765" target="_blank" rel="noreferrer">CdTe photoplasticity <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a></p>
         </Row>
@@ -175,16 +176,16 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
       </section>
 
       <section id="projects" tabIndex={-1}>
-        <Row label={<h2 className="mg-h">Experiments</h2>}><p className="mg-section-intro">Smaller tools and open questions, often prompted by something I wanted to use myself.</p></Row>
+        <Row label={<h2 className="mg-h">Experiments</h2>}><p className="mg-section-intro">Smaller tools and open questions, usually built because I needed them for my own research.</p></Row>
         <div className="mg-experiments-grid">
           {EXPERIMENTS.map(([id,description])=>{const project=byId[id];return <article id={id} tabIndex={-1} data-project-id={id} data-reading-focus={id} key={id} className="mg-experiment">
-            <h3>{project.title}</h3><p>{description}</p>{EXPERIMENT_STATUS[id]?<small className="mg-project-status">{EXPERIMENT_STATUS[id]}</small>:null}<ProjectLinks project={project}/>
+            <h3>{project.title}</h3><p>{description}</p>{project.media?<ProjectMedia title={project.title} media={project.media} projectId={id}/>:null}{EXPERIMENT_STATUS[id]?<small className="mg-project-status">{EXPERIMENT_STATUS[id]}</small>:null}<ProjectLinks project={project}/>
           </article>;})}
         </div>
       </section>
 
       <section id="experience" tabIndex={-1}>
-        {JOURNEY.map((entry,index)=><Row key={entry.id} id={entry.id} label={index===0?<h2 className="mg-h">Along the way</h2>:null} className="mg-job">
+        {JOURNEY.map((entry,index)=><Row key={entry.id} id={entry.id} label={index===0?<h2 className="mg-h">Along the way</h2>:null} note={entry.note} className="mg-job">
           <h3 className="mg-entry-title">{entry.title}</h3><p className="mg-title">{entry.role}</p><p className="mg-when">{entry.period}</p><p>{entry.text}</p>
           {entry.work?<dl className="mg-work-notes">{entry.work.map(work=><div key={work.title}><dt>{work.title}</dt><dd>{work.text}</dd></div>)}</dl>:null}
           {entry.id==='sunwoda'?<details id="patents" tabIndex={-1} className="mg-reading" open={focusId==='patents'||undefined}><summary>{patents.length} granted patents from battery R&amp;D</summary><ul>{patents.map(p=><li key={p.id}><a href={p.href} target="_blank" rel="noreferrer">{p.title} · {p.id} <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><small className="mg-patent-dates">Filed {p.filed} · Granted {p.granted}</small></li>)}</ul></details>:null}
@@ -209,7 +210,7 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
 
       <footer className="mg-footer">
         <Row label={<h2 className="mg-h">Say hello</h2>}>
-          <p>If you have a role or a project in mind, <Under seed={4}>I’d like to hear from you</Under>.</p>
+          <p>If you have a role or a project in mind, <Under seed={4}>email me</Under> — I’d like to hear from you.</p>
           <p className="mg-project-links"><a href={links.email}>{links.emailText}</a><a href={links.cv}>Academic CV (PDF)</a><a href={links.resume}>Résumé (PDF)</a><a href={links.linkedin}>LinkedIn</a></p>
         </Row>
       </footer>

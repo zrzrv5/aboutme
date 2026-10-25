@@ -8,7 +8,8 @@ export const person = {
   location: 'Ames, Iowa',
   graduation: 'May 2027',
   interests: 'Materials research, simulation, machine learning and software',
-  availability: 'I expect to graduate in May 2027 and can start in June 2027. I’m looking for roles in computational materials and machine learning for science, and I’m happy to relocate anywhere in the U.S.',
+  availableFrom: 'Graduating May 2027, available from June 2027.',
+  seeking: 'Looking for roles in computational materials, ML for science or scientific software, anywhere in the U.S.',
   // Plain, first-person. No taglines.
   intro:
     'I’m a PhD candidate in Materials Science and Engineering at Iowa State University. I study ion transport and deformation in materials — from solid electrolytes to semiconductors, ceramics and metals — and build software for simulations and everyday life.',

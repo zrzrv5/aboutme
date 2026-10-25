@@ -36,6 +36,7 @@ npm run dev
 - `public/publications.json` supplies the paper list and first-author counts.
 - `public/ZHOU_Rui_CV.pdf` and `public/ZHOU_Rui_Resume.pdf` are the current downloads. Replace them in place so shared links keep working; the build also serves the older dated CV address.
 - `public/images/projects/` contains compressed screenshots from the real apps. Projects without public screenshots or links have none; do not invent substitute diagrams.
+- `public/videos/` holds compressed project demos (H.264, 1280 px, faststart); a project's `media.video` opens it in the screenshot dialog.
 - `public/fonts/` contains local fonts and their licenses.
 - `archive/` preserves older designs and original assets outside the deployed site.
 

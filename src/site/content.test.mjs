@@ -4,7 +4,7 @@ import {existsSync,readFileSync} from 'node:fs';
 import {links,experienceById,patents,appById,appMedia,normalizePublications} from '../redesign/content.js';
 import {LINKS,byId} from '../redesign/worlds/data.js';
 import {readingFocus} from './reading-focus.js';
-import {worldRenderSettings} from '../redesign/worlds/render-settings.js';
+import {worldRenderSettings,createFrameGovernor} from '../redesign/worlds/render-settings.js';
 
 test('career dates, documents and app destinations use the shared records',()=>{
   assert.equal(LINKS,links);
@@ -41,4 +41,20 @@ test('coarse pointers have a bounded render budget while desktop quality is pres
   assert.equal(worldRenderSettings({coarse:true,dpr:1}).pixelRatio,1);
   const tablet=worldRenderSettings({coarse:true,dpr:3,width:1024,height:1366});
   assert.ok(1024*1366*tablet.pixelRatio**2<=2_000_001);
+});
+test('slow GPUs step down in resolution without dropping below a sharp floor',()=>{
+  const base=worldRenderSettings({coarse:false,dpr:2,width:1280,height:800});
+  const low=worldRenderSettings({coarse:false,dpr:2,width:1280,height:800,tier:2});
+  assert.ok(low.pixelRatio<base.pixelRatio&&low.shadowSize<base.shadowSize);
+  assert.equal(worldRenderSettings({dpr:1,width:1366,height:768,tier:2}).pixelRatio,.8);
+  assert.ok(3840*2160*worldRenderSettings({dpr:1.5,width:3840,height:2160}).pixelRatio**2<=4_200_001);
+  const governor=createFrameGovernor({frames:10});
+  let now=0,slow=false;
+  for(let i=0;i<12;i++)slow=governor.sample(now+=17,1000/60,0)||slow;
+  assert.equal(slow,false,'a steady 60 fps keeps full quality');
+  for(let i=0;i<12;i++)slow=governor.sample(now+=40,1000/60,0)||slow;
+  assert.equal(slow,true,'frames at 25 fps step down');
+  governor.reset();slow=false;
+  for(let i=0;i<12;i++)slow=governor.sample(now+=(i%4?17:3000),1000/60,0)||slow;
+  assert.equal(slow,false,'tab switches and loading hitches are ignored');
 });

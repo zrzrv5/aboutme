@@ -10,7 +10,7 @@ import { loadWorldModel } from './model-assets';
 import { GAME_AREAS, WORLD_REGIONS, PROJECT_LAYOUT, STUDY_OFFSET_Z, campusPoint, PLAZA_LAYOUT } from './world-layout';
 import { mapLabelLevel, resolveMapLabels } from './map-labels';
 import { byId } from './data';
-import { worldRenderSettings } from './render-settings';
+import { worldRenderSettings, createFrameGovernor, QUALITY_TIERS } from './render-settings';
 import { walkTarget, planWalk, groundHeightAt } from './walk';
 import { GROUND, SHORE, RIVER_POINTS, RIVER_OUTLET, RIVER_SOURCE, riverHeightAt, waterfallGeometry, CROSSINGS, DOCK, MOUNTAIN_TRAILS, mountainGeometry, mountainHeightAt, ribbonGeometry } from './landscape';
 
@@ -46,7 +46,11 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   const illustrated = art === 'illustrated';
   const pixel = art === 'pixel';
   const coarse=window.matchMedia('(pointer: coarse)').matches;
-  const quality=worldRenderSettings({coarse,pixel,dpr:window.devicePixelRatio||1});
+  // A GPU that could not keep up last time starts at the step it settled on.
+  let tier=0;
+  try{tier=Math.min(QUALITY_TIERS.length-1,Number(sessionStorage.getItem('world-quality'))||0);}catch{/* Storage is optional. */}
+  const quality=worldRenderSettings({coarse,pixel,dpr:window.devicePixelRatio||1,tier});
+  const governor=createFrameGovernor(),created=performance.now();
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(c.sea);
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !pixel, alpha: false, powerPreference: 'low-power' });
@@ -457,7 +461,8 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   function resize(w,h) {
     width=Math.max(1,w); height=Math.max(1,h);
     const aspect=width/height;
-    renderer.setPixelRatio(worldRenderSettings({coarse,pixel,dpr:window.devicePixelRatio||1,width,height}).pixelRatio);
+    renderer.setPixelRatio(worldRenderSettings({coarse,pixel,dpr:window.devicePixelRatio||1,width,height,tier}).pixelRatio);
+    governor.reset();
     const renderWidth=pixel?Math.max(280,Math.round(width/2.2)):width;
     renderer.setSize(renderWidth,pixel?Math.round(renderWidth/aspect):height,false);
     orbit.resize(width,height,inspecting);
@@ -549,11 +554,22 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   }
   canvas.addEventListener('pointermove',move);
   canvas.addEventListener('pointerleave',leave);
+  // Step down one quality tier when frames keep missing their slot.
+  function lowerQuality() {
+    tier++;
+    try{sessionStorage.setItem('world-quality',String(tier));}catch{/* Storage is optional. */}
+    const {shadowSize}=worldRenderSettings({coarse,pixel,tier});
+    if(sun.shadow.mapSize.x!==shadowSize) {sun.shadow.map?.dispose();sun.shadow.map=null;sun.shadow.mapSize.set(shadowSize,shadowSize);}
+    lastShadow=-Infinity;resize(width,height);
+  }
   function render(now,force=false) {
     if(disposed || document.hidden) return;
-    // Full rate while dragging and while the camera glides to a stop.
-    const interval=1000/(orbit.isInteracting()||now-lastMove<300?60:30);
+    // Full rate while dragging and while the camera glides to a stop. The
+    // idle rate eases off on the lowest tier, where the scene is mostly still.
+    const moving=orbit.isInteracting()||now-lastMove<300;
+    const interval=1000/(moving?60:tier>=QUALITY_TIERS.length-1?24:30);
     if(!force&&(paused||now-previous<interval-.5))return;
+    if(!force&&now-created>2500&&governor.sample(now,interval,tier)){lowerQuality();return;}
     profiler?.begin();
     previous=force?now:now-((now-previous)%interval);
     const t=reduced.matches?0:now/1000;
@@ -568,7 +584,8 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
       if(camera.zoom>1.4&&!orbit.isInteracting())orbit.follow(pet.position);
     }
     petMap.offset.x=(reduced.matches?0:Math.floor(t*5)%6)/8;
-    if(now-lastShadow>120) {renderer.shadowMap.needsUpdate=true;lastShadow=now;}
+    // Only small props move; a lower tier refreshes their shadows less often.
+    if(now-lastShadow>(tier?200:120)) {renderer.shadowMap.needsUpdate=true;lastShadow=now;}
     renderer.render(scene,camera);
     pinLabels();
     profiler?.end();
@@ -579,6 +596,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   }
   function visibility() {
     profiler?.reset(document.hidden?'hidden':paused?'paused':'running');
+    governor.reset();
     if(reduced.matches) hopStart=-1e4;
     renderer.setAnimationLoop(document.hidden || paused || reduced.matches ? null : animate);
     if(!document.hidden) render(performance.now(),true);

@@ -341,6 +341,21 @@ export function buildProjectObjects({ group, box, cylinder, mesh, screen, regist
   link(lensFrame,[.14,-.17,0],[.38,-.46,0],.055,dark);
   register(typeshi,'typeshi','TypeSHI',[3.35,.35,-.2]);
 
+  // MUD: a block of atoms on a plinth, each coloured by the local structure
+  // it was assigned, in the zinc-blende / wurtzite / disordered key of the demo.
+  const mud=group('MUD / structure identification',0,0);
+  plinth(mud,.5);
+  box(mud,.62,.08,.62,dark,0,.16,0,true);
+  const LABELS={b:'#d77fc0',w:'#c9c45a',d:'#7d8790'};
+  const mudKey='bbbbwbbbbbdbbbbbbbbbbbbbbbbd';
+  let k=0;
+  for(let y=0;y<3;y++)for(let x=0;x<3;x++)for(let z=0;z<3;z++)if((x+y+z)%2===0||y===1)sphere(mud,.085,LABELS[mudKey[k++%mudKey.length]],(x-1)*.17,.30+y*.17,(z-1)*.17);
+  const flag=part(mud,.36,.2,.28);
+  cylinder(flag,.016,.016,.78,'#9b835c',0,.39,0,6);
+  rounded(flag,.30,.20,.02,.03,ivory,[.16,.66,0]);
+  for(const [i,color] of Object.values(LABELS).entries())box(flag,.05,.05,.012,color,.07+i*.08,.66,.016);
+  register(mud,'mud','MUD',[5.0,.35,-5.7]);
+
   const traj=group('Quick TrajView / trajectory viewer',6.85,-1.05);
   box(traj,.75,.06,.44,silver,0,.04,0,true);
   box(traj,.11,.25,.10,dark,0,.20,0);

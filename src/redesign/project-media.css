@@ -7,5 +7,5 @@
 .project-media-dialog header{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:12px}
 .project-media-dialog h2{font-size:21px!important;font-weight:500}
 .project-media-dialog header button{min-height:44px;min-width:65px;background:none;border:0;text-decoration:underline;color:inherit}
-.project-media-dialog>img{display:block;width:100%;height:auto}
+.project-media-dialog>img,.project-media-dialog>video{display:block;width:100%;height:auto;max-height:calc(90svh - 110px);background:#0e1117}
 body:has(.project-media-dialog[open]){overflow:hidden}

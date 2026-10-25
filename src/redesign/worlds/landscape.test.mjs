@@ -35,7 +35,7 @@ test('the dock starts on the grassy shore and extends out over water',()=> {
 });
 
 test('ML objects have actual flat ground under their whole base',()=> {
-  const feet={slop:[1.225,.66],dshslop:[.37,.34],gradbench:[.58,.52],typeshi:[.58,.52],dpmetal:[.74,.60]};
+  const feet={slop:[1.225,.66],dshslop:[.37,.34],gradbench:[.58,.52],typeshi:[.58,.52],mud:[.4,.4],dpmetal:[.74,.60]};
   for(const [id,[x,z]] of Object.entries(feet)) {
     const site=ML_SITES[id];
     for(const dx of [-x,0,x]) for(const dz of [-z,0,z]) close(mountainHeightAt(site.x+dx,site.z+dz),site.height);
