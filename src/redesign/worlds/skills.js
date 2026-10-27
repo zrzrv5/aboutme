@@ -44,7 +44,7 @@ export const SKILL_JOURNEYS = {
   slurm: [
     { place:'wustl', level:1, title:'MS simulation work', detail:'Acquired HPC skills while carrying out molecular-dynamics thesis research.' },
     { place:'isu', level:2, detail:'Slurm-managed simulations and active-learning workflows for computational materials research.' },
-    { place:'dshslop', level:3, contexts:['isu'], independent:true, title:'Persistent cluster workflows', detail:'DSH-SLOP, open source: reusable SSH logins, searchable machine notes and Slurm/PBS job tracking for agents.' },
+    { place:'dshslop', level:3, contexts:['isu'], independent:true, title:'Persistent cluster workflows', detail:'DSH-SLOP: reusable SSH logins, searchable machine notes and Slurm/PBS job tracking for agents.' },
   ],
   dem: [
     { place:'sunwoda', level:1, detail:'LIGGGHTS powder-compaction workflows: fit contact parameters to measured density–pressure curves, then explore particle-size distributions and mixing ratios.' },

@@ -51,7 +51,7 @@ const EXPERIMENTS=[
   ['gradbench','Research-workflow benchmarks for comparing models and harnesses on recovery, completion and verification.'],
   ['laneloaf','Dashcam footage turned into trip logs.'],
 ];
-const EXPERIMENT_STATUS={mud:'In development',slop:'Private project',dshslop:'Open source · public preview',gradbench:'In development'};
+const EXPERIMENT_STATUS={mud:'In development',slop:'Private project',gradbench:'In development'};
 const SCHOOL_NAMES=Object.fromEntries(EDUCATION.map(school=>[school.id,school.school]));
 const JOURNEY=[
   {id:'isu',title:'Iowa State University',role:'PhD candidate · Materials Science and Engineering',period:experienceById.isu.when,text:'Electronic-structure calculations, active learning and ML potentials are my day-to-day tools for studying atomic motion. I also build the software I need to inspect and organize the resulting data.',note:<Note arrow="left" tilt={-2}>I train the ML potentials myself, with active learning</Note>},
