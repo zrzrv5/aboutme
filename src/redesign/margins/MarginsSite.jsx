@@ -47,11 +47,11 @@ const EXPERIMENTS=[
   ['typeshi','Element hypotheses from anonymous atom types and geometry. A set transformer on partial-RDF descriptors; the 1.9 MB model answers in under a second on a CPU.'],
   ['trajview','Preview atomistic trajectories inside VS Code.'],
   ['slop','A research-agent runtime connecting reusable methods, remote machines and long-running calculations.'],
-  ['dshslop','Persistent cluster sessions, machine notes and a Slurm/PBS job ledger for research agents.'],
+  ['dshslop','Lets AI agents work on HPC clusters: reusable SSH logins with 2FA kept out of the model, searchable machine notes, and Slurm/PBS job tracking. A DeepSeek Harness plugin.'],
   ['gradbench','Research-workflow benchmarks for comparing models and harnesses on recovery, completion and verification.'],
   ['laneloaf','Dashcam footage turned into trip logs.'],
 ];
-const EXPERIMENT_STATUS={mud:'In development',slop:'Private project',dshslop:'In development',gradbench:'In development'};
+const EXPERIMENT_STATUS={mud:'In development',slop:'Private project',dshslop:'Open source · public preview',gradbench:'In development'};
 const SCHOOL_NAMES=Object.fromEntries(EDUCATION.map(school=>[school.id,school.school]));
 const JOURNEY=[
   {id:'isu',title:'Iowa State University',role:'PhD candidate · Materials Science and Engineering',period:experienceById.isu.when,text:'Electronic-structure calculations, active learning and ML potentials are my day-to-day tools for studying atomic motion. I also build the software I need to inspect and organize the resulting data.',note:<Note arrow="left" tilt={-2}>I train the ML potentials myself, with active learning</Note>},
