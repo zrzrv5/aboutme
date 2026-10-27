@@ -407,3 +407,5 @@ html[data-margin-notes='off'] .mg-ink{display:none}
 .mg-fix-new{margin-right:.12em;font-family:'Caveat','Bradley Hand',cursive !important;font-size:1.3em;line-height:1;color:var(--pen);white-space:nowrap}
 .notes-off .mg-fix-new,html[data-margin-notes='off'] .mg-fix-new{display:none}
 @media print{.mg-fix-new{display:none}}
+.mg-experiment-note{min-height:0;margin-top:8px}
+@media print{.mg-experiment-note{display:none}}

@@ -51,6 +51,9 @@ const EXPERIMENTS=[
   ['gradbench','Research-workflow benchmarks for comparing models and harnesses on recovery, completion and verification.'],
   ['laneloaf','Dashcam footage turned into trip logs.'],
 ];
+const EXPERIMENT_NOTES={
+  dshslop:<Note arrow="up-left" tilt={-2}>an AI agent with my cluster login. what could possibly go wrong?</Note>,
+};
 const EXPERIMENT_STATUS={mud:'In development',slop:'Private project',gradbench:'In development'};
 const SCHOOL_NAMES=Object.fromEntries(EDUCATION.map(school=>[school.id,school.school]));
 const JOURNEY=[
@@ -177,7 +180,7 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
         <Row label={<h2 className="mg-h">Experiments</h2>}><p className="mg-section-intro">Smaller tools and open questions, usually <Fix seed={9} to="prompted into existence">built</Fix> because I needed them for my own research.</p></Row>
         <div className="mg-experiments-grid">
           {EXPERIMENTS.map(([id,description])=>{const project=byId[id];return <article id={id} tabIndex={-1} data-project-id={id} data-reading-focus={id} key={id} className="mg-experiment">
-            <h3>{project.title}</h3><p>{description}</p>{project.media?<ProjectMedia title={project.title} media={project.media} projectId={id}/>:null}{EXPERIMENT_STATUS[id]?<small className="mg-project-status">{EXPERIMENT_STATUS[id]}</small>:null}<ProjectLinks project={project}/>
+            <h3>{project.title}</h3><p>{description}</p>{project.media?<ProjectMedia title={project.title} media={project.media} projectId={id}/>:null}{EXPERIMENT_STATUS[id]?<small className="mg-project-status">{EXPERIMENT_STATUS[id]}</small>:null}<ProjectLinks project={project}/>{EXPERIMENT_NOTES[id]?<aside className="mg-app-note mg-experiment-note">{EXPERIMENT_NOTES[id]}</aside>:null}
           </article>;})}
         </div>
       </section>
