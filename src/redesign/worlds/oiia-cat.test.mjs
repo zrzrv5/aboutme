@@ -1,46 +1,58 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createOiiaTimeline, letterSchedule, TAP_SECONDS, COMBO_GAP, FULL_SECONDS, LETTER_SECONDS } from './oiia-cat.js';
+import { createOiiaTimeline, lettersAt, COMBO_GAP, SONG_GRACE, FALLBACK_SECONDS, LETTER_SECONDS } from './oiia-cat.js';
 
 const ms=seconds=>seconds*1000;
+const quick=COMBO_GAP-.1,slow=COMBO_GAP+.1;
 
-test('one click is a short spin that stops by itself',()=>{
+test('one click sings one "oiia" and stops by itself; clicks during it do not restart it',()=>{
+  const cat=createOiiaTimeline(kind=>kind==='tap'?1.6:0);
+  assert.equal(cat.tap(0),'tap');assert.equal(cat.length(),1.6);
+  assert.equal(cat.tap(ms(slow)),null);
+  assert.ok(cat.running(ms(1.55)));assert.ok(!cat.running(ms(1.6)));
+  assert.equal(cat.tap(ms(2.5)),'tap','A click after it ends sings again');
+});
+
+test('three quick clicks start the song, which plays out through the rest of the combo',()=>{
+  const cat=createOiiaTimeline(kind=>kind==='song'?133:1.6);
+  assert.equal(cat.tap(0),'tap');assert.equal(cat.tap(ms(quick)),null);
+  assert.equal(cat.tap(ms(2*quick)),'song');assert.equal(cat.mode,'song');assert.equal(cat.length(),133);
+  for(let i=3;i<7;i++)assert.equal(cat.tap(ms(i*quick)),null,'Mashing on is not a stop');
+});
+
+test('slow clicks never reach the song',()=>{
   const cat=createOiiaTimeline();
-  assert.deepEqual(cat.tap(0),{kind:'tap',fresh:true});
-  assert.ok(cat.running(ms(TAP_SECONDS-.05)));assert.equal(cat.fullAt,null);
-  assert.ok(!cat.running(ms(TAP_SECONDS)));
+  for(let i=0;i<8;i++)assert.notEqual(cat.tap(ms(i*slow)),'song');
 });
 
-test('three quick clicks turn the short spin into the full egg, which then plays out',()=>{
-  const cat=createOiiaTimeline(),step=COMBO_GAP-.1;
-  cat.tap(0);
-  assert.deepEqual(cat.tap(ms(step)),{kind:'more',fresh:false});
-  assert.ok(cat.length>=step+TAP_SECONDS,'A second click keeps the cat spinning');
-  assert.deepEqual(cat.tap(ms(2*step)),{kind:'oiia',fresh:false});
-  assert.equal(cat.fullAt,2*step);assert.equal(cat.length,2*step+FULL_SECONDS);
-  assert.equal(cat.tap(ms(2*step+.2)),null,'Clicks during the full egg change nothing');
-  assert.ok(cat.running(ms(2*step+FULL_SECONDS-.05)));assert.ok(!cat.running(ms(2*step+FULL_SECONDS)));
+test('a deliberate click stops the song, and the rest of a double click does nothing',()=>{
+  const cat=createOiiaTimeline(()=>133);
+  assert.equal(cat.song(0),'song');assert.equal(cat.song(ms(1)),null,'Typing again changes nothing');
+  assert.equal(cat.tap(ms(SONG_GRACE-.2)),null,'Too soon: still part of the combo');
+  assert.equal(cat.tap(ms(10)),'stop');assert.ok(!cat.running(ms(10)));
+  assert.equal(cat.tap(ms(10+quick)),null);
+  assert.equal(cat.tap(ms(12)),'tap');
 });
 
-test('slow clicks never reach the full egg',()=>{
-  const cat=createOiiaTimeline(),step=COMBO_GAP+.1;
-  for(let i=0;i<6;i++)assert.notEqual(cat.tap(ms(i*step))?.kind,'oiia');
+test('the song runs until it ends, and falls back to a short spin without sound',()=>{
+  let seconds=Infinity;
+  const streaming=createOiiaTimeline(kind=>kind==='song'?seconds:0);
+  streaming.song(0);assert.ok(streaming.running(ms(60)),'Still loading its length');
+  seconds=133;assert.ok(streaming.running(ms(132)));assert.ok(!streaming.running(ms(133)));
+  streaming.end('tap');streaming.song(ms(200));streaming.end('tap');assert.ok(streaming.running(ms(201)),'Another sound ending does not stop the song');
+  streaming.end('song');assert.ok(!streaming.running(ms(201)));
+  const silent=createOiiaTimeline();
+  silent.tap(0);assert.equal(silent.length(),FALLBACK_SECONDS.tap);
+  silent.end();silent.song(0);assert.equal(silent.length(),FALLBACK_SECONDS.song);
 });
 
-test('the full egg lasts as long as the song once it has loaded; typing starts it at once',()=>{
-  const cat=createOiiaTimeline(()=>5.5);
-  assert.deepEqual(cat.full(0),{kind:'oiia',fresh:true});
-  assert.equal(cat.fullAt,0);assert.equal(cat.length,5.5);
-  assert.equal(cat.full(ms(1)),null);
-  const late=createOiiaTimeline(()=>5.5);late.tap(0);late.tap(ms(.3));late.tap(ms(.6));
-  assert.equal(late.length,5.5,'An upgrade keeps the song running to its end');
-});
-
-test('OIIA letters spell the song and are gone when the egg ends',()=>{
-  const notes=letterSchedule(.8,4.8);
-  assert.equal(notes.map(note=>note.letter).join(''),'OIIA'.repeat(notes.length/4));
-  assert.ok(notes.length>=8);assert.equal(notes[0].at,.8);
-  assert.ok(notes.every(note=>note.at+LETTER_SECONDS<=4.8+1e-9));
-  // Two sprite sets: a burst ends before the next but one starts.
-  for(const note of notes)for(const other of notes)if(other.burst===note.burst+2)assert.ok(other.at>=note.at+LETTER_SECONDS);
+test('OIIA letters come in order, at most two bursts at once, never outliving the run',()=>{
+  let seen='';
+  for(let t=0;t<20;t+=.01) {
+    const notes=lettersAt(t,20);
+    assert.ok(new Set(notes.map(note=>note.burst)).size<=2);
+    for(const note of notes)if(note.age<.01)seen+=note.letter;
+  }
+  assert.ok(seen.startsWith('OIIAOIIAOIIA'),seen.slice(0,12));
+  for(let t=0;t<5;t+=.01)for(const note of lettersAt(t,5))assert.ok(t-note.age+LETTER_SECONDS<=5+1e-9);
 });

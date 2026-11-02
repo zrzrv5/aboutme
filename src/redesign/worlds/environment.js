@@ -561,9 +561,9 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   }
   canvas.addEventListener('pointermove',move);
   canvas.addEventListener('pointerleave',leave);
-  // One click is a short spin; three quick ones (or typing) the full song.
+  // One click sings one "oiia"; three quick ones (or typing) the full song.
   function petCat(kind) {
-    if(kind==='tap'||kind==='oiia')onGesture?.(kind==='oiia'?'oiia':'cat');
+    if(kind==='tap'||kind==='song')onGesture?.(kind==='song'?'oiia':'cat');
     render(performance.now(),true);
   }
   // Typing the song anywhere on the island brings the camera to the cat.
@@ -574,7 +574,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
     if(typed!=='oiia'||!cat.ready())return;
     typed='';
     orbit.focus(cat.position(),2);updateLayout();
-    petCat(cat.full(performance.now(),reduced.matches));
+    petCat(cat.song(performance.now(),reduced.matches));
   }
   window.addEventListener('keydown',spell);
   // Step down one quality tier when frames keep missing their slot.
@@ -619,6 +619,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
     }
   }
   function visibility() {
+    if(document.hidden)cat.stop();
     profiler?.reset(document.hidden?'hidden':paused?'paused':'running');
     governor.reset();
     if(reduced.matches) hopStart=-1e4;
