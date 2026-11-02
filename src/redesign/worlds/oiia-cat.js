@@ -15,7 +15,7 @@ export const CAT_SHEET='/game/oiia-cat.webp';
 // file the cat simply spins in silence.
 export const CAT_SOUND='/game/oiia.mp3';
 const COLUMNS=8,SPIN_FRAMES=59,FRAME_SECONDS=.03,FOOT=4/128;
-const CAT_SIZE=.86;               // sprite edge in world units; the standing cat is about .8 tall
+const CAT_SIZE=1.45;              // sprite edge in world units; the standing cat is about 1.35 tall, taller than the frog
 const SONG_LEVEL=.8;
 export const TAP_SECONDS=.9;      // one click: a short spin
 export const COMBO_TAPS=3;        // quick clicks that start the full egg…
@@ -159,7 +159,7 @@ export function buildOiiaCat(parent,{mesh,layer,camera,at,redraw=()=>{}}) {
   const show=frame=>sheet.offset.set((frame%COLUMNS)/COLUMNS,1-(Math.floor(frame/COLUMNS)+1)/COLUMNS);
   show(0);
   // A generous, invisible target, so the cat is tappable on a phone.
-  const target=mesh(cat,new THREE.CylinderGeometry(.4,.4,.95,10),'#ffffff',[0,.47,0]);
+  const target=mesh(cat,new THREE.CylinderGeometry(CAT_SIZE*.45,CAT_SIZE*.45,CAT_SIZE,10),'#ffffff',[0,CAT_SIZE/2,0]);
   target.visible=false;target.castShadow=target.receiveShadow=false;
 
   const song=createSong(CAT_SOUND),timeline=createOiiaTimeline(song.seconds);

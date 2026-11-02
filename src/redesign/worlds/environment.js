@@ -353,7 +353,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   for(let i=0;i<10;i++) box(dock,1.3,.09,.19,i%2?'#c9ae80':'#bda071',0,.015,i*.2);
   for(const side of [-1,1]) for(const z of [.15,1.60]) cylinder(dock,.075,.09,1.42,'#9d855f',side*.56,-.56,z,7);
   box(dock,1.44,.16,.27,c.rock,0,-.06,.02,true);
-  const cat=buildOiiaCat(dock,{mesh,layer:scene,camera,at:[.24,.06,1.5],redraw:()=>render(performance.now(),true)});
+  const cat=buildOiiaCat(dock,{mesh,layer:scene,camera,at:[0,.06,1.3],redraw:()=>render(performance.now(),true)});
 
   const boat=group('little sailboat',-11,3.5);
   boat.position.y=-.58; boat.userData.dynamic=true;
