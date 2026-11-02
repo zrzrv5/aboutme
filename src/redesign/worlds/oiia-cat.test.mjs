@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createOiiaTimeline, lettersAt, COMBO_GAP, SONG_GRACE, FALLBACK_SECONDS, LETTER_SECONDS } from './oiia-cat.js';
+import { createOiiaTimeline, COMBO_GAP, SONG_GRACE, FALLBACK_SECONDS } from './oiia-cat.js';
+import { beatAt, songEnergy, BPM, FIRST_BEAT } from './club.js';
 
 const ms=seconds=>seconds*1000;
 const quick=COMBO_GAP-.1,slow=COMBO_GAP+.1;
@@ -46,13 +47,17 @@ test('the song runs until it ends, and falls back to a short spin without sound'
   silent.end();silent.song(0);assert.equal(silent.length(),FALLBACK_SECONDS.song);
 });
 
-test('OIIA letters come in order, at most two bursts at once, never outliving the run',()=>{
-  let seen='';
-  for(let t=0;t<20;t+=.01) {
-    const notes=lettersAt(t,20);
-    assert.ok(new Set(notes.map(note=>note.burst)).size<=2);
-    for(const note of notes)if(note.age<.01)seen+=note.letter;
-  }
-  assert.ok(seen.startsWith('OIIAOIIAOIIA'),seen.slice(0,12));
-  for(let t=0;t<5;t+=.01)for(const note of lettersAt(t,5))assert.ok(t-note.age+LETTER_SECONDS<=5+1e-9);
+test('the club keeps the song\'s beat: gentle pulses, colours by the bar',()=>{
+  const period=60/BPM;
+  assert.equal(beatAt(FIRST_BEAT-.01).pulse,0);
+  const first=beatAt(FIRST_BEAT),last=beatAt(FIRST_BEAT+period*.99);
+  assert.equal(first.beat,0);assert.ok(Math.abs(first.pulse-1)<1e-9);assert.ok(last.pulse<.02);
+  assert.equal(beatAt(FIRST_BEAT+period*4.01).bar,1);
+  assert.ok(BPM/60<3,'Pulses must stay below three a second');
+});
+
+test('the drops are the loudest part of the song',()=>{
+  const drop=songEnergy(45),intro=songEnergy(1),late=songEnergy(115);
+  assert.ok(drop>.85&&late>.85);assert.ok(intro<.2);
+  assert.equal(songEnergy(-5),songEnergy(0));assert.ok(songEnergy(999)>=0);
 });

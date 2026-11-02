@@ -8,6 +8,8 @@ import { buildWorkplaces } from './workplaces';
 import { buildProjectObjects } from './project-objects';
 import { loadWorldModel } from './model-assets';
 import { buildOiiaCat } from './oiia-cat';
+import { createClub } from './club';
+import { buildUfo } from './ufo';
 import { GAME_AREAS, WORLD_REGIONS, PROJECT_LAYOUT, STUDY_OFFSET_Z, campusPoint, PLAZA_LAYOUT } from './world-layout';
 import { mapLabelLevel, resolveMapLabels } from './map-labels';
 import { byId } from './data';
@@ -66,7 +68,8 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   camera.lookAt(0,0,0);
   camera.updateMatrixWorld();
 
-  scene.add(new THREE.HemisphereLight('#fff5dc','#709392',1.7));
+  const sky = new THREE.HemisphereLight('#fff5dc','#709392',1.7);
+  scene.add(sky);
   const sun = new THREE.DirectionalLight('#fff3dc',2.3);
   sun.position.set(-10,22,10);
   sun.castShadow = true;
@@ -353,15 +356,11 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   for(let i=0;i<10;i++) box(dock,1.3,.09,.19,i%2?'#c9ae80':'#bda071',0,.015,i*.2);
   for(const side of [-1,1]) for(const z of [.15,1.60]) cylinder(dock,.075,.09,1.42,'#9d855f',side*.56,-.56,z,7);
   box(dock,1.44,.16,.27,c.rock,0,-.06,.02,true);
-  const cat=buildOiiaCat(dock,{mesh,layer:scene,camera,at:[0,.06,1.3],redraw:()=>render(performance.now(),true)});
+  const cat=buildOiiaCat(dock,{mesh,at:[0,.06,1.3],redraw:()=>render(performance.now(),true)});
+  let club=null;
 
-  const boat=group('little sailboat',-11,3.5);
-  boat.position.y=-.58; boat.userData.dynamic=true;
-  const hull=ball(boat,.7,'#cda77b'); hull.scale.set(.55,.28,1.4);
-  cylinder(boat,.035,.035,1.5,'#9a845d',0,.75,0,6);
-  const sailShape=new THREE.Shape(); sailShape.moveTo(0,0); sailShape.lineTo(.75,-.1); sailShape.lineTo(0,1.15); sailShape.closePath();
-  mesh(boat,new THREE.ShapeGeometry(sailShape),c.trim,[.03,.32,0],true,{side:THREE.DoubleSide});
-  animations.push(t=> { boat.rotation.z=Math.sin(t*.6)*.07; boat.position.y=-.58+Math.sin(t*.9)*.035; });
+  buildUfo({group,mesh,animations,at:[-11,3.5],redraw:()=>{if(!disposed)render(performance.now(),true);},
+    ownMaterial:material=>{modelMaterials.add(material);return material;},ownGeometry:geometry=>{geometries.add(geometry);return geometry;},ownTexture:texture=>{textures.add(texture);return texture;}});
 
   // Foam marks are geometry and move independently of the island.
   for(let i=0;i<26;i++) {
@@ -589,7 +588,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
     if(disposed || document.hidden) return;
     // Full rate while dragging and while the camera glides to a stop. The
     // idle rate eases off on the lowest tier, where the scene is mostly still.
-    const moving=orbit.isInteracting()||now-lastMove<300||cat.active(now);
+    const moving=orbit.isInteracting()||now-lastMove<300||cat.active(now)||club?.active();
     const interval=1000/(moving?60:tier>=QUALITY_TIERS.length-1?24:30);
     if(!force&&(paused||now-previous<interval-.5))return;
     if(!force&&now-created>2500&&governor.sample(now,interval,tier)){lowerQuality();return;}
@@ -598,6 +597,10 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
     const t=reduced.matches?0:now/1000;
     animations.forEach(update=>update(t));
     cat.update(now,reduced.matches);
+    // The full song turns the island into a night club, built on first use.
+    const partying=cat.partying(now);
+    if(partying&&!club)club=createClub({scene,sky,sun,renderer,at:cat.position()});
+    club?.update(partying,cat.songTime(now),now,reduced.matches);
     clickables.forEach(g=> {const target=g===hovered?1.035:1; g.scale.setScalar(THREE.MathUtils.lerp(g.scale.x,target,.18));});
     const progress=Math.min(1,Math.max(0,(now-hopStart)/walk.duration)),walking=progress<1;
     pet.position.lerpVectors(from,destination,walk.hops===1?progress*progress*(3-2*progress):progress);
@@ -659,7 +662,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
       canvas.removeEventListener('pointermove',move);
       canvas.removeEventListener('pointerleave',leave);
       window.removeEventListener('keydown',spell);
-      cat.dispose();
+      cat.dispose();club?.dispose();
       orbit.dispose();
       document.removeEventListener('visibilitychange',visibility);
       reduced.removeEventListener('change',visibility);
