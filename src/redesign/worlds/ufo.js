@@ -1,13 +1,40 @@
 import * as THREE from 'three';
 
-// Glorp on a UFO, hovering high off the west shore where a sailboat used to
-// be. The saucer is island geometry; glorp is the original picture
+// Glorp on a UFO, patrolling high off the west shore where a sailboat used
+// to be. The saucer is island geometry; glorp is the original picture
 // (public/game/glorp.webp), a camera-facing sprite in the cockpit under a
 // glass bubble. Until the picture loads the saucer flies empty.
 export const GLORP='/game/glorp.webp';
 const HOVER=2.3,SEA=-.78,SCALE=1.25,BULBS=10;
 // The bubble is tall enough to hold glorp, antennae and all, from the island camera.
 const DOME={radius:.52,height:.86,floor:.2};
+
+// The patrol: hover over a spot of open sea, scanning with the beam, then
+// dart to the next, as UFOs do. The spots and the straight darts between
+// them stay off the coast, so the saucer never covers the island.
+export const SPOTS=[[-11,3.5],[-15,-1.5],[-15.2,-7.5],[-15.4,-11],[-15.6,-4.4],[-13.6,.6],[-9.4,8.6]];
+const HOLD=4,DART=1.6,LEG=HOLD+DART,CYCLE=SPOTS.length*LEG,SPIN=2.5;
+const smooth=x=>{const t=Math.min(1,Math.max(0,x));return t*t*(3-2*t);};
+
+// Where the saucer is `t` seconds in: position, how hard it is darting
+// (0..1, for the bank), which way, how far its spin has run, and how bright
+// its beam is. Every value is continuous in `t`; t=0 is mid-hover, beam on.
+export function ufoPose(t) {
+  // Modulo first, so rounding at a lap boundary can never pick a missing leg.
+  const time=t+HOLD/2,at=(time%CYCLE+CYCLE)%CYCLE,lap=Math.round((time-at)/CYCLE);
+  const leg=Math.min(SPOTS.length-1,Math.floor(at/LEG)),local=at-leg*LEG,from=SPOTS[leg],to=SPOTS[(leg+1)%SPOTS.length];
+  const darting=local>HOLD,p=darting?(local-HOLD)/DART:0,eased=smooth(p);
+  // A slow drift while hovering keeps the saucer alive between darts.
+  const x=from[0]+(to[0]-from[0])*eased+Math.sin(t*.8)*.22,z=from[1]+(to[1]-from[1])*eased+Math.cos(t*.6)*.18;
+  const length=Math.hypot(to[0]-from[0],to[1]-from[1]);
+  return {
+    x,z,lift:Math.sin(Math.PI*p)*.35,
+    speed:darting?6*p*(1-p)/1.5:0,
+    heading:[(to[0]-from[0])/length,(to[1]-from[1])/length],
+    spin:t*.6+((lap*SPOTS.length+leg)+eased)*SPIN,
+    beam:darting?0:smooth(local/.5)*smooth((HOLD-local)/.5),
+  };
+}
 
 // Glass: nearly clear face-on and brighter towards the outline, so the bubble
 // reads against the water and glorp shows through it.
@@ -77,13 +104,17 @@ export function buildUfo({group,mesh,animations,ownMaterial,ownGeometry,ownTextu
   beam.renderOrder=1;ufo.add(beam);
   const colors=lit.map(material=>material.color.clone());
   animations.push(t=> {
-    ufo.position.y=HOVER+Math.sin(t*1.1)*.08;
-    ufo.rotation.z=Math.sin(t*.7)*.05;ufo.rotation.x=Math.sin(t*.5)*.04;
-    saucer.rotation.y=t*.6;
+    const pose=ufoPose(t);
+    ufo.position.set(pose.x,HOVER+pose.lift+Math.sin(t*1.1)*.08,pose.z);
+    // Bank into a dart: the leading edge dips, as it would on a real turn.
+    ufo.rotation.z=Math.sin(t*.7)*.05-pose.heading[0]*pose.speed*.28;
+    ufo.rotation.x=Math.sin(t*.5)*.04+pose.heading[1]*pose.speed*.28;
+    saucer.rotation.y=pose.spin;
+    beam.visible=pose.beam>.01;
     // The two sets of bulbs take turns, so the light seems to run round the rim.
     const swap=Math.floor(t*4)%2;
     lit.forEach((material,i)=>material.color.copy(colors[(i+swap)%2]));
-    beam.material.opacity=.26+.08*Math.sin(t*2.2);
+    beam.material.opacity=pose.beam*(.26+.08*Math.sin(t*2.2));
   });
   return ufo;
 }
