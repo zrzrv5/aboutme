@@ -7,6 +7,7 @@ import { buildPlaza } from './plaza';
 import { buildWorkplaces } from './workplaces';
 import { buildProjectObjects } from './project-objects';
 import { loadWorldModel } from './model-assets';
+import { buildOiiaCat } from './oiia-cat';
 import { GAME_AREAS, WORLD_REGIONS, PROJECT_LAYOUT, STUDY_OFFSET_Z, campusPoint, PLAZA_LAYOUT } from './world-layout';
 import { mapLabelLevel, resolveMapLabels } from './map-labels';
 import { byId } from './data';
@@ -311,19 +312,18 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
 
   buildWorkplaces({group,box,cylinder,mesh,register,animations,c});
 
-  buildProjectObjects({group,box,cylinder,mesh,screen,register,animations,c,ownMaterial:material=>{modelMaterials.add(material);return material;},ownGeometry:geometry=>{geometries.add(geometry);return geometry;},isActive:g=>g===hovered || g===selected,
-    loadModel:(parent,url,options)=>loadWorldModel(parent,url,{...options,isDisposed:()=>disposed,
-      adopt:loaded=> {
-        loaded.geometries.forEach(value=>geometries.add(value));
-        loaded.materials.forEach(value=>modelMaterials.add(value));
-        loaded.textures.forEach(value=>textures.add(value));
-      },
-      invalidate:()=> {
-        for(const anchor of anchors) anchor.position=new THREE.Box3().setFromObject(objects.get(anchor.id)).getCenter(new THREE.Vector3()).toArray();
-        updateLayout(); render(performance.now(),true);
-      },
-    }),
+  const loadModel=(parent,url,options)=>loadWorldModel(parent,url,{...options,isDisposed:()=>disposed,
+    adopt:loaded=> {
+      loaded.geometries.forEach(value=>geometries.add(value));
+      loaded.materials.forEach(value=>modelMaterials.add(value));
+      loaded.textures.forEach(value=>textures.add(value));
+    },
+    invalidate:()=> {
+      for(const anchor of anchors) anchor.position=new THREE.Box3().setFromObject(objects.get(anchor.id)).getCenter(new THREE.Vector3()).toArray();
+      updateLayout(); render(performance.now(),true);
+    },
   });
+  buildProjectObjects({group,box,cylinder,mesh,screen,register,animations,c,ownMaterial:material=>{modelMaterials.add(material);return material;},ownGeometry:geometry=>{geometries.add(geometry);return geometry;},isActive:g=>g===hovered || g===selected,loadModel});
 
   function sign(id,title,x,z,color=c.blue) {
     const g=group(title,x,z);
@@ -352,6 +352,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   for(let i=0;i<10;i++) box(dock,1.3,.09,.19,i%2?'#c9ae80':'#bda071',0,.015,i*.2);
   for(const side of [-1,1]) for(const z of [.15,1.60]) cylinder(dock,.075,.09,1.42,'#9d855f',side*.56,-.56,z,7);
   box(dock,1.44,.16,.27,c.rock,0,-.06,.02,true);
+  const cat=buildOiiaCat(dock,{mesh,loadModel,layer:scene,camera,at:[.24,.06,1.5],redraw:()=>render(performance.now(),true)});
 
   const boat=group('little sailboat',-11,3.5);
   boat.position.y=-.58; boat.userData.dynamic=true;
@@ -448,10 +449,13 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   }
   // The ground under a click: intersect the ray with the terrain height
   // field, then keep only places the frog can stand.
-  function groundPoint(event) {
+  function aim(event) {
     const rect=canvas.getBoundingClientRect();
     pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);
     raycaster.setFromCamera(pointer,camera);
+  }
+  function groundPoint(event) {
+    aim(event);
     const {origin,direction}=raycaster.ray;
     if(Math.abs(direction.y)<1e-6)return null;
     let x=0,y=GROUND,z=0;
@@ -523,9 +527,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
     for(const label of mapLabels){const text=label.el.firstElementChild??label.el;label.w=text.offsetWidth;label.h=text.offsetHeight;}
   }
   function hit(event) {
-    const rect=canvas.getBoundingClientRect();
-    pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);
-    raycaster.setFromCamera(pointer,camera);
+    aim(event);
     const intersections=raycaster.intersectObjects(clickables,true);
     for(const intersection of intersections) {
       let node=intersection.object;
@@ -538,15 +540,17 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
     if(orbit.isInteracting() || event.pointerType==='touch') return;
     const now=performance.now();if(now-lastPick<50)return;lastPick=now;
     const next=hit(event);
+    // The OIIA cat has no label or card; only the cursor gives it away.
+    canvas.style.cursor=next||cat.hit(raycaster)?'pointer':'grab';
     if(next===hovered) return;
     hovered=next;
-    canvas.style.cursor=hovered?'pointer':'grab';
     onHover(hovered?{title:hovered.userData.title,location:hovered.userData.location,...project([hovered.position.x,hovered.position.y+2.8,hovered.position.z])}:null);
     render(performance.now(),true);
   }
   function leave() { hovered=null; onHover(null); canvas.style.cursor='grab'; render(performance.now(),true); }
   function click(event) {
     const picked=hit(event);
+    if(cat.hit(raycaster)){oiia();return;}
     if(picked){onSelect(picked.userData.id);return;}
     const target=groundPoint(event);
     if(target){travel(target);onGesture?.('walk');render(performance.now(),true);}
@@ -554,6 +558,23 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   }
   canvas.addEventListener('pointermove',move);
   canvas.addEventListener('pointerleave',leave);
+  function oiia() {
+    const now=performance.now();
+    if(!cat.start(now,reduced.matches))return;
+    onGesture?.('oiia');
+    render(now,true);
+  }
+  // Typing the song anywhere on the island brings the camera to the cat.
+  let typed='';
+  function spell(event) {
+    if(paused||event.metaKey||event.ctrlKey||event.altKey)return;
+    typed=(typed+(event.key.length===1?event.key.toLowerCase():' ')).slice(-4);
+    if(typed!=='oiia'||!cat.ready())return;
+    typed='';
+    orbit.focus(cat.position(),2);updateLayout();
+    oiia();
+  }
+  window.addEventListener('keydown',spell);
   // Step down one quality tier when frames keep missing their slot.
   function lowerQuality() {
     tier++;
@@ -566,7 +587,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
     if(disposed || document.hidden) return;
     // Full rate while dragging and while the camera glides to a stop. The
     // idle rate eases off on the lowest tier, where the scene is mostly still.
-    const moving=orbit.isInteracting()||now-lastMove<300;
+    const moving=orbit.isInteracting()||now-lastMove<300||cat.active(now);
     const interval=1000/(moving?60:tier>=QUALITY_TIERS.length-1?24:30);
     if(!force&&(paused||now-previous<interval-.5))return;
     if(!force&&now-created>2500&&governor.sample(now,interval,tier)){lowerQuality();return;}
@@ -574,6 +595,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
     previous=force?now:now-((now-previous)%interval);
     const t=reduced.matches?0:now/1000;
     animations.forEach(update=>update(t));
+    cat.update(now,reduced.matches);
     clickables.forEach(g=> {const target=g===hovered?1.035:1; g.scale.setScalar(THREE.MathUtils.lerp(g.scale.x,target,.18));});
     const progress=Math.min(1,Math.max(0,(now-hopStart)/walk.duration)),walking=progress<1;
     pet.position.lerpVectors(from,destination,walk.hops===1?progress*progress*(3-2*progress):progress);
@@ -633,6 +655,8 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
       renderer.setAnimationLoop(null);
       canvas.removeEventListener('pointermove',move);
       canvas.removeEventListener('pointerleave',leave);
+      window.removeEventListener('keydown',spell);
+      cat.dispose();
       orbit.dispose();
       document.removeEventListener('visibilitychange',visibility);
       reduced.removeEventListener('change',visibility);
