@@ -312,18 +312,19 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
 
   buildWorkplaces({group,box,cylinder,mesh,register,animations,c});
 
-  const loadModel=(parent,url,options)=>loadWorldModel(parent,url,{...options,isDisposed:()=>disposed,
-    adopt:loaded=> {
-      loaded.geometries.forEach(value=>geometries.add(value));
-      loaded.materials.forEach(value=>modelMaterials.add(value));
-      loaded.textures.forEach(value=>textures.add(value));
-    },
-    invalidate:()=> {
-      for(const anchor of anchors) anchor.position=new THREE.Box3().setFromObject(objects.get(anchor.id)).getCenter(new THREE.Vector3()).toArray();
-      updateLayout(); render(performance.now(),true);
-    },
+  buildProjectObjects({group,box,cylinder,mesh,screen,register,animations,c,ownMaterial:material=>{modelMaterials.add(material);return material;},ownGeometry:geometry=>{geometries.add(geometry);return geometry;},isActive:g=>g===hovered || g===selected,
+    loadModel:(parent,url,options)=>loadWorldModel(parent,url,{...options,isDisposed:()=>disposed,
+      adopt:loaded=> {
+        loaded.geometries.forEach(value=>geometries.add(value));
+        loaded.materials.forEach(value=>modelMaterials.add(value));
+        loaded.textures.forEach(value=>textures.add(value));
+      },
+      invalidate:()=> {
+        for(const anchor of anchors) anchor.position=new THREE.Box3().setFromObject(objects.get(anchor.id)).getCenter(new THREE.Vector3()).toArray();
+        updateLayout(); render(performance.now(),true);
+      },
+    }),
   });
-  buildProjectObjects({group,box,cylinder,mesh,screen,register,animations,c,ownMaterial:material=>{modelMaterials.add(material);return material;},ownGeometry:geometry=>{geometries.add(geometry);return geometry;},isActive:g=>g===hovered || g===selected,loadModel});
 
   function sign(id,title,x,z,color=c.blue) {
     const g=group(title,x,z);
@@ -352,7 +353,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   for(let i=0;i<10;i++) box(dock,1.3,.09,.19,i%2?'#c9ae80':'#bda071',0,.015,i*.2);
   for(const side of [-1,1]) for(const z of [.15,1.60]) cylinder(dock,.075,.09,1.42,'#9d855f',side*.56,-.56,z,7);
   box(dock,1.44,.16,.27,c.rock,0,-.06,.02,true);
-  const cat=buildOiiaCat(dock,{mesh,loadModel,layer:scene,camera,at:[.24,.06,1.5],redraw:()=>render(performance.now(),true)});
+  const cat=buildOiiaCat(dock,{mesh,layer:scene,camera,at:[.24,.06,1.5],redraw:()=>render(performance.now(),true)});
 
   const boat=group('little sailboat',-11,3.5);
   boat.position.y=-.58; boat.userData.dynamic=true;
@@ -541,7 +542,9 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
     const now=performance.now();if(now-lastPick<50)return;lastPick=now;
     const next=hit(event);
     // The OIIA cat has no label or card; only the cursor gives it away.
-    canvas.style.cursor=next||cat.hit(raycaster)?'pointer':'grab';
+    const overCat=!next&&cat.hit(raycaster);
+    if(overCat)cat.prefetch();
+    canvas.style.cursor=next||overCat?'pointer':'grab';
     if(next===hovered) return;
     hovered=next;
     onHover(hovered?{title:hovered.userData.title,location:hovered.userData.location,...project([hovered.position.x,hovered.position.y+2.8,hovered.position.z])}:null);
@@ -550,7 +553,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   function leave() { hovered=null; onHover(null); canvas.style.cursor='grab'; render(performance.now(),true); }
   function click(event) {
     const picked=hit(event);
-    if(cat.hit(raycaster)){oiia();return;}
+    if(cat.hit(raycaster)){petCat(cat.tap(performance.now(),reduced.matches));return;}
     if(picked){onSelect(picked.userData.id);return;}
     const target=groundPoint(event);
     if(target){travel(target);onGesture?.('walk');render(performance.now(),true);}
@@ -558,11 +561,10 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
   }
   canvas.addEventListener('pointermove',move);
   canvas.addEventListener('pointerleave',leave);
-  function oiia() {
-    const now=performance.now();
-    if(!cat.start(now,reduced.matches))return;
-    onGesture?.('oiia');
-    render(now,true);
+  // One click is a short spin; three quick ones (or typing) the full song.
+  function petCat(kind) {
+    if(kind==='tap'||kind==='oiia')onGesture?.(kind==='oiia'?'oiia':'cat');
+    render(performance.now(),true);
   }
   // Typing the song anywhere on the island brings the camera to the cat.
   let typed='';
@@ -572,7 +574,7 @@ export function createEnvironment(canvas, { art, onSelect, onHover, onLayout, on
     if(typed!=='oiia'||!cat.ready())return;
     typed='';
     orbit.focus(cat.position(),2);updateLayout();
-    oiia();
+    petCat(cat.full(performance.now(),reduced.matches));
   }
   window.addEventListener('keydown',spell);
   // Step down one quality tier when frames keep missing their slot.

@@ -14,7 +14,7 @@ function resources(root) {
   return {geometries,materials,textures};
 }
 
-export async function loadWorldModel(parent,url,{fit,name='the AmiiBot model',onReady,isDisposed,adopt,invalidate}) {
+export async function loadWorldModel(parent,url,{fit,onReady,isDisposed,adopt,invalidate}) {
   try {
     const {GLTFLoader}=await import('three/addons/loaders/GLTFLoader.js');
     if(isDisposed()) return;
@@ -41,6 +41,6 @@ export async function loadWorldModel(parent,url,{fit,name='the AmiiBot model',on
     onReady?.();
     invalidate();
   } catch(error) {
-    if(!isDisposed()) console.error(`Could not load ${name}:`,error);
+    if(!isDisposed()) console.error('Could not load the AmiiBot model:',error);
   }
 }

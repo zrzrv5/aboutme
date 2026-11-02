@@ -1,79 +1,125 @@
 import * as THREE from 'three';
 
-// An easter egg at the end of the dock: the OIIA cat. Click it, or
-// type "oiia" anywhere on the island, and it spins on the spot while singing
-// "OIIA OIIA". The voice is synthesised with Web Audio (a sawtooth through
-// three vowel formants), so the site ships no audio file. With reduced
-// motion the cat sings without spinning.
+// An easter egg at the end of the dock: the OIIA cat, cut from the original
+// GIF (archive/original-assets/oiia-cat.gif). One click spins it briefly to
+// the start of the song; three quick clicks, or typing "oiia" anywhere on the
+// island, play the whole thing. With reduced motion the cat stands still and
+// only sings.
 
-export const SPIN_SECONDS=2.2;
-export const SPIN_TURNS=9;
+// public/game/oiia-cat.webp is the GIF as an 8 × 8 sheet of 128 px cells:
+// cell 0 is the standing cat, cells 1-59 the spin, all cut from one box and
+// bottom-aligned 4 px above the cell edge. The spin frames are lowered 48 px,
+// so the spinning cat sits where the standing cat's feet were.
+export const CAT_SHEET='/game/oiia-cat.webp';
+// The original sound. It loads on first contact with the cat; without the
+// file the cat simply spins in silence.
+export const CAT_SOUND='/game/oiia.mp3';
+const COLUMNS=8,SPIN_FRAMES=59,FRAME_SECONDS=.03,FOOT=4/128;
+const CAT_SIZE=.86;               // sprite edge in world units; the standing cat is about .8 tall
+const SONG_LEVEL=.8;
+export const TAP_SECONDS=.9;      // one click: a short spin
+export const COMBO_TAPS=3;        // quick clicks that start the full egg…
+export const COMBO_GAP=.6;        // …each within this many seconds of the last
+export const FULL_SECONDS=4;      // the full egg's length until the song has loaded
 export const LETTER_SECONDS=.9;
-const RAMP_UP=.12,RAMP_DOWN=.32;
-const LETTER_SIZE=.6;
-const VOLUME=.4;
-export const CAT_MODEL='/game/oiia-cat.glb';
-// The model is scaled to fit this box (world units): a little shorter than the frog.
-const CAT_FIT=[.7,.8,.7];
+const BURST=[0,.15,.27,.39],BURST_EVERY=.8,LETTER_SIZE=.6;
 
-// Share of the spin completed at progress p (0..1). Angular speed ramps up,
-// holds and winds down; the total is normalised, so the cat always comes to
-// rest facing the sea again.
-export function spinProgress(p) {
-  p=Math.min(1,Math.max(0,p));
-  const total=1-RAMP_UP/2-RAMP_DOWN/2;
-  const done=p<RAMP_UP?p*p/(2*RAMP_UP):p<=1-RAMP_DOWN?p-RAMP_UP/2:total-(1-p)**2/(2*RAMP_DOWN);
-  return done/total;
+// "OIIA" bursts from `from` seconds, ending before the egg does. A burst is
+// gone before the next but one begins, so two sets of four sprites suffice.
+export function letterSchedule(from,length) {
+  const notes=[];
+  for(let burst=0,start=from;start+BURST.at(-1)+LETTER_SECONDS<=length+1e-9;burst++,start+=BURST_EVERY)
+    BURST.forEach((at,index)=>notes.push({letter:'OIIA'[index],index,burst,at:start+at}));
+  return notes;
 }
 
-// Two phrases, the second a step higher with its last vowel held.
-// [letter, start, end, pitch, falling to], in seconds and Hz.
-const PHRASE=[['O',0,.15,540],['I',.15,.27,680],['I',.27,.39,760],['A',.39,.62,620,520]];
-export const SONG=[[0,1,.62],[.8,1.06,.86]].flatMap(([start,lift,hold],phrase)=>PHRASE.map(([letter,at,end,hz,to],index)=>({
-  letter,phrase,index,at:start+at,end:start+(index===3?hold:end),hz:hz*lift,to:to?to*lift:0,
-})));
-export const SONG_SECONDS=SONG.at(-1).end;
-const joined=(a,b)=>Math.abs(a-b)<1e-6;
+// Clicks to runs. A click on a still cat starts a short spin; clicks that
+// follow keep it going; the third quick click turns it into the full egg,
+// which then plays out. `clipSeconds` is the song's length once loaded.
+export function createOiiaTimeline(clipSeconds=()=>0) {
+  let started=null,length=0,full=null,lastTap=-Infinity,taps=0;
+  const elapsed=now=>(now-started)/1000;
+  const running=now=>started!==null&&elapsed(now)<length;
+  function goFull(now) {
+    const at=elapsed(now),clip=clipSeconds();
+    full=at;length=clip?Math.max(clip,at+2):at+FULL_SECONDS;taps=0;
+  }
+  return {
+    elapsed,running,
+    get length(){return length;},
+    get fullAt(){return full;},
+    tap(now) {
+      taps=(now-lastTap)/1000<=COMBO_GAP?taps+1:1;lastTap=now;
+      const fresh=!running(now);
+      if(fresh){started=now;length=TAP_SECONDS;full=null;}
+      else if(full!==null)return null;
+      if(taps>=COMBO_TAPS){goFull(now);return {kind:'oiia',fresh};}
+      if(!fresh)length=Math.max(length,elapsed(now)+TAP_SECONDS);
+      return {kind:fresh?'tap':'more',fresh};
+    },
+    full(now) {
+      const fresh=!running(now);
+      if(!fresh&&full!==null)return null;
+      if(fresh)started=now;
+      goFull(now);
+      return {kind:'oiia',fresh};
+    },
+    end(){started=null;full=null;},
+  };
+}
 
-// Formant centres (Hz) and levels for a small, bright voice. The levels
-// even out the vowels: a bright I passes far less of the sawtooth than O.
-const VOWELS={
-  O:[[560,.77],[950,.42],[2600,.09]],
-  I:[[400,1.5],[2700,2.1],[3500,.85]],
-  A:[[950,1.8],[1500,1.17],[2800,.32]],
-};
-
-export function sing(context,when=context.currentTime+.03) {
-  const out=context.createGain(),voice=context.createOscillator(),vibrato=context.createOscillator(),depth=context.createGain(),envelope=context.createGain();
-  out.gain.value=VOLUME;out.connect(context.destination);
-  voice.type='sawtooth';vibrato.frequency.value=6.5;depth.gain.value=10;
-  vibrato.connect(depth).connect(voice.frequency);
-  envelope.gain.value=0;voice.connect(envelope);
-  const formants=[6,9,12].map(q=> {
-    const filter=context.createBiquadFilter(),level=context.createGain();
-    filter.type='bandpass';filter.Q.value=q;
-    envelope.connect(filter).connect(level).connect(out);
-    return {filter,level};
-  });
-  SONG.forEach((note,i)=> {
-    const t=when+note.at,before=SONG[i-1],after=SONG[i+1];
-    const tied=!!before&&joined(before.end,note.at),glide=tied?.025:.004;
-    // A phrase scoops up into its first note; the notes inside it glide.
-    if(tied)voice.frequency.setTargetAtTime(note.hz,t,.03);
-    else {voice.frequency.setValueAtTime(note.hz*.85,t);voice.frequency.setTargetAtTime(note.hz,t,.035);}
-    if(note.to)voice.frequency.setTargetAtTime(note.to,t+(note.end-note.at)*.4,(note.end-note.at)*.3);
-    VOWELS[note.letter].forEach(([hz,level],k)=> {
-      formants[k].filter.frequency.setTargetAtTime(hz,t,glide);
-      formants[k].level.gain.setTargetAtTime(level,t,glide);
-    });
-    // A repeated vowel is sung again after a short dip; a phrase ends in silence.
-    if(!tied)envelope.gain.setTargetAtTime(1,t,.012);
-    else if(before.letter===note.letter){envelope.gain.setTargetAtTime(.1,t-.035,.008);envelope.gain.setTargetAtTime(1,t,.012);}
-    if(!after||!joined(after.at,note.end))envelope.gain.setTargetAtTime(0,when+note.end-.04,.02);
-  });
-  const stop=when+SONG_SECONDS+.3;
-  voice.start(when);vibrato.start(when);voice.stop(stop);vibrato.stop(stop);
-  voice.onended=()=>out.disconnect();
+// The original clip, decoded once. Playback follows the cat's timeline: it
+// starts with a run, fades out where the run ends, and a late arrival joins
+// a run already under way at the right offset.
+function createSong(url) {
+  let loading=null,clip=null,context=null,source=null,gain=null,origin=0;
+  function load() {
+    const Offline=window.OfflineAudioContext||window.webkitOfflineAudioContext;
+    if(!Offline)return Promise.resolve(null);
+    // Decoding offline needs no click, so the clip can load on hover.
+    loading??=fetch(url)
+      .then(response=>{if(!response.ok)throw new Error(String(response.status));return response.arrayBuffer();})
+      .then(data=>new Offline(1,1,44100).decodeAudioData(data))
+      .then(buffer=>{clip=buffer;return buffer;})
+      .catch(()=>null);
+    return loading;
+  }
+  // Called inside the click, so mobile browsers let the sound start later.
+  function unlock() {
+    const Context=window.AudioContext||window.webkitAudioContext;
+    if(!Context)return;
+    try {context??=new Context();context.resume?.().catch(()=>{});} catch {context=null;}
+  }
+  function stop() {
+    if(!source)return;
+    const old=source;source=null;
+    try {old.stop();} catch {/* Already stopped. */}
+    old.disconnect();
+  }
+  // Fade out by clip time `length`, unless the clip ends first.
+  function fade(length) {
+    const now=context.currentTime,end=origin+length,level=gain.gain;
+    level.cancelScheduledValues(now);level.setValueAtTime(SONG_LEVEL,now);
+    if(length<clip.duration){level.setValueAtTime(SONG_LEVEL,Math.max(now,end-.15));level.linearRampToValueAtTime(0,Math.max(now+.01,end));}
+  }
+  return {
+    load,unlock,stop,
+    seconds:()=>clip?.duration??0,
+    // A fresh run restarts the clip; otherwise only its end moves.
+    sync(elapsed,length,fresh) {
+      if(fresh)stop();
+      if(!clip||!context)return;
+      if(source){fade(length);return;}
+      if(elapsed>=Math.min(length,clip.duration))return;
+      const player=context.createBufferSource();
+      player.buffer=clip;gain=context.createGain();
+      player.connect(gain).connect(context.destination);
+      origin=context.currentTime-elapsed;player.start(context.currentTime,elapsed);
+      player.onended=()=>{if(source===player)stop();};
+      source=player;fade(length);
+    },
+    dispose(){stop();context?.close().catch(()=>{});},
+  };
 }
 
 const LETTER_COLORS=['#e58a6b','#efbf4c','#6aae9f','#d47a9c'];
@@ -92,95 +138,105 @@ function paintLetter(letter) {
   return texture;
 }
 
-// The cat itself is the original OIIA model, loaded as a GLB like the
-// AmiiBot figure. Its root is its own batching root, so it spins as one
-// piece. Until the model arrives there is nothing to see or click.
-export function buildOiiaCat(parent,{mesh,loadModel,layer,camera,at,redraw=()=>{}}) {
-  const cat=new THREE.Group(),scale=1;
+// A camera-facing sprite, like the frog: the GIF's frames supply the spin.
+// The root is its own batching root, so the sprite keeps updating.
+export function buildOiiaCat(parent,{mesh,layer,camera,at,redraw=()=>{}}) {
+  const cat=new THREE.Group();
   cat.name='OIIA cat at the end of the dock';
   cat.userData.dynamic=true;
   cat.position.fromArray(at);
   parent.add(cat);
-  const base=cat.position.y;
-  let ready=false;
-  loadModel(cat,CAT_MODEL,{fit:CAT_FIT,name:'the OIIA cat model',onReady:()=>{ready=true;}});
+  let ready=false,disposed=false,idle=true,timer=0,letters=null,schedule=[];
+  const sheet=new THREE.TextureLoader().load(CAT_SHEET,()=>{if(disposed)return;ready=true;figure.visible=true;redraw();});
+  sheet.colorSpace=THREE.SRGBColorSpace;sheet.generateMipmaps=false;sheet.minFilter=THREE.LinearFilter;
+  sheet.repeat.set(1/COLUMNS,1/COLUMNS);
+  // Unlit and outside tone mapping, so the cat keeps the GIF's colours.
+  const material=new THREE.SpriteMaterial({map:sheet,alphaTest:.1,toneMapped:false});
+  const figure=new THREE.Sprite(material);
+  figure.center.set(.5,FOOT);figure.scale.set(CAT_SIZE,CAT_SIZE,1);
+  figure.visible=false;figure.userData.dynamic=true;
+  cat.add(figure);
+  const show=frame=>sheet.offset.set((frame%COLUMNS)/COLUMNS,1-(Math.floor(frame/COLUMNS)+1)/COLUMNS);
+  show(0);
   // A generous, invisible target, so the cat is tappable on a phone.
-  const target=mesh(cat,new THREE.CylinderGeometry(.42,.42,CAT_FIT[1]+.15,10),'#ffffff',[0,(CAT_FIT[1]+.15)/2,0]);
+  const target=mesh(cat,new THREE.CylinderGeometry(.4,.4,.95,10),'#ffffff',[0,.47,0]);
   target.visible=false;target.castShadow=target.receiveShadow=false;
 
-  let started=null,timer=0,letters=null,audio=null;
-  const head=new THREE.Vector3(),right=new THREE.Vector3(),up=new THREE.Vector3(),owned=new Set();
+  const song=createSong(CAT_SOUND),timeline=createOiiaTimeline(song.seconds);
+  const head=new THREE.Vector3(),right=new THREE.Vector3(),up=new THREE.Vector3(),owned=new Set([sheet,material]);
   function makeLetters() {
     const textures={};
-    return SONG.map(note=> {
-      if(!textures[note.letter]){textures[note.letter]=paintLetter(note.letter);owned.add(textures[note.letter]);}
-      const material=new THREE.SpriteMaterial({map:textures[note.letter],color:LETTER_COLORS[note.index],transparent:true,depthTest:false,depthWrite:false,toneMapped:false});
-      owned.add(material);
-      const sprite=new THREE.Sprite(material);
+    return Array.from({length:8},(_,slot)=> {
+      const letter='OIIA'[slot%4];
+      if(!textures[letter]){textures[letter]=paintLetter(letter);owned.add(textures[letter]);}
+      const tint=new THREE.SpriteMaterial({map:textures[letter],color:LETTER_COLORS[slot%4],transparent:true,depthTest:false,depthWrite:false,toneMapped:false});
+      owned.add(tint);
+      const sprite=new THREE.Sprite(tint);
       sprite.renderOrder=20;sprite.visible=false;layer.add(sprite);
       return sprite;
     });
   }
-  function voice() {
-    const Context=window.AudioContext||window.webkitAudioContext;
-    if(!Context)return;
-    try {
-      audio??=new Context();
-      audio.resume?.().catch(()=>{});
-      sing(audio);
-    } catch {/* The song is optional; the cat still spins. */}
-  }
-  function rest() {
-    cat.rotation.y=0;cat.position.y=base;cat.scale.setScalar(scale);
+  function settle() {
+    idle=true;timeline.end();song.stop();show(0);schedule=[];
     letters?.forEach(sprite=>{sprite.visible=false;});
+  }
+  function apply(change,now,reduced) {
+    if(!change)return null;
+    idle=false;
+    const elapsed=timeline.elapsed(now);
+    if(change.kind==='oiia') {
+      letters??=makeLetters();
+      schedule=letterSchedule(timeline.fullAt,timeline.length);
+      parent.updateWorldMatrix(true,false);
+      head.set(at[0],at[1]+CAT_SIZE*.9,at[2]).applyMatrix4(parent.matrixWorld);
+    } else if(change.fresh) schedule=[];
+    song.unlock();
+    song.sync(elapsed,timeline.length,change.fresh);
+    // A song that arrives late joins the run at the right point.
+    if(!song.seconds())song.load().then(()=> {
+      const later=performance.now();
+      if(!disposed&&timeline.running(later))song.sync(timeline.elapsed(later),timeline.length,false);
+    });
+    // Without the animation loop, one more frame puts the cat back.
+    clearTimeout(timer);
+    if(reduced)timer=setTimeout(redraw,(timeline.length-elapsed)*1000+50);
+    return change.kind;
   }
   return {
     ready:()=>ready,
     hit:raycaster=>ready&&raycaster.intersectObject(target,false).length>0,
+    prefetch:()=>{song.load();},
     position:()=>cat.getWorldPosition(new THREE.Vector3()).toArray(),
-    active:now=>started!==null&&now-started<SPIN_SECONDS*1000+100,
-    // Returns false before the model loads or while a song is under way.
-    start(now,reduced) {
-      if(!ready||started!==null&&now-started<SPIN_SECONDS*1000)return false;
-      rest();started=now;letters??=makeLetters();
-      parent.updateWorldMatrix(true,false);
-      head.set(at[0],at[1]+CAT_FIT[1]-.05,at[2]).applyMatrix4(parent.matrixWorld);
-      voice();
-      // Without the animation loop, one more frame clears the letters.
-      clearTimeout(timer);if(reduced)timer=setTimeout(redraw,SONG_SECONDS*1000+50);
-      return true;
-    },
+    active:now=>timeline.running(now),
+    // What a click did: 'tap', 'more' or 'oiia'; null if it changed nothing.
+    tap:(now,reduced)=>ready?apply(timeline.tap(now),now,reduced):null,
+    full:(now,reduced)=>ready?apply(timeline.full(now),now,reduced):null,
     update(now,reduced) {
-      if(started===null)return;
-      const elapsed=(now-started)/1000;
-      if(elapsed>=(reduced?SONG_SECONDS:SPIN_SECONDS)){rest();started=null;return;}
-      if(!reduced) {
-        const p=elapsed/SPIN_SECONDS,swell=Math.sin(Math.PI*p);
-        let beat=0;for(const note of SONG)if(elapsed>=note.at)beat=Math.exp(-(elapsed-note.at)*16);
-        cat.rotation.y=spinProgress(p)*SPIN_TURNS*Math.PI*2;
-        cat.position.y=base+.05*swell+.04*beat;
-        cat.scale.set(scale*(1-.04*swell),scale*(1+.07*swell),scale*(1-.04*swell));
-      }
+      if(idle)return;
+      if(!timeline.running(now)){settle();return;}
+      const elapsed=timeline.elapsed(now);
+      show(reduced?0:1+Math.floor(elapsed/FRAME_SECONDS)%SPIN_FRAMES);
+      if(!letters)return;
+      letters.forEach(sprite=>{sprite.visible=false;});
       // Letters rise from the cat's head in screen space, one per syllable,
-      // and grow when zoomed out so they stay legible.
-      // Reduced motion shows a single, still "OIIA" while the song plays.
+      // and grow when zoomed out so they stay legible. Reduced motion shows
+      // a single, still "OIIA" for as long as the egg lasts.
       right.setFromMatrixColumn(camera.matrixWorld,0);up.setFromMatrixColumn(camera.matrixWorld,1);
       const grow=Math.max(1,1.6/camera.zoom);
-      SONG.forEach((note,i)=> {
-        const sprite=letters[i],age=elapsed-note.at;
-        sprite.visible=reduced?note.phrase===0:age>=0&&age<LETTER_SECONDS;
-        if(!sprite.visible)return;
+      for(const note of schedule) {
+        const age=elapsed-note.at;
+        if(reduced?note.burst>0:age<0||age>=LETTER_SECONDS)continue;
+        const sprite=letters[(note.burst%2)*4+note.index];
         const life=reduced?.4:age/LETTER_SECONDS,size=LETTER_SIZE*grow*(reduced?1:backOut(Math.min(1,age/.14)));
-        sprite.scale.set(size,size,1);
+        sprite.visible=true;sprite.scale.set(size,size,1);
         sprite.position.copy(head).addScaledVector(right,(note.index-1.5)*.46*grow*(1+life*.6)).addScaledVector(up,(.3+1.1*(1-(1-life)**2))*grow);
         sprite.material.opacity=reduced?1:Math.min(1,(1-life)/.3);
-      });
+      }
     },
     dispose() {
-      clearTimeout(timer);
+      disposed=true;clearTimeout(timer);song.dispose();
       letters?.forEach(sprite=>sprite.removeFromParent());
       owned.forEach(value=>value.dispose());
-      audio?.close().catch(()=>{});
     },
   };
 }

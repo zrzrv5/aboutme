@@ -1,39 +1,46 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import * as THREE from 'three';
-import { batchWorld } from './batch-world.js';
-import { spinProgress, SONG, SONG_SECONDS, SPIN_SECONDS, LETTER_SECONDS, CAT_MODEL, buildOiiaCat } from './oiia-cat.js';
+import { createOiiaTimeline, letterSchedule, TAP_SECONDS, COMBO_GAP, FULL_SECONDS, LETTER_SECONDS } from './oiia-cat.js';
 
-test('the spin starts and stops at rest and always ends facing the sea',()=>{
-  assert.equal(spinProgress(0),0);assert.equal(spinProgress(1),1);
-  let previous=0,fastest=0;
-  for(let i=1;i<=1000;i++){const p=i/1000,value=spinProgress(p);assert.ok(value>=previous);fastest=Math.max(fastest,value-previous);previous=value;}
-  assert.ok(spinProgress(.002)<fastest&&1-spinProgress(.998)<fastest,'The cat jumps to full speed or stops dead');
+const ms=seconds=>seconds*1000;
+
+test('one click is a short spin that stops by itself',()=>{
+  const cat=createOiiaTimeline();
+  assert.deepEqual(cat.tap(0),{kind:'tap',fresh:true});
+  assert.ok(cat.running(ms(TAP_SECONDS-.05)));assert.equal(cat.fullAt,null);
+  assert.ok(!cat.running(ms(TAP_SECONDS)));
 });
 
-test('the song spells OIIA twice, inside the spin',()=>{
-  assert.equal(SONG.map(note=>note.letter).join(''),'OIIAOIIA');
-  for(const [i,note] of SONG.entries()) {
-    assert.ok(note.end>note.at);
-    if(SONG[i+1]?.phrase===note.phrase)assert.equal(SONG[i+1].at,note.end,'A phrase is sung in one breath');
-  }
-  assert.ok(SONG[4].at>SONG[3].end,'The phrases need a rest between them');
-  assert.ok(SONG_SECONDS<SPIN_SECONDS);
-  assert.ok(SONG.every(note=>note.at+LETTER_SECONDS<=SPIN_SECONDS),'A letter outlives the spin');
+test('three quick clicks turn the short spin into the full egg, which then plays out',()=>{
+  const cat=createOiiaTimeline(),step=COMBO_GAP-.1;
+  cat.tap(0);
+  assert.deepEqual(cat.tap(ms(step)),{kind:'more',fresh:false});
+  assert.ok(cat.length>=step+TAP_SECONDS,'A second click keeps the cat spinning');
+  assert.deepEqual(cat.tap(ms(2*step)),{kind:'oiia',fresh:false});
+  assert.equal(cat.fullAt,2*step);assert.equal(cat.length,2*step+FULL_SECONDS);
+  assert.equal(cat.tap(ms(2*step+.2)),null,'Clicks during the full egg change nothing');
+  assert.ok(cat.running(ms(2*step+FULL_SECONDS-.05)));assert.ok(!cat.running(ms(2*step+FULL_SECONDS)));
 });
 
-test('the cat is only clickable once its model loads, and spins after batching',()=>{
-  const scene=new THREE.Scene(),dock=new THREE.Group(),owned=new Set(),material=new THREE.MeshBasicMaterial();
-  dock.position.set(6.4,.35,6.5);dock.rotation.y=.36;scene.add(dock);
-  const mesh=(parent,geometry,_color,position=[0,0,0])=>{const model=new THREE.Mesh(geometry,material);model.position.fromArray(position);parent.add(model);owned.add(geometry);return model;};
-  let loaded;
-  const loadModel=(parent,url,{onReady})=>{assert.equal(url,CAT_MODEL);loaded=()=>{mesh(parent,new THREE.BoxGeometry(.5,.7,.4),'#fff',[0,.35,0]);onReady();};};
-  const cat=buildOiiaCat(dock,{mesh,loadModel,layer:scene,camera:new THREE.OrthographicCamera(),at:[.24,.06,1.5]});
-  batchWorld(scene,owned);scene.updateMatrixWorld(true);
-  const [x,y,z]=cat.position(),ray=new THREE.Raycaster(new THREE.Vector3(x,5,z),new THREE.Vector3(0,-1,0));
-  assert.equal(cat.hit(ray),false);assert.equal(cat.start(0,false),false);
-  loaded();scene.updateMatrixWorld(true);
-  assert.equal(cat.ready(),true);assert.equal(cat.hit(ray),true);
-  assert.equal(cat.hit(new THREE.Raycaster(new THREE.Vector3(x+1,5,z),new THREE.Vector3(0,-1,0))),false,'The click target spills off the dock');
-  cat.dispose();owned.forEach(g=>g.dispose());material.dispose();
+test('slow clicks never reach the full egg',()=>{
+  const cat=createOiiaTimeline(),step=COMBO_GAP+.1;
+  for(let i=0;i<6;i++)assert.notEqual(cat.tap(ms(i*step))?.kind,'oiia');
+});
+
+test('the full egg lasts as long as the song once it has loaded; typing starts it at once',()=>{
+  const cat=createOiiaTimeline(()=>5.5);
+  assert.deepEqual(cat.full(0),{kind:'oiia',fresh:true});
+  assert.equal(cat.fullAt,0);assert.equal(cat.length,5.5);
+  assert.equal(cat.full(ms(1)),null);
+  const late=createOiiaTimeline(()=>5.5);late.tap(0);late.tap(ms(.3));late.tap(ms(.6));
+  assert.equal(late.length,5.5,'An upgrade keeps the song running to its end');
+});
+
+test('OIIA letters spell the song and are gone when the egg ends',()=>{
+  const notes=letterSchedule(.8,4.8);
+  assert.equal(notes.map(note=>note.letter).join(''),'OIIA'.repeat(notes.length/4));
+  assert.ok(notes.length>=8);assert.equal(notes[0].at,.8);
+  assert.ok(notes.every(note=>note.at+LETTER_SECONDS<=4.8+1e-9));
+  // Two sprite sets: a burst ends before the next but one starts.
+  for(const note of notes)for(const other of notes)if(other.burst===note.burst+2)assert.ok(other.at>=note.at+LETTER_SECONDS);
 });
