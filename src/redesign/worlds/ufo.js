@@ -23,13 +23,13 @@ export function buildUfo({group,mesh,animations,ownMaterial,ownGeometry,ownTextu
     const a=i/BULBS*Math.PI*2,light=new THREE.Mesh(bulb,lit[i%2]);
     light.position.set(Math.cos(a)*.84,0,Math.sin(a)*.84);saucer.add(light);
   }
-  // Glorp sits in the cockpit; the hull's lip hides the bottom of the picture.
+  // Glorp sits on the cockpit floor, face clear of the rim when seen from above.
   const picture=new THREE.TextureLoader().load(GLORP,()=>{pilot.visible=true;redraw();});
   picture.colorSpace=THREE.SRGBColorSpace;ownTexture(picture);
   const pilot=new THREE.Sprite(ownMaterial(new THREE.SpriteMaterial({map:picture,alphaTest:.5,transparent:false,toneMapped:false})));
-  pilot.center.set(.5,0);pilot.scale.set(.62,.62,1);pilot.position.y=.02;pilot.visible=false;
+  pilot.center.set(.5,0);pilot.scale.set(.72,.72,1);pilot.position.y=.1;pilot.visible=false;
   ufo.add(pilot);
-  const dome=new THREE.Mesh(ownGeometry(new THREE.SphereGeometry(.42,20,10,0,Math.PI*2,0,Math.PI/2)),ownMaterial(new THREE.MeshBasicMaterial({color:'#a6f5cf',transparent:true,opacity:.38,depthWrite:false})));
+  const dome=new THREE.Mesh(ownGeometry(new THREE.SphereGeometry(.5,20,10,0,Math.PI*2,0,Math.PI/2)),ownMaterial(new THREE.MeshBasicMaterial({color:'#a6f5cf',transparent:true,opacity:.38,depthWrite:false})));
   dome.position.y=.1;dome.renderOrder=2;ufo.add(dome);
   // A faint tractor beam down to the water.
   const beam=new THREE.Mesh(ownGeometry(new THREE.CylinderGeometry(.22,.75,HOVER+.6,20,1,true).translate(0,-(HOVER+.6)/2-.12,0)),
