@@ -188,6 +188,14 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
         </Row>
       </section>
 
+      <section id="experience" tabIndex={-1}>
+        {JOURNEY.map((entry,index)=><Row key={entry.id} id={entry.id} label={index===0?<h2 className="mg-h">Along the way</h2>:null} note={entry.note} className="mg-job">
+          <h3 className="mg-entry-title">{entry.title}</h3><p className="mg-title">{entry.role}</p><p className="mg-when">{entry.period}</p><p>{entry.text}</p>
+          {entry.work?<dl className="mg-work-notes">{entry.work.map(work=><div key={work.title}><dt>{work.title}</dt><dd>{work.text}</dd></div>)}</dl>:null}
+          {entry.id==='sunwoda'?<details id="patents" tabIndex={-1} className="mg-reading" open={focusId==='patents'||undefined}><summary>{patents.length} granted patents from battery R&amp;D</summary><ul>{patents.map(p=><li key={p.id}><a href={p.href} target="_blank" rel="noreferrer">{p.title} · {p.id} <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><small className="mg-patent-dates">Filed {p.filed} · Granted {p.granted}</small></li>)}</ul></details>:null}
+        </Row>)}
+      </section>
+
       <section id="software" tabIndex={-1}>
         <Row label={<h2 className="mg-h">Software</h2>}/>
         <div className="mg-software-grid">
@@ -211,14 +219,6 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
             <h3>{project.title}</h3><p>{description}</p>{project.media?<ProjectMedia title={project.title} media={project.media} projectId={id}/>:null}{EXPERIMENT_STATUS[id]?<small className="mg-project-status">{EXPERIMENT_STATUS[id]}</small>:null}<ProjectLinks project={project}/>{EXPERIMENT_NOTES[id]?<aside className="mg-app-note mg-experiment-note">{EXPERIMENT_NOTES[id]}</aside>:null}
           </article>;})}
         </div>
-      </section>
-
-      <section id="experience" tabIndex={-1}>
-        {JOURNEY.map((entry,index)=><Row key={entry.id} id={entry.id} label={index===0?<h2 className="mg-h">Along the way</h2>:null} note={entry.note} className="mg-job">
-          <h3 className="mg-entry-title">{entry.title}</h3><p className="mg-title">{entry.role}</p><p className="mg-when">{entry.period}</p><p>{entry.text}</p>
-          {entry.work?<dl className="mg-work-notes">{entry.work.map(work=><div key={work.title}><dt>{work.title}</dt><dd>{work.text}</dd></div>)}</dl>:null}
-          {entry.id==='sunwoda'?<details id="patents" tabIndex={-1} className="mg-reading" open={focusId==='patents'||undefined}><summary>{patents.length} granted patents from battery R&amp;D</summary><ul>{patents.map(p=><li key={p.id}><a href={p.href} target="_blank" rel="noreferrer">{p.title} · {p.id} <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><small className="mg-patent-dates">Filed {p.filed} · Granted {p.granted}</small></li>)}</ul></details>:null}
-        </Row>)}
       </section>
 
       <section id="education" tabIndex={-1}>
