@@ -175,8 +175,10 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
           <h3 className="mg-entry-title">Defects and mechanical response</h3>
           <p>I also contribute to studies of how crystals deform, using ML potentials: dislocation slip in Mg–Bi alloys and high-entropy carbides, and photoplasticity in ZnS and CdTe, where constrained DFT provides the excited-state reference data.</p>
           <p className="mg-result">In our ZnS study, photoexcitation increased the stress needed for dislocations to move, helping explain why illumination makes the crystal harder to deform.</p>
-          <div className="mg-figures mg-figures-single"><ResearchFigure figure={figureById.zns} linked={false}/></div>
-          <p className="mg-project-links"><a data-analytics="publication" href="https://doi.org/10.1021/acsaenm.4c00280" target="_blank" rel="noreferrer">Carbide ceramics <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1103/l83s-dwqz" target="_blank" rel="noreferrer">Mg–Bi alloys <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1021/acsmaterialslett.4c01982" target="_blank" rel="noreferrer">ZnS photoplasticity <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1016/j.ijmecsci.2025.110765" target="_blank" rel="noreferrer">CdTe photoplasticity <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a></p>
+          <div className="mg-figure-links">
+            <div className="mg-figures mg-figures-single"><ResearchFigure figure={figureById.zns} linked={false}/></div>
+            <p className="mg-project-links"><a data-analytics="publication" href="https://doi.org/10.1021/acsaenm.4c00280" target="_blank" rel="noreferrer">Carbide ceramics <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1103/l83s-dwqz" target="_blank" rel="noreferrer">Mg–Bi alloys <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1021/acsmaterialslett.4c01982" target="_blank" rel="noreferrer">ZnS photoplasticity <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1016/j.ijmecsci.2025.110765" target="_blank" rel="noreferrer">CdTe photoplasticity <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a></p>
+          </div>
         </Row>
         <Row id="papers" className="mg-pub">
           <details className="mg-reading" open>
@@ -202,7 +204,7 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
         {['naiive','totk','amiibot','ling'].map(id=>{
           const app=byId[id];
           return <article key={id} id={id} tabIndex={-1} data-project-id={id} data-reading-focus={id} className="mg-app">
-            <h3 className="mg-entry-title">{app.title}</h3>
+            <div className="mg-app-head"><h3 className="mg-entry-title">{app.title}</h3><span className="mg-app-year">{appById[id].year}</span></div>
             <div className="mg-app-copy"><p>{APP_COPY[id]}</p><p className="mg-app-facts">{appById[id].meta}</p></div>
             <ProjectMedia title={app.title} media={app.media} projectId={id}/>
             <div className="mg-app-links"><ProjectLinks project={app}/></div>
