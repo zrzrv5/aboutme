@@ -9,3 +9,8 @@
 .project-media-dialog header button{min-height:44px;min-width:65px;background:none;border:0;text-decoration:underline;color:inherit}
 .project-media-dialog>img,.project-media-dialog>video{display:block;width:100%;height:auto;max-height:calc(90svh - 110px);background:#0e1117}
 body:has(.project-media-dialog[open]){overflow:hidden}
+.project-media-figure{margin:0}
+.project-media-figure .project-media-preview{max-width:none}
+.project-media-figure .project-media-preview img{object-fit:cover;background:#fff;outline:1px solid var(--rule,#d9d5ca);outline-offset:-1px}
+.project-media-figure .project-media-dialog>img{width:auto;max-width:100%;max-height:calc(90svh - 140px);margin:0 auto;background:#fff}
+.project-media-credit{margin-top:10px;font-size:12px;line-height:1.4;color:var(--dim,#6f6c64)}

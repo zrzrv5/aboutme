@@ -29,6 +29,33 @@ function ProjectLinks({project}) {
   return <p className="mg-project-links">{project.links.map(link=><a key={link.href} href={link.href} target="_blank" rel="noreferrer">{link.label}<span aria-hidden="true"> <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></span></a>)}</p>;
 }
 
+// Placeholders from the papers until the NAIIVE re-renders: swap src/preview/credit per entry.
+const RESEARCH_FIGURES=[
+  {id:'interface',title:'Lithium–electrolyte interfaces',doi:'10.1039/D6TA01253A',src:'/images/research/interface.webp',preview:'/images/research/interface-thumb.webp',width:900,height:425,
+    alt:'Simulation snapshots of lithium metal against 75Li₂S–25P₂S₅ glass: after 5 ns an ordered band has crystallized inside the interphase, magnified as a phosphorus-doped Li₂S lattice. A plot of interphase thickness over 10 ns shows this run levelling off while five runs that stayed amorphous keep thickening.',
+    source:'© The Authors · CC BY-NC 3.0',credit:'Fig. 5 from R. Zhou, K. Luo and Q. An, J. Mater. Chem. A, 2026. © The Authors, published by the Royal Society of Chemistry under CC BY-NC 3.0.'},
+  {id:'closo',title:'Closo-hydroborates',doi:'10.1021/acsaem.6c00367',src:'/images/research/closo.webp',preview:'/images/research/closo-thumb.webp',width:440,height:440,
+    alt:'Illustration: a sodium ion at a fork in the road. The Na₂B₁₀H₁₀ road is stormy and under construction with a low speed limit; the NaCB₉H₁₀ road is open with a limit four times higher.',
+    source:'© The Authors · CC BY-NC-ND 4.0',credit:'Table-of-contents graphic from R. Zhou, K. Luo and Q. An, ACS Appl. Energy Mater., 2026. © The Authors, published by the American Chemical Society under CC BY-NC-ND 4.0.'},
+  {id:'cover',title:'Na₂B₁₂H₁₂ cover article',doi:'10.1021/acselectrochem.4c00077',src:'/images/research/cover.webp',preview:'/images/research/cover-thumb.webp',width:330,height:439,
+    alt:'Cover of ACS Electrochemistry, February 2025: sodium ions moving through a cubic crystal of cage-shaped B₁₂H₁₂ anions.',
+    source:'© 2025 ACS',credit:'Cover of ACS Electrochemistry 1(2), February 2025. © 2025 American Chemical Society.'},
+  {id:'zns',title:'ZnS photoplasticity',doi:'10.1021/acsmaterialslett.4c01982',src:'/images/research/zns.webp',preview:'/images/research/zns-thumb.webp',width:720,height:451,
+    alt:'Illustration: Peierls stress against strain for a dislocation in ZnS. The line under light climbs higher than the line in darkness before the dislocation moves; a dislocation core is drawn in each region.',
+    source:'© 2024 ACS',credit:'Reprinted with permission from K. Luo, R. Zhou and Q. An, ACS Materials Lett., 2025, 7, 46–51. Copyright 2024 American Chemical Society.'},
+].map(figure=>({...figure,kind:'figure'}));
+const figureById=Object.fromEntries(RESEARCH_FIGURES.map(figure=>[figure.id,figure]));
+
+function ResearchFigure({figure, linked = true}) {
+  return <figure className="mg-figure" style={{'--ratio':figure.width/figure.height}}>
+    <ProjectMedia title={figure.title} media={figure} projectId={`figure-${figure.id}`} label={null}/>
+    <figcaption>
+      {linked?<a data-analytics="publication" href={`https://doi.org/${figure.doi}`} target="_blank" rel="noreferrer">{figure.title} <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a>:null}
+      <small>{figure.source}</small>
+    </figcaption>
+  </figure>;
+}
+
 const APP_NOTES={
   naiive:<Note arrow="up-left" tilt={-2}>needed it for my own simulations, so I built it</Note>,
   totk:<Note arrow="up-right" tilt={2}>two days from idea to #2 in the US App Store</Note>,
@@ -142,12 +169,13 @@ export default function MarginsSite({focusId, onSwitch, initialPublications}) {
           <h3 className="mg-entry-title">Ion transport and interfacial reactions</h3>
           <p>In solid electrolytes, I study how disorder, phase changes and interfaces shape ion transport. My systems include thiophosphate glasses, closo-hydroborates and metal oxyhalides.</p>
           <p className="mg-result">At lithium–sulfide interfaces, our simulations <Hl>linked faster interphase growth to phosphorus-rich chemistry</Hl> and showed how a crystallization event could slow further thickening.</p>
-          <p className="mg-project-links"><a data-analytics="publication" href="https://doi.org/10.1039/D6TA01253A" target="_blank" rel="noreferrer">Lithium–electrolyte interfaces <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1021/acsaem.6c00367" target="_blank" rel="noreferrer">Closo-hydroborates <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1021/acselectrochem.4c00077" target="_blank" rel="noreferrer">Na₂B₁₂H₁₂ cover article <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a></p>
+          <div className="mg-figures">{['interface','closo','cover'].map(id=><ResearchFigure key={id} figure={figureById[id]}/>)}</div>
         </Row>
         <Row>
           <h3 className="mg-entry-title">Defects and mechanical response</h3>
           <p>I also contribute to studies of how crystals deform, using ML potentials: dislocation slip in Mg–Bi alloys and high-entropy carbides, and photoplasticity in ZnS and CdTe, where constrained DFT provides the excited-state reference data.</p>
           <p className="mg-result">In our ZnS study, photoexcitation increased the stress needed for dislocations to move, helping explain why illumination makes the crystal harder to deform.</p>
+          <div className="mg-figures mg-figures-single"><ResearchFigure figure={figureById.zns} linked={false}/></div>
           <p className="mg-project-links"><a data-analytics="publication" href="https://doi.org/10.1021/acsaenm.4c00280" target="_blank" rel="noreferrer">Carbide ceramics <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1103/l83s-dwqz" target="_blank" rel="noreferrer">Mg–Bi alloys <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1021/acsmaterialslett.4c01982" target="_blank" rel="noreferrer">ZnS photoplasticity <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a><a data-analytics="publication" href="https://doi.org/10.1016/j.ijmecsci.2025.110765" target="_blank" rel="noreferrer">CdTe photoplasticity <ArrowUpRight className="inline-link-arrow" aria-hidden="true"/></a></p>
         </Row>
         <Row id="papers" className="mg-pub">

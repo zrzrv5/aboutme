@@ -296,7 +296,9 @@ body.mg-body-bg { background: #e8e6e0; }
   @page { size: letter; margin: 0.5in; }
   body.mg-body-bg { background: #fff; }
   .rz-margins { background: #fff; padding: 0; }
-  .mg-tools, .mg-after, .site-privacy { display: none !important; }
+  .mg-tools, .mg-after, .site-privacy, .site-skip { display: none !important; }
+  /* A letter page is narrower than 900px, so keep empty labels holding the first column. */
+  .mg-label:empty { display: block; }
   .mg-sheet { box-shadow: none; padding: 0; max-width: none; font-size: 11pt; }
   .mg-row { grid-template-columns: 1.1in minmax(0, 1fr); }
   .mg-head .mg-row { grid-template-columns: minmax(0, 1fr); }
@@ -409,3 +411,14 @@ html[data-margin-notes='off'] .mg-ink{display:none}
 @media print{.mg-fix-new{display:none}}
 .mg-experiment-note{min-height:0;margin-top:8px}
 @media print{.mg-experiment-note{display:none}}
+
+/* Research figures: equal-height cards whose widths follow each image's ratio. */
+.mg-figures{display:flex;align-items:flex-start;gap:18px;margin-top:16px}
+.mg-figure{flex:var(--ratio) 1 0;min-width:0;margin:0}
+.mg-figure figcaption{margin-top:6px;font-size:15px;line-height:1.35}
+.mg-figure figcaption a{border-bottom:1px solid var(--rule)}
+.mg-figure figcaption a:hover{border-color:var(--ink);text-decoration:none}
+.mg-figure figcaption small{display:block;margin-top:3px;font-size:12px;line-height:1.35;color:var(--dim)}
+.mg-figures-single{max-width:216px}
+@media(max-width:560px){.mg-figures{flex-wrap:wrap;gap:16px 14px}.mg-figures>.mg-figure:first-child:not(:last-child){flex-basis:100%}.mg-figures-single{max-width:260px}}
+@media print{#summary{break-inside:auto}#summary>.mg-row{break-inside:avoid}.mg-figures{max-width:4.4in;gap:.15in}.mg-figures-single{max-width:1.7in}.mg-figure{break-inside:avoid}.mg-figure figcaption{font-size:9pt}.mg-figure figcaption small{font-size:7.5pt}}
